@@ -1,0 +1,49 @@
+header{
+  background-color:var(--color-1);
+  display:flex;
+  height:var(--size-header);
+  box-shadow:0 4px 10px rgba(0,0,0,0.5);
+  padding-left:10px;
+  padding-right:10px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+header *{
+  color:var(--color-2);
+}
+
+header > *{
+  height:100%;
+}
+
+header ul,
+header li{
+  margin:0;
+  padding:0;
+}
+header li{
+  list-style:none;
+}
+
+/* Logo */
+
+header .logo{
+  padding:10px 0;
+}
+header .logo svg{
+  height:100%;
+  fill:white;
+}
+
+/* Menu */
+
+header .menu{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+
