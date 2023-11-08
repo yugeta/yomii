@@ -13,6 +13,9 @@ html,body{
   display:flex;
   flex-direction:column;
 } */
+body{
+  overflow-y:scroll;
+}
 
 *, *:before, *:after {
   -webkit-box-sizing  : border-box;
@@ -20,5 +23,8 @@ html,body{
        -o-box-sizing  : border-box;
       -ms-box-sizing  : border-box;
           box-sizing  : border-box;
+  font-size:14px;
 }
-
+.spacer-1{
+  height:1px;
+}

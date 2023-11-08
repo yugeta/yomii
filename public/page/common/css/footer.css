@@ -1,0 +1,33 @@
+footer{
+  height:var(--size-footer);
+  background-color:var(--color-1);
+}
+
+footer *{
+  color:var(--color-2);
+}
+
+footer ul,
+footer li{
+  margin:0;
+  padding:0;
+}
+footer li{
+  list-style:none;
+}
+
+footer .copy{
+  text-align:center;
+  padding:10px;
+}
+footer .menu{
+  display:flex;
+  padding:10px;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+}
+
+footer .menu a{
+  text-decoration:none;
+}

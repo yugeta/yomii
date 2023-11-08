@@ -46,4 +46,7 @@ header .menu{
   gap:10px;
 }
 
+header .menu a{
+  text-decoration:none;
+}
 

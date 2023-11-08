@@ -1,12 +1,14 @@
-import { Header }  from "./header.js"
-import { Footer }  from "./footer.js"
+// import { Header }  from "./header.js"
+// import { Footer }  from "./footer.js"
 import { Content } from "./content.js"
+import { SvgImport } from '../../../asset/js/lib/svg_import.js'
 
 class Main{
   constructor(){
-    new Header({callback:this.loaded.bind(this)})
-    new Footer({callback:this.loaded.bind(this)})
+    // new Header({callback:this.loaded.bind(this)})
+    // new Footer({callback:this.loaded.bind(this)})
     new Content({callback:this.loaded.bind(this)})
+    new SvgImport()
   }
 
   loaded(e){
