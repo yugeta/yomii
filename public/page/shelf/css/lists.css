@@ -1,0 +1,39 @@
+ul.lists{
+  width:100%;
+  display:block;
+  /* flex-direction:column; */
+  margin:0 auto;
+  padding:0;
+  gap:2px;
+  border:1px solid black;
+}
+ul.lists li{
+  display:inline-block;
+  list-style:none;
+  margin:0;
+  padding:10px 0;
+  
+  /* cursor:pointer; */
+  width:120px;
+  margin:5px;
+  border:1px solid transparent;
+  vertical-align:top;
+}
+ul.lists li[data-status="active"]{
+  border:1px dashed #666;
+}
+/* ul.lists li:hover{
+  background-color:#FFA;
+} */
+
+ul.lists li .icon{
+  width:64px;
+  display:block;
+  margin:0 auto;
+}
+ul.lists li .name{
+  white-space:pre-wrap;
+  word-break:break-all;
+  font-size:0.8em;
+  text-align:center;
+}

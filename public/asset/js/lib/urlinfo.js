@@ -1,7 +1,7 @@
 export class Urlinfo{
   constructor(){}
   get url(){
-    return this.protocol +'://'+ this.host + this.path
+    return this.protocol +'://'+ this.host + (this.port !== 80 && this.port !== 443 ? `:${this.port}` : '') + this.path
   }
   // 全部
   get href(){
@@ -41,8 +41,28 @@ export class Urlinfo{
   }
   // ファイル名
   get filename(){
-    return this.path.split('/').pop()
+    return this.path.split('/').pop() || ''
   }
+
+  get filename_name(){
+    if(this.filename){
+      const sp = this.filename.split(".")
+      return sp.slice(0, sp.length-1).join(".")
+    }
+    else{
+      return ""
+    }
+  }
+  get filename_ext(){
+    if(this.filename){
+      const sp = this.filename.split(".")
+      return sp[sp.length-1]
+    }
+    else{
+      return ""
+    }
+  }
+
   // 階層
   get dir(){
     return this.path.split('/').slice(0,-1).join('/')
@@ -54,7 +74,7 @@ export class Urlinfo{
     const query = `?`+ Object.entries(queries).map(e => {return `${e[0]}=${e[1]}`}).join('&')
     const hash  = this.hash || ''
     const url = `${this.url}${query}${hash}`
-    history.pushState({} , null , url);
+    history.pushState(null , null , url);
   }
   del_query(key){
     const queries = this.queries
@@ -64,6 +84,6 @@ export class Urlinfo{
     const query = `?`+ Object.entries(queries).map(e => {return `${e[0]}=${e[1]}`}).join('&')
     const hash  = this.hash || ''
     const url = `${this.url}${query}${hash}`
-    history.pushState({} , null , url);
+    history.pushState(null , null , url);
   }
 }

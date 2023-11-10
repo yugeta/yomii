@@ -1,3 +1,5 @@
+import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
+
 export class Content{
   constructor(options){
     this.options = options || {}
@@ -6,7 +8,11 @@ export class Content{
   }
   elm_root = document.querySelector('main')
 
-  default_page_name = 'index'
+  default_name = "index"
+
+  get default_page_name(){
+    return new Urlinfo().filename_name || this.default_name
+  }
 
   get queries(){
     const query = location.search.replace(/^\?/,'')
@@ -16,7 +22,7 @@ export class Content{
     return this.queries.p || this.default_page_name
   }
   get file_name(){
-    return this.queries.f || this.default_page_name
+    return this.queries.f || this.default_name
   }
 
   load(){

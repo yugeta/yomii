@@ -1,2 +1,9 @@
-/trash
-.bak
+.DS_Store
+Thumbs.db
+.vscode
+
+*.bak
+
+trash/
+data/
+
