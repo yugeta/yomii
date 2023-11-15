@@ -1,0 +1,54 @@
+FROM php:8.1-fpm-alpine
+
+RUN apk update && \
+  apk add --update --no-cache \
+  libjpeg-turbo-dev \
+  libwebp-dev \
+  libpng-dev \
+  zlib-dev \
+  libarchive-tools
+
+# RUN apk update && apk add -u zlib-dev \
+#   && docker-php-ext-install zip
+
+RUN docker-php-ext-configure gd --with-jpeg
+RUN docker-php-ext-install -j$(nproc) gd
+
+# Archive
+RUN apk update && apk add -u curl
+RUN apk update && apk add -u zip
+RUN apk update && apk add -u unzip
+RUN apk update && apk add -u vim
+RUN apk update && apk add -u libpng-dev
+RUN apk update && apk add -u iputils-ping
+RUN apk update && apk add -u bc
+
+
+# RUN apk update && apk search unar
+RUN apk update && apk add -u unarj
+# RUN apk update && apk add -u unar
+# RUN apk update && apk add -u libfreetype6-dev
+
+# RUN apk update && \
+#   apk add -u busybox && \
+#   apk add --update --no-cache \
+#   syslog-ng \
+#   cyrus-sasl \
+#   postfix \
+#   vim
+
+# COPY main.cf /etc/postfix/
+# COPY sasl_passwd /etc/postfix/
+# RUN /usr/sbin/postmap /etc/postfix/sasl_passwd
+
+# COPY entrypoint.sh /
+# ENTRYPOINT ["sh", "/entrypoint.sh"]
+
+# Unar
+# RUN apk update && apk add -u alpine-sdk
+# RUN apk update && apk add -u libbz2
+# # RUN apk update && apk add -u libgnustep-base
+# RUN apk update && apk add -u libicu
+# RUN apk update && apk add -u libssl
+# RUN apk update && apk add -u libz
+

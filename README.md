@@ -50,6 +50,29 @@ Author : Yugeta.Koji
 # URL
 - https://book.myntinc.com
 
+# Docker
+- php+ubuntuコマンドを使うので、独自のdocker-composeを実行して開発環境を構築する。
+```
+# 実行手順
+cd docker
+docker-compose up -d
+```
+
+# Server modules
+- php : zipArchive
+- Linux : lang-ja
+
+# Upload(convert)
+- 使っているPCやスマホなどからのzipやpdfファイルをアップロードして、jsonデータ(yomi)を取得する。
+- web上にあるURLを指定して、jsonデータ(yomi)を取得する。
+- 任意のオープンストレージ（API等）にアクセス（ログイン）をして、jsonデータ(yomi)を取得する。
+
+- 取得したjsonデータはローカルに保存しておくか、サーバーにプール（有料）することが選択できる。
+
+# Data
+- 変換前のbookデータ(zipやpdf)ファイルをサーバーにプールしておくことができる（有料）
+- 変換後のjsonデータをサーバープールしてある場合、1ページずつの画像データをブラウザで読むことができる。（軽量でスピードが早い）
+- 無料で使い続けたければ、ローカルjsonデータがオススメ。
 
 
 
