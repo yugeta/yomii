@@ -2,7 +2,8 @@
 
 
 set_time_limit(120);
-require_once dirname(__FILE__) .'/../../../plugin/FPDI/src/autoload.php';
+require_once 'vendor/autoload.php';
+// require_once dirname(__FILE__) .'/../../../plugin/FPDI/src/autoload.php';
 // require_once dirname(__FILE__) .'/../../../plugin/FPDI/src/Tfpdf/Fpdi.php';
 // use setasign\Fpdi\Tfpdf\FpdfTpl;
 use setasign\Fpdi\Fpdi;
@@ -18,11 +19,33 @@ class Pdf{
   function __construct($filepath=null){
     $this->filepath = dirname(__FILE__) ."/../../../".$filepath;
     // die($this->filepath);
+    // echo is_file($this->filepath)." @ ".$this->filepath.PHP_EOL;
 
+    // pdftoppm
+
+
+    // // ImageMagick
+    // // $pdfFilePath = 'path/to/your/file.pdf';
+    // $outputImagePath = 'path/to/output/image.png';
+
+    // // ImageMagickを使用してPDFの最初のページを画像に変換
+    // // echo $this->filepath[0].PHP_EOL;
+    // exec("convert {$this->filepath} out.png");
+
+    // echo "Image saved as $outputImagePath";
+
+    /*
     // FPDI
     // initiate FPDI
     $pdf = new Fpdi();
-    // $pageCount = $pdf->setSourceFile($this->$filepath);
+    $file = $this->filepath;
+    $pageCount = $pdf->setSourceFile($file);
+    echo $pageCount;exit();
+    
+    $tplId  = $pdf->importPage(1);
+    $pdf->useTemplate($tplId, 10, 10, 100);
+    $pdf->Output(); 
+    // echo $pageData;
     // print_r($pageCount);
     // // add a page
     // $pdf->AddPage();
@@ -35,7 +58,7 @@ class Pdf{
     // $pdf->useTemplate($tplId, 10, 10, 100);
 
     // $pdf->Output();   
-
+    */
 
     
     // $this->zip = new ZipArchive;

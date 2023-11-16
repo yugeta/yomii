@@ -65,6 +65,8 @@ docker-compose up -d
 - FPDI
 > git clone https://github.com/Setasign/FPDI.git
 
+# composer
+> composer update
 
 
 # Server modules
