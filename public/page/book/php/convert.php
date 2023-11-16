@@ -35,7 +35,7 @@ class Convert{
   function zip(){
     require_once "zip.php";
     $zip = new Zip($this->path());
-    $zip->convert_book();
+    // $zip->convert_book();
   }
 
   function pdf(){

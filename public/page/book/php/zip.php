@@ -8,11 +8,27 @@ class Zip{
   var $filepath = null;
   var $zip = null;
   var $datas = [];
+  public static $info = [];
 
   function __construct($filepath=null){
     $this->filepath = $filepath;
-    $this->zip = new ZipArchive;
-    $this->set_lists();
+    $this->uuid = date("YmdHis") ."_". uniqid();
+
+    // $this->zip = new ZipArchive;
+    // $this->set_lists();
+
+    $this->get_info();
+
+    echo "<pre>";
+    print_r(Zip::$info);
+  }
+
+  function get_info(){
+    Zip::$info = [
+      "file" => $this->filepath,
+      "uuid" => $this->uuid,
+    ];
+    
   }
 
   function set_lists(){

@@ -9,8 +9,15 @@ $page  = @$_GET["page"];
 
 // require_once "page/book/php/zip.php";
 // $zip = new Zip($path);
+// echo "-".$_POST.PHP_EOL;
+// print_r($_POST);
 
-switch(@$_GET["mode"]){
+switch(@$_POST["mode"]){
+  case "upload":
+    echo "+";
+    print_r($_FILES);
+    break;
+
   case "convert":
     require_once "page/book/php/convert.php";
     new Convert("{$dir}{$book}");

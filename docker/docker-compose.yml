@@ -13,7 +13,8 @@ services:
     container_name : php
     build : ./php
     volumes:
-      - ./php/php.ini:/etc/php81/php.ini
+      # - ./php/php.ini:/etc/php81/php.ini
+      - ./php/php.ini:/usr/local/etc/php/php.ini
       - ../public:/var/www/html
     working_dir: /var/www/html
 

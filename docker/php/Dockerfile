@@ -1,5 +1,7 @@
 FROM php:8.1-fpm-alpine
 
+# COPY php.ini /etc/php81/
+
 RUN apk update && \
   apk add --update --no-cache \
   libjpeg-turbo-dev \
@@ -39,3 +41,6 @@ ENV TZ=Asia/Tokyo \
   LANG=ja_JP.UTF-8 \
   LANGUAGE=ja_JP:ja \
   LC_ALL=ja_JP.UTF-8
+
+# CMD [ "service php restart" ]
+# ENTRYPOINT ["sh", "/entrypoint.sh"]
