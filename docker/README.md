@@ -24,4 +24,9 @@ Author : Yugeta.Koji
 - nginx
 > docker exec -it nginx sh
 
+# Howto
+- Dockerfileなどを更新した際は、以下のコマンドでビルドし直し
+> docker-compose build --no-cache
 
+- <none>となったイメージファイルを削除
+> docker rmi %image-id
