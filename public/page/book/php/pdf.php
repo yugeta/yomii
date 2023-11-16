@@ -1,7 +1,7 @@
 <?php
 
 
-set_time_limit(120);
+// set_time_limit(120);
 require_once 'vendor/autoload.php';
 // require_once dirname(__FILE__) .'/../../../plugin/FPDI/src/autoload.php';
 // require_once dirname(__FILE__) .'/../../../plugin/FPDI/src/Tfpdf/Fpdi.php';
@@ -14,15 +14,27 @@ class Pdf{
   var $uuid     = null;
   var $filepath = null;
   // var $zip = null;
-  var $datas = [];
+  var $datas    = [];
+  var $quality  = 30;
+  var $max_size = 1000;
 
   function __construct($filepath=null){
+    if(!$filepath){return;}
     $this->filepath = dirname(__FILE__) ."/../../../".$filepath;
+    $this->uuid = date("YmdHis") ."_". uniqid();
+    $out_path = $this->temp_dir.$this->uuid."/";
+    $this->make_dir($out_path);
+    $this->pdf2png($this->filepath , $out_path);
+    $this->png2webp($out_path, $this->quality);
     // die($this->filepath);
     // echo is_file($this->filepath)." @ ".$this->filepath.PHP_EOL;
 
     // pdftoppm
-
+    // $cmd = 'pdfimages "'.$this->filepath.'" -f '.($pageNum+1).' -l '. ($pageNum+1) .' -'. $cmd_ext_option .' '. $archiveDir .'file';
+    // pdf->png
+    // $cmd = "pdftoppm -png {$this->filepath} {$this->temp_dir}out -cropbox";
+    // exec($cmd);
+    // 
 
     // // ImageMagick
     // // $pdfFilePath = 'path/to/your/file.pdf';
@@ -60,10 +72,69 @@ class Pdf{
     // $pdf->Output();   
     */
 
-    
     // $this->zip = new ZipArchive;
     // $this->set_lists();
   }
+
+  function make_dir($dir=null){
+    if(!is_dir($dir)){
+      mkdir($dir , 0777 , true);
+    }
+  }
+
+  function pdf2png($pdf_file=null, $out_path=null){
+    $cmd = "pdftoppm -png {$pdf_file} {$out_path}out -cropbox";
+    // $cmd = "pdftoppm -png {$pdf_file} {$out_path}out -f 1 -l 1 -cropbox";
+    exec($cmd);
+  }
+  
+  function png2webp($out_path=null, $quality=50){
+    $files = scandir($out_path);
+    for($i=0; $i<count($files); $i++){
+      if(!preg_match("/^(.+?)\.png$/", $files[$i] , $match)){continue;}
+      $path = $out_path. $files[$i];
+      $png = imagecreatefrompng($path);
+      $png = $this->resize_image($png);
+      $webp_file = $out_path. $match[1].".webp";
+      imagewebp($png , $webp_file, $quality);
+      if(is_file($webp_file)){
+        unlink($path);
+      }
+    }
+  }
+
+  function resize_image($image=null, $ext=null){
+    $max_size = 1000;
+    $x1 = imagesx($image);
+    $y1 = imagesy($image);
+    $x2 = $y2 = $max_size;
+    // landscape
+    if($x1 > $y1){
+      if($x1 < $max_size){
+        return $image;
+      }
+      $rate = $x1 / $max_size;
+      $x2 = $max_size;
+      $y2 = floor($y1 / $rate);
+
+    }
+    // horizontal
+    else{
+      if($y1 < $max_size){
+        return $image;
+      }
+      $rate = $y1 / $max_size;
+      $y2 = $max_size;
+      $x2 = floor($x1 / $rate);
+    }
+    $image2 = imagecreatetruecolor($x2, $y2);
+    imagecopyresampled($image2, $image, 0, 0, 0, 0, $x2, $y2, $x1, $y1);
+    return $image2;
+  }
+
+
+
+
 
   function set_lists(){
     $this->zip->open($this->filepath);
@@ -172,34 +243,7 @@ class Pdf{
     // return $tmp_dir." @ ".count($this->datas)." @ ". (microtime(true) - $start_time);
   }
 
-  function resize_image($image=null, $ext=null){
-    $max_size = 1000;
-    $x1 = imagesx($image);
-    $y1 = imagesy($image);
-    $x2 = $y2 = $max_size;
-    // landscape
-    if($x1 > $y1){
-      if($x1 < $max_size){
-        return $image;
-      }
-      $rate = $x1 / $max_size;
-      $x2 = $max_size;
-      $y2 = floor($y1 / $rate);
-
-    }
-    // horizontal
-    else{
-      if($y1 < $max_size){
-        return $image;
-      }
-      $rate = $y1 / $max_size;
-      $y2 = $max_size;
-      $x2 = floor($x1 / $rate);
-    }
-    $image2 = imagecreatetruecolor($x2, $y2);
-    imagecopyresampled($image2, $image, 0, 0, 0, 0, $x2, $y2, $x1, $y1);
-    return $image2;
-  }
+  
 
   function create_json($tmp_dir=null){
     $files = scandir($tmp_dir);
