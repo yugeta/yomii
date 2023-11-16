@@ -6,12 +6,15 @@ $book  = @$_GET['book'];
 $path  = "{$shelf}{$dir}{$book}";
 $page  = @$_GET["page"];
 
-require_once "page/book/php/zip.php";
-$zip = new Zip($path);
+
+// require_once "page/book/php/zip.php";
+// $zip = new Zip($path);
 
 switch(@$_GET["mode"]){
   case "convert":
-    $zip->convert_book();
+    require_once "page/book/php/convert.php";
+    new Convert("{$dir}{$book}");
+    // $zip->convert_book($dir, $book);
     // echo $json;
     break;
 

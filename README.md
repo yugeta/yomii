@@ -58,6 +58,15 @@ cd docker
 docker-compose up -d
 ```
 
+# Plugin
+- TCPDF
+> git clone https://github.com/tecnickcom/TCPDF
+
+- FPDI
+> git clone https://github.com/Setasign/FPDI.git
+
+
+
 # Server modules
 - php : zipArchive
 - Linux : lang-ja
