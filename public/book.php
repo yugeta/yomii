@@ -1,10 +1,10 @@
 <?php
 
-$shelf = "data/shelf/";
-$dir   = @$_GET['dir'];
-$book  = @$_GET['book'];
-$path  = "{$shelf}{$dir}{$book}";
-$page  = @$_GET["page"];
+// $shelf = "data/shelf/";
+// $dir   = @$_GET['dir'];
+// $book  = @$_GET['book'];
+// $path  = "{$shelf}{$dir}{$book}";
+// $page  = @$_GET["page"];
 
 
 // require_once "page/book/php/zip.php";
@@ -14,12 +14,17 @@ $page  = @$_GET["page"];
 
 switch(@$_POST["mode"]){
   case "upload":
-    echo "+";
-    print_r($_FILES);
+    require_once dirname(__FILE__). "/page/book/php/upload.php";
+    $upload = new Upload($_FILES['book']);
+    $datas = [
+      "files" => $upload->files,
+      "info"  => $upload->info,
+    ];
+    echo json_encode($datas , JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     break;
 
   case "convert":
-    require_once "page/book/php/convert.php";
+    require_once dirname(__FILE__). "/page/book/php/convert.php";
     new Convert("{$dir}{$book}");
     // $zip->convert_book($dir, $book);
     // echo $json;

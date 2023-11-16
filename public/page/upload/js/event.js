@@ -8,6 +8,9 @@ export class Event{
     if(this.button_upload){
       this.button_upload.addEventListener("click" , this.upload.bind(this))
     }
+    if(this.input_file){
+      this.input_file.addEventListener("change" , this.upload.bind(this))
+    }
   }
 
   form_upload = document.forms.upload
@@ -29,7 +32,10 @@ export class Event{
     xhr.send(form_data)
   }
   posted(e){
-    console.log(e.target.response)
+    // console.log(e.target.response);
+    if(!e || !e.target || !e.target.response){return}
+    const res = JSON.parse(e.target.response)
+    console.log(res)
   }
 
 }
