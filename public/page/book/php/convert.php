@@ -1,51 +1,33 @@
 <?php
 
-class Convert{
-  var $shelf = "data/shelf/";
-  var $temp  = "data/tmp/";
-  var $file  = null;
-  var $ext   = null;
+require_once dirname(__FILE__). "/common.php";
 
-  function __construct($file=null){
-    $this->file  = $file;
-    $this->ext = $this->ext();
-    switch($this->ext){
-      case "zip":
-        $this->zip();
+class Convert{
+  var $uuid    = null;
+  var $setting = null;
+
+  function __construct($query=[]){
+    if(!$query["uuid"]){return;}
+    $setting = Common::get_setting_data($query["uuid"]);
+    if(!$setting){return;}
+
+    switch($setting["ext"]){
+      case "pdf":
+        require_once dirname(__FILE__)."/pdf.php";
+        $pdf = new Pdf($setting);
+        $pdf->convert();
         break;
 
-      case "pdf":
-        $this->pdf();
+      case "zip":
+        require_once dirname(__FILE__)."/zip.php";
+        $zip = new Zip($setting);
+        $zip->convert();
         break;
 
       case "epub":
-        $this->epub();
+        die("Unimplemented");
         break;
     }
-  }
-
-  function ext(){
-    return pathinfo($this->file, PATHINFO_EXTENSION);
-  }
-
-  function path(){
-    return "{$this->shelf}{$this->file}";
-  }
-
-  function zip(){
-    require_once "zip.php";
-    $zip = new Zip($this->path());
-    // $zip->convert_book();
-  }
-
-  function pdf(){
-    require_once "pdf.php";
-    $pdf = new Pdf($this->path());
-    // $pdf->convert_book();
-  }
-
-  function epub(){
-    die("Unimplemented");
   }
 
 }

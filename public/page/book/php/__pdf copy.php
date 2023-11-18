@@ -1,114 +1,87 @@
 <?php
 
-require_once dirname(__FILE__). "/common.php";
-
 class Pdf{
   var $temp_dir = "data/tmp/";
-  var $setting  = [];
   var $uuid     = null;
-  var $ext      = null;
-  var $path     = null;
+  var $filepath = null;
   var $datas    = [];
   public static $info = [];
 
   var $quality  = 30;
   var $max_size = 1000;
 
-  function __construct($setting=[]){
-    if(!$setting){return;}
-    $this->setting = $setting;
-    // $this->path = $setting["path"];
-    // $this->uuid = $setting["uuid"];
-    // $this->ext  = $setting["ext"];
+  function __construct($filepath=null){
+    if(!$filepath){return;}
+    $this->filepath = dirname(__FILE__) ."/../../../".$filepath;
+    $this->uuid = date("YmdHis") ."_". uniqid();
 
-    // Pdf::$info["file"] = $filepath;
-    // Pdf::$info["uuid"] = $this->uuid;
-    // $info = $this->get_pdfinfo();
-    // print_r($info);
-    // Pdf::$info = array_merge(Pdf::$info , $info);
+    Pdf::$info["file"] = $filepath;
+    Pdf::$info["uuid"] = $this->uuid;
+    $info = $this->get_pdfinfo();
+    Pdf::$info = array_merge(Pdf::$info , $info);
 
     // $out_path = $this->temp_dir.$this->uuid."/";
     // $this->make_dir($out_path);
     // $this->pdf2png($this->filepath , $out_path);
     // $this->png2webp($out_path, $this->quality);
 
-    // echo "<pre>";
-    // print_r(Pdf::$info);
+    echo "<pre>";
+    print_r(Pdf::$info);
   }
 
-  // function get_pdfinfo(){
-  //   $cmd = "pdfinfo {$this->path}";
-  //   $datas = [];
-  //   exec($cmd , $res);
-  //   for($i=0; $i<count($res); $i++){
-  //     if(!$res[$i]){continue;}
-  //     $sp = explode(":", $res[$i]);
-  //     $key = trim($sp[0]);
-  //     $val = trim($sp[1]);
-  //     // blank
-  //     if($val === ""){
-  //       $datas[$key] = null;
-  //     }
-  //     // number
-  //     else if(preg_match("/^\d+?$/" , $val)){
-  //       $datas[$key] = (int)$val;
-  //     }
-  //     // string
-  //     else{
-  //       $datas[$key] = $val;
-  //     }
-  //   }
-  //   return $datas;
-  // }
+  function get_pdfinfo(){
+    $cmd = "pdfinfo {$this->filepath}";
+    $datas = [];
+    exec($cmd , $res);
+    for($i=0; $i<count($res); $i++){
+      if(!$res[$i]){continue;}
+      $sp = explode(":", $res[$i]);
+      $key = trim($sp[0]);
+      $val = trim($sp[1]);
+      // blank
+      if($val === ""){
+        $datas[$key] = null;
+      }
+      // number
+      else if(preg_match("/^\d+?$/" , $val)){
+        $datas[$key] = (int)$val;
+      }
+      // string
+      else{
+        $datas[$key] = $val;
+      }
+    }
+    return $datas;
+  }
 
-  // function make_dir($dir=null){
-  //   if(!is_dir($dir)){
-  //     mkdir($dir , 0777 , true);
-  //   }
-  // }
-
-  function convert(){
-    $dir  = $this->setting["tmp_dir"];
-    $file = $dir .DIRECTORY_SEPARATOR. $this->setting["origin_file"];
-    for($i=1; $i<=$this->setting["page_count"]; $i++){
-      echo $i.PHP_EOL;
-      $this->pdf2png($file , $dir , $i);
-      $this->png2webp($dir , $i);
+  function make_dir($dir=null){
+    if(!is_dir($dir)){
+      mkdir($dir , 0777 , true);
     }
   }
 
-  function pdf2png($pdf_file=null, $out_path=null , $page=null){
-    $cmd = "pdftoppm -png {$pdf_file} {$out_path}/out -f {$page} -l {$page} -cropbox";
+  function pdf2png($pdf_file=null, $out_path=null){
+    $cmd = "pdftoppm -png {$pdf_file} {$out_path}out -cropbox";
     // $cmd = "pdftoppm -png {$pdf_file} {$out_path}out -f 1 -l 1 -cropbox";
     exec($cmd);
   }
   
-  function png2webp($out_path=null, $page=null, $quality=50){
-    $num  = sprintf("%03d" , $page);
-    $ext  = $this->setting["ext"];
-    $path = "{$out_path}/out-{$num}.png";
-    $webp = "{$out_path}/out-{$num}.webp";
-    // echo $path.PHP_EOL;
-    // echo $webp.PHP_EOL;
-    $png = imagecreatefrompng($path);
-    $png = $this->resize_image($png);
-    imagewebp($png , $webp, $quality);
-    unlink($path);
-    // $files = scandir($out_path);
-    // for($i=0; $i<count($files); $i++){
-    //   if(!preg_match("/^(.+?)\.png$/", $files[$i] , $match)){continue;}
-    //   $path = $out_path. $files[$i];
-    //   $png = imagecreatefrompng($path);
-    //   $png = $this->resize_image($png);
-    //   $webp_file = $out_path. $match[1].".webp";
-    //   imagewebp($png , $webp_file, $quality);
-    //   if(is_file($webp_file)){
-    //     unlink($path);
-    //   }
-    // }
+  function png2webp($out_path=null, $quality=50){
+    $files = scandir($out_path);
+    for($i=0; $i<count($files); $i++){
+      if(!preg_match("/^(.+?)\.png$/", $files[$i] , $match)){continue;}
+      $path = $out_path. $files[$i];
+      $png = imagecreatefrompng($path);
+      $png = $this->resize_image($png);
+      $webp_file = $out_path. $match[1].".webp";
+      imagewebp($png , $webp_file, $quality);
+      if(is_file($webp_file)){
+        unlink($path);
+      }
+    }
   }
 
-  function resize_image($image=null){
+  function resize_image($image=null, $ext=null){
     $max_size = 1000;
     $x1 = imagesx($image);
     $y1 = imagesy($image);

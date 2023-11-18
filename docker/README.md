@@ -30,3 +30,6 @@ Author : Yugeta.Koji
 
 - <none>となったイメージファイルを削除
 > docker rmi %image-id
+
+- dockerを起動したら次のURLでアクセスできる
+> http://localhost:8088/
