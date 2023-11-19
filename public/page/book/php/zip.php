@@ -15,29 +15,33 @@ class Zip{
   }
 
   function convert(){
-    echo $this->setting["page_count"]." ";
     $zip      = new ZipArchive;
     $dir      = $this->setting["tmp_dir"];
     $file     = $dir .DIRECTORY_SEPARATOR. $this->setting["origin_file"];
     $zip->open($file);
     $jsons    = [];
-
+    $names    = [];
     for($i=0; $i<$this->setting["page_count"]; $i++){
-      echo PHP_EOL. $i." ";
       $name = $zip->getNameIndex($i);
       $name = trim($name);
+      // progress
+      $progress_data = [
+        "page_count" => $this->setting["page_count"],
+        "current"    => $i+1,
+      ];
+      Common::progress_save($this->setting["uuid"] , $progress_data);
+
       // フォルダの場合は処理を飛ばす
       if(!$name || preg_match("/\/$/", $name)){continue;}
       // 画像ファイルのみをたいしょうにする。
       $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-      echo $name." ".$ext." ";
       if(!$this->is_target_ext($ext)){continue;}
       $data = $zip->getFromIndex($i);
       $image = imagecreatefromstring($data);
       $image = $this->resize_image($image, $ext);
       $num = sprintf("%05d" , $i);
       $webp_path = "{$dir}/out-{$num}.webp";
-      echo $webp_path." ";
+      echo $webp_path.PHP_EOL;
       imagewebp($image , $webp_path , $this->quality);
       imagedestroy($image);
       $base64 = base64_encode(file_get_contents($webp_path));

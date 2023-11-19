@@ -46,7 +46,6 @@ switch(@$_POST["mode"]){
       "status" => $res ? "success" : "error",
       "data"   => $res,
     ];
-
     echo json_encode($data , JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     break;
 
@@ -55,9 +54,20 @@ switch(@$_POST["mode"]){
     new Convert($_POST);
     break;
 
-  case "json":
-    $res = $zip->convert_json();
-    echo $res;
+  case "convert_progress":
+    echo Common::progress_load($_POST['uuid']);
+    break;
+
+  case "get_json":
+    $json = "";
+    if(is_file(Common::get_book_json($_POST['uuid']))){
+      $json = file_get_contents(Common::get_book_json($_POST['uuid']));
+      $data = json_decode($json , true);
+      $name = pathinfo($data["setting"]["files"]["name"] , PATHINFO_FILENAME);
+      $data["name"] = $name.".json";
+      $json = json_encode($data , JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+    echo $json;
     break;
 
   case "view":

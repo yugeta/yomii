@@ -22,13 +22,23 @@ class Pdf{
     for($i=0; $i<$this->setting["page_count"]; $i++){
       $page_num = $i+1;
       $page_str = sprintf("%05d", $page_num);
+
+      // progress
+      $progress_data = [
+        "page_count" => $this->setting["page_count"],
+        "current"    => $page_num,
+      ];
+      Common::progress_save($this->setting["uuid"] , $progress_data);
+
       // png変換
       $out_path = "{$dir}/out-{$page_str}";
       $png_path = "{$out_path}.png";
       $this->pdf2png($file , $out_path , $page_num);
+
       // webp変換
       $webp_path = "{$dir}/out-{$page_str}.webp";
       $this->png2webp($png_path, $webp_path);
+      
       // json変換
       $json = $this->webp2json($webp_path);
       $jsons[$i] = $json;
