@@ -7,10 +7,7 @@ export class Upload{
   }
 
   post(){
-    if(!Common.input_file.value){
-      alert("ファイルが選択されていません。")
-      return
-    }
+    if(!Common.input_file.value){return}
     const form_data = new FormData(Common.form_upload)
     const xhr = new XMLHttpRequest()
     xhr.withCredentials = true;
@@ -22,7 +19,6 @@ export class Upload{
   posted(e){
     if(!e || !e.target || !e.target.response){return}
     const res = JSON.parse(e.target.response)
-// console.log(res)
     if(!res){
       // alert("正常にアップロードできませんでした。")
       return
