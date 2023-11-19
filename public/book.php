@@ -52,10 +52,7 @@ switch(@$_POST["mode"]){
 
   case "convert":
     require_once dirname(__FILE__). "/page/book/php/convert.php";
-    // die("convert:". $_POST["uuid"].PHP_EOL);
     new Convert($_POST);
-    // $zip->convert_book($dir, $book);
-    // echo $json;
     break;
 
   case "json":
@@ -72,12 +69,3 @@ switch(@$_POST["mode"]){
     print_r($zip->datas);
     break;
 }
-
-// if(is_numeric($page)){
-//   // echo $zip->webp($page);
-//   $zip->img($page);
-// }
-// else{
-//   echo "<pre>";
-//   print_r($zip->datas);
-// }

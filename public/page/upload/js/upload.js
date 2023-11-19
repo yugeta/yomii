@@ -28,5 +28,11 @@ export class Upload{
       return
     }
     new Convert(res.uuid)
+    this.setting = res
+    this.progress()
+  }
+
+  progress(){
+
   }
 }

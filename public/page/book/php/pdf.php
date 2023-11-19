@@ -69,43 +69,47 @@ class Pdf{
 
   function convert(){
     $dir  = $this->setting["tmp_dir"];
+    $out  = "{$dir}/out-singlefile";
     $file = $dir .DIRECTORY_SEPARATOR. $this->setting["origin_file"];
-    for($i=1; $i<=$this->setting["page_count"]; $i++){
-      echo $i.PHP_EOL;
-      $this->pdf2png($file , $dir , $i);
-      $this->png2webp($dir , $i);
+    $jsons = [];
+    for($i=0; $i<$this->setting["page_count"]; $i++){
+      $page_num = $i+1;
+      $page_str = sprintf("%05d", $page_num);
+      // png変換
+      $out_path = "{$dir}/out-{$page_str}";
+      $png_path = "{$out_path}.png";
+      $this->pdf2png($file , $out_path , $page_num);
+      // webp変換
+      $webp_path = "{$dir}/out-{$page_str}.webp";
+      $this->png2webp($png_path, $webp_path);
+      // json変換
+      $json = $this->webp2json($webp_path);
+      $jsons[$i] = $json;
+      echo $i ." @ ". $png_path ." @ ". $webp_path .PHP_EOL;
     }
+    $json_path = $this->setting["tmp_dir"].".json";
+    $datas = [
+      "setting" => $this->setting,
+      "datas"   => $jsons,
+    ];
+    $json = json_encode($datas , JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    file_put_contents($json_path, $json);
+    $this->delete_tmp_dir();
   }
 
-  function pdf2png($pdf_file=null, $out_path=null , $page=null){
-    $cmd = "pdftoppm -png {$pdf_file} {$out_path}/out -f {$page} -l {$page} -cropbox";
-    // $cmd = "pdftoppm -png {$pdf_file} {$out_path}out -f 1 -l 1 -cropbox";
+  function pdf2png($pdf_file=null, $out_path=null , $page=1){
+    $cmd = "pdftoppm -png {$pdf_file} {$out_path} -f {$page} -l {$page} -cropbox -singlefile";
     exec($cmd);
+    $num = sprintf("%03d" , $page);
+    return "{$out_path}-{$num}.png";
   }
   
-  function png2webp($out_path=null, $page=null, $quality=50){
-    $num  = sprintf("%03d" , $page);
-    $ext  = $this->setting["ext"];
-    $path = "{$out_path}/out-{$num}.png";
-    $webp = "{$out_path}/out-{$num}.webp";
-    // echo $path.PHP_EOL;
-    // echo $webp.PHP_EOL;
-    $png = imagecreatefrompng($path);
-    $png = $this->resize_image($png);
-    imagewebp($png , $webp, $quality);
-    unlink($path);
-    // $files = scandir($out_path);
-    // for($i=0; $i<count($files); $i++){
-    //   if(!preg_match("/^(.+?)\.png$/", $files[$i] , $match)){continue;}
-    //   $path = $out_path. $files[$i];
-    //   $png = imagecreatefrompng($path);
-    //   $png = $this->resize_image($png);
-    //   $webp_file = $out_path. $match[1].".webp";
-    //   imagewebp($png , $webp_file, $quality);
-    //   if(is_file($webp_file)){
-    //     unlink($path);
-    //   }
-    // }
+  function png2webp($png_path=null, $webp_path=null, $quality=50){
+    if(!is_file($png_path)){return;}
+    $png_image = imagecreatefrompng($png_path);
+    $png_image = $this->resize_image($png_image);
+    imagewebp($png_image , $webp_path, $quality);
+    unlink($png_path);
   }
 
   function resize_image($image=null){
@@ -137,7 +141,19 @@ class Pdf{
     return $image2;
   }
 
+  function webp2json($webp_path=null){
+    if(!$webp_path || !is_file($webp_path)){return;}
+    $num  = sprintf("%03d" , $page);
+    $base64 = base64_encode(file_get_contents($webp_path));
+    unlink($webp_path);
+    return $base64;
+  }
 
+  function delete_tmp_dir(){
+    if(!is_dir($this->setting["tmp_dir"])){return;}
+    exec("rm -rf ".$this->setting["tmp_dir"] , $res);
+    return $res;
+  }
 
 
 
