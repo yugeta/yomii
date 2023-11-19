@@ -1,61 +1,160 @@
 <?php
 
-// set_time_limit(120);
+require_once dirname(__FILE__). "/common.php";
 
 class Zip{
-  var $temp_dir = "data/tmp/";
-  var $uuid     = null;
-  var $filepath = null;
-  var $zip = null;
-  var $datas = [];
   public static $info = [];
+  var $temp_dir = "data/tmp/";
+  var $setting  = [];
+  var $quality  = 50;
+  var $max_size = 1000;
 
-  function __construct($filepath=null){
-    $this->filepath = $filepath;
-    $this->uuid = date("YmdHis") ."_". uniqid();
+  function __construct($setting=null){
+    if(!$setting){return;}
+    $this->setting = $setting;
 
     // $this->zip = new ZipArchive;
     // $this->set_lists();
 
-    $this->get_info();
+    // $this->get_info();
 
-    echo "<pre>";
-    print_r(Zip::$info);
+    // echo "<pre>";
+    // print_r(Zip::$info);
   }
 
-  function get_info(){
-    Zip::$info = [
-      "file" => $this->filepath,
-      "uuid" => $this->uuid,
-    ];
-    
-  }
+  function convert(){
+    echo $this->setting["page_count"]." ";
+    $zip      = new ZipArchive;
+    $dir      = $this->setting["tmp_dir"];
+    $file     = $dir .DIRECTORY_SEPARATOR. $this->setting["origin_file"];
+    $zip->open($file);
+    $jsons    = [];
 
-  function set_lists(){
-    $this->zip->open($this->filepath);
-    $page_count = $this->zip->numFiles;
-    $pages = [];
-    for($i=0; $i<$page_count; $i++){
-      $name = $this->zip->getNameIndex($i);
+    // $test = $zip;
+    // print_r($test);
+
+    for($i=0; $i<$this->setting["page_count"]; $i++){
+      echo PHP_EOL. $i." ";
+      $name = $zip->getNameIndex($i);
       $name = trim($name);
-      if(preg_match("/\/$/", $name)){continue;}
-      $ext = $this->get_ext($name);
-      switch($ext){
-        case "jpg":
-        case "jpeg":
-        case "png":
-        case "gif":
-        case "webp":
-          $data = $this->zip->statIndex($i);
-          $data["ext"] = $ext;
-          $pages[] = $data;
-          break;
-      }
+      // フォルダの場合は処理を飛ばす
+      if(!$name || preg_match("/\/$/", $name)){continue;}
+      // 画像ファイルのみをたいしょうにする。
+      $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+      echo $name." ".$ext." ";
+      if(!$this->is_target_ext($ext)){continue;}
+      $data = $zip->getFromIndex($i);
+      $image = imagecreatefromstring($data);
+      $image = $this->resize_image($image, $ext);
+      $num = sprintf("%05d" , $i);
+      $webp_path = "{$dir}/out-{$num}.webp";
+      echo $webp_path." ";
+      imagewebp($image , $webp_path , $this->quality);
+      imagedestroy($image);
+      $base64 = base64_encode(file_get_contents($webp_path));
+      $jsons[] = $base64;
+      // echo count($base64);
     }
-    $this->zip->close();
-    $this->datas = $pages;
-    return $pages;
+    $zip->close();
+    $json_path = $this->setting["tmp_dir"].".json";
+    $this->setting["page_count"] = count($jsons);
+    $datas = [
+      "setting" => $this->setting,
+      "datas"   => $jsons,
+    ];
+    $json = json_encode($datas , JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    file_put_contents($json_path, $json);
+    $this->delete_tmp_dir();
   }
+
+  function is_target_ext($ext=null){
+    switch($ext){
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+      case "webp":
+        return true;
+        // $data = $zip->statIndex($i);
+        // $data["ext"] = $ext;
+        // $pages[] = $data;
+        // // $page_num++;
+      default:
+       return false;
+    }
+  }
+
+  function resize_image($image=null, $ext=null){
+    $max_size = 1000;
+    $x1 = imagesx($image);
+    $y1 = imagesy($image);
+    $x2 = $y2 = $max_size;
+    // landscape
+    if($x1 > $y1){
+      if($x1 < $max_size){
+        return $image;
+      }
+      $rate = $x1 / $max_size;
+      $x2 = $max_size;
+      $y2 = floor($y1 / $rate);
+
+    }
+    // horizontal
+    else{
+      if($y1 < $max_size){
+        return $image;
+      }
+      $rate = $y1 / $max_size;
+      $y2 = $max_size;
+      $x2 = floor($x1 / $rate);
+    }
+    $image2 = imagecreatetruecolor($x2, $y2);
+    imagecopyresampled($image2, $image, 0, 0, 0, 0, $x2, $y2, $x1, $y1);
+    return $image2;
+  }
+
+  function delete_tmp_dir(){
+    if(!is_dir($this->setting["tmp_dir"])){return;}
+    exec("rm -rf ".$this->setting["tmp_dir"] , $res);
+    return $res;
+  }
+
+
+
+
+  // function get_info(){
+  //   Zip::$info = [
+  //     "file" => $this->filepath,
+  //     "uuid" => $this->uuid,
+  //   ];
+    
+  // }
+
+  // function set_lists(){
+  //   $this->zip->open($this->filepath);
+  //   $page_count = $this->zip->numFiles;
+  //   $pages = [];
+  //   for($i=0; $i<$page_count; $i++){
+  //     $name = $this->zip->getNameIndex($i);
+  //     $name = trim($name);
+  //     if(preg_match("/\/$/", $name)){continue;}
+  //     $ext = $this->get_ext($name);
+  //     switch($ext){
+  //       case "jpg":
+  //       case "jpeg":
+  //       case "png":
+  //       case "gif":
+  //       case "webp":
+  //         $data = $this->zip->statIndex($i);
+  //         $data["ext"] = $ext;
+  //         $pages[] = $data;
+  //         break;
+  //     }
+  //   }
+  //   $this->zip->close();
+  //   $this->datas = $pages;
+  //   return $pages;
+  // }
 
   function page2index($page=null){
     return $this->datas[$page]["index"];
@@ -65,12 +164,12 @@ class Zip{
     return $this->datas[$page];
   }
 
-  function get_ext($file_name=null){
-    if(!$file_name){return;}
-    if(!strstr($file_name, ".")){return;}
-    $sp = explode(".", $file_name);
-    return $sp[count($sp)-1];
-  }
+  // function get_ext($file_name=null){
+  //   if(!$file_name){return;}
+  //   if(!strstr($file_name, ".")){return;}
+  //   $sp = explode(".", $file_name);
+  //   return $sp[count($sp)-1];
+  // }
 
   function page2ext($page=null){
     if($page===null){return;}
@@ -80,8 +179,8 @@ class Zip{
   function get_page($page=null){
     if($page === null){return;}
     $index = $this->page2index($page);
-    $this->zip->open($this->filepath);
-    $data = $this->zip->getFromIndex($index);
+    $zip->open($this->filepath);
+    $data = $zip->getFromIndex($index);
     $this->zip->close();
     return $data;
   }
@@ -138,39 +237,7 @@ class Zip{
     // return $tmp_dir." @ ".count($this->datas)." @ ". (microtime(true) - $start_time);
   }
 
-  function resize_image($image=null, $ext=null){
-    $max_size = 1000;
-    $x1 = imagesx($image);
-    $y1 = imagesy($image);
-    $x2 = $y2 = $max_size;
-    // landscape
-    if($x1 > $y1){
-      if($x1 < $max_size){
-        return $image;
-      }
-      $rate = $x1 / $max_size;
-      $x2 = $max_size;
-      $y2 = floor($y1 / $rate);
-
-    }
-    // horizontal
-    else{
-      if($y1 < $max_size){
-        return $image;
-      }
-      $rate = $y1 / $max_size;
-      $y2 = $max_size;
-      $x2 = floor($x1 / $rate);
-    }
-    $image2 = imagecreatetruecolor($x2, $y2);
-    imagecopyresampled($image2, $image, 0, 0, 0, 0, $x2, $y2, $x1, $y1);
-    return $image2;
-    // switch($ext){
-    //   case "jpg":
-    //   case "jpeg":
-    //     imagejpeg($image2, null, 100);
-    // }
-  }
+  
 
   function create_json($tmp_dir=null){
     // $dir = dirname(__FILE__) ."/../../../";
