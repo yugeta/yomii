@@ -78,4 +78,17 @@ switch(@$_POST["mode"]){
     echo "<pre>";
     print_r($zip->datas);
     break;
+
+  case "get_download_link":
+    $path = Common::$temp . @$_POST["uuid"] . ".json";
+    if(is_file($path)){
+      $data = json_decode(file_get_contents($path),true);
+      $name = pathinfo($data["setting"]["files"]["name"] , PATHINFO_FILENAME);
+      $data = [
+        "name" => $name.".json",
+        "path" => $path,
+      ];
+      echo json_encode($data , JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+    break;
 }

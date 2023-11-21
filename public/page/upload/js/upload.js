@@ -1,6 +1,7 @@
 import { Common }  from "./common.js"
 import { Convert } from "./convert.js"
 
+
 export class Upload{
   constructor(){
     this.post()
@@ -29,6 +30,6 @@ export class Upload{
   }
 
   progress(){
-
+    
   }
 }

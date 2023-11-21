@@ -1,0 +1,137 @@
+.modal_window,
+.modal_window::before,
+.modal_window::after
+.modal_window *,
+.modal_window *::before,
+.modal_window *::after{
+  -webkit-box-sizing : border-box;
+     -moz-box-sizing : border-box;
+      -ms-box-sizing : border-box;
+       -o-box-sizing : border-box;
+          box-sizing : border-box;
+}
+
+.modal_window{
+  --time: 0.3s;
+  --color : #aaa;
+
+  position:absolute;
+  left: 50%;
+  top : 50%;
+  transform:translate(-50%,-50%);
+  border-radius:10px;
+  font-size:16px;
+  width:500px;
+  max-width:95%;
+  padding:10px;
+  box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+  background-color:white;
+  
+  transition-property:margin opacity;
+  transition-duration:var(--time);
+}
+.modal_window[data-active='before']{
+  margin-top:-50px;
+  opacity:0;
+}
+.modal_window[data-active='true']{
+  margin-top:0px;
+  opacity:1;
+}
+.modal_window > *:empty{
+  display:none;
+}
+
+.modal_window .modal_title{
+  font-size: 0.8em;
+  padding: 5px;
+}
+
+.modal_window .modal_caption{
+  font-size: 1.0em;
+  font-weight:bold;
+  padding: 5px;
+  border-bottom:1px solid var(--color);
+}
+
+.modal_window .modal_content{
+  font-size: 0.8em;
+  padding: 10px;
+  margin: 0;
+}
+
+.modal_window .modal_buttons{
+  font-size: 0.8em;
+  padding:10px 5px;
+  display:flex;
+  justify-content: space-around;
+  gap:10px;
+  border-top:1px solid var(--color);
+}
+.modal_window .modal_buttons > *{
+  padding:5px 10px;
+  min-width:25%;
+}
+.modal_window .modal_buttons button{
+  cursor:pointer;
+}
+
+
+
+.modal_window .modal_close{
+  position:absolute;
+  width:20px;
+  height:20px;
+  /* border:1px solid black; */
+  right:5px;
+  top:5px;
+  cursor:pointer;
+}
+.modal_window .modal_close:hover{
+  opacity:0.5;
+}
+.modal_window .modal_close::before,
+.modal_window .modal_close::after{
+  content: '';
+  position:absolute;
+  width:100%;
+  height:1px;
+  top:50%;
+  left:50%;
+  background-color: var(--color);
+}
+.modal_window .modal_close::before{
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+.modal_window .modal_close::after{
+  transform:translate(-50%,-50%) rotate(-45deg);
+}
+
+
+.modal_bg{
+  position:fixed;
+  width:100vw;
+  height:100vh;
+  top:0;
+  left:0;
+  background-color:rgba(0,0,0,0.3);
+}
+
+/* Form */
+.modal_window select,
+.modal_window input:not([type='checkbox'],[type='radio']){
+  padding:5px;
+  font-size:16px;
+  border:1px solid var(--color);
+  border-radius:5px;
+  width:100%;
+}
+.modal_window textarea{
+  width:100%;
+  height:100px;
+  padding:5px;
+  font-size:16px;
+  border:1px solid var(--color);
+  border-radius:5px;
+
+}

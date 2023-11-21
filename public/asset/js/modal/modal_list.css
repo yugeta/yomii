@@ -1,0 +1,23 @@
+ul.modal-list{
+  position:absolute;
+  background-color:white;
+  display:inline-block;
+  width:auto;
+  height:auto;
+  border:1px solid black;
+  padding:0;
+  max-height:200px;
+  overflow-y:auto;
+  box-shadow:4px 4px 10px rgba(0,0,0,0.5);
+  z-index:100;
+}
+ul.modal-list li{
+  padding:5px 10px;
+  cursor:pointer;
+}
+ul.modal-list > li + *{
+  border-top:1px solid black;
+}
+ul.modal-list li:hover{
+  background-color:#FEE;
+}

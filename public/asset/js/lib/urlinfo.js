@@ -3,6 +3,9 @@ export class Urlinfo{
   get url(){
     return this.protocol +'://'+ this.host + (this.port !== 80 && this.port !== 443 ? `:${this.port}` : '') + this.path
   }
+  get dir(){
+    return location.href.split("/").slice(0,-1) +"/"
+  }
   // 全部
   get href(){
     return location.href
