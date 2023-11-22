@@ -18,16 +18,25 @@ export class Upload{
   }
 
   book_up(e){
-    // console.log(e.target.files[0])
+    const filepath = e.target.value
     const fileReader = new FileReader();
     fileReader.onload = (e => {
 			const json = e.target.result
       const data = JSON.parse(json)
-      this.book = data
-
+      data.filepath = filepath
+      Book.data = data
+      this.change_url(data)
+      new Book({
+        book : data
+      })
       this.finish()
 		})
 		fileReader.readAsText(e.target.files[0])
+  }
+
+  change_url(data){
+    const name = data.name
+    new Urlinfo().add_query("book" , name)
   }
 
   finish(){

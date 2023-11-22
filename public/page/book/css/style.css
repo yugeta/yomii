@@ -1,7 +1,22 @@
+
 .book-select{
   padding:20px;
 }
 
 .book-area{
-  border:1px solid red;
+  display:none;
+}
+
+
+main[rel="book"] .book-area{
+  display:flex;
+}
+
+main[rel="book"] .book-select{
+  display:none;
+}
+
+.book-area{
+  
+
 }

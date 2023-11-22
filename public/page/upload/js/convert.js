@@ -3,6 +3,8 @@ import { Loading } from "../../../asset/js/loading/loading.js"
 import { Urlinfo } from "../../../asset/js/lib/urlinfo.js"
 
 export class Convert{
+  static ext = "yomii"
+
   constructor(uuid){
     new Loading()
     Loading.set_status('active')
@@ -87,7 +89,7 @@ export class Convert{
     const data    = JSON.parse(json)
     const a       = document.createElement("a")
     a.className   = "download"
-    a.download    = data.name || (+new Date())+".json"
+    a.download    = data.name || (+new Date())+"."+ Convert.ext
     a.href        = new Urlinfo().dir + data.path
     a.textContent = data.name
     a.setAttribute("name" , data.name)
@@ -102,26 +104,26 @@ export class Convert{
     }
   }
 
-  download(){
-    const query = {
-      mode : "get_json",
-      uuid : this.uuid,
-    }
-    const xhr = new XMLHttpRequest()
-    xhr.open('POST' , Common.php_book , true)
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onload = this.download_dialog.bind(this)
-    const e = encodeURIComponent
-    const q = Object.entries(query).map(([k, v]) => `${e(k)}=${e(v)}`).join('&')
-    xhr.send(q)
-  }
-  download_dialog(e){
-    const json = e.target.response
-    const data = JSON.parse(json)
-    const blob = new Blob([json], { type: 'application/json' });
-    const a    = document.createElement("a")
-    a.download = data.name || (+new Date())+".json"
-    a.href     = URL.createObjectURL(blob)
-    a.click()
-  }
+  // download(){
+  //   const query = {
+  //     mode : "get_json",
+  //     uuid : this.uuid,
+  //   }
+  //   const xhr = new XMLHttpRequest()
+  //   xhr.open('POST' , Common.php_book , true)
+  //   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  //   xhr.onload = this.download_dialog.bind(this)
+  //   const e = encodeURIComponent
+  //   const q = Object.entries(query).map(([k, v]) => `${e(k)}=${e(v)}`).join('&')
+  //   xhr.send(q)
+  // }
+  // download_dialog(e){
+  //   const json = e.target.response
+  //   const data = JSON.parse(json)
+  //   const blob = new Blob([json], { type: 'application/json' });
+  //   const a    = document.createElement("a")
+  //   a.download = data.name || (+new Date()) +"."+ Convert.ext
+  //   a.href     = URL.createObjectURL(blob)
+  //   a.click()
+  // }
 }

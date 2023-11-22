@@ -44,7 +44,7 @@ class Pdf{
       $jsons[$i] = $json;
       echo $i ." @ ". $png_path ." @ ". $webp_path .PHP_EOL;
     }
-    $json_path = $this->setting["tmp_dir"].".json";
+    $json_path = $this->setting["tmp_dir"].".". Common::$output_ext;
     $datas = [
       "setting" => $this->setting,
       "datas"   => $jsons,

@@ -64,7 +64,7 @@ switch(@$_POST["mode"]){
       $json = file_get_contents(Common::get_book_json($_POST['uuid']));
       $data = json_decode($json , true);
       $name = pathinfo($data["setting"]["files"]["name"] , PATHINFO_FILENAME);
-      $data["name"] = $name.".json";
+      $data["name"] = $name.".". Common::$output_ext;
       $json = json_encode($data , JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
     echo $json;
@@ -80,12 +80,12 @@ switch(@$_POST["mode"]){
     break;
 
   case "get_download_link":
-    $path = Common::$temp . @$_POST["uuid"] . ".json";
+    $path = Common::$temp . @$_POST["uuid"] . ".". Common::$output_ext;
     if(is_file($path)){
       $data = json_decode(file_get_contents($path),true);
       $name = pathinfo($data["setting"]["files"]["name"] , PATHINFO_FILENAME);
       $data = [
-        "name" => $name.".json",
+        "name" => $name .".". Common::$output_ext,
         "path" => $path,
       ];
       echo json_encode($data , JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

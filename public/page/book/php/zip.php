@@ -48,7 +48,7 @@ class Zip{
       $jsons[] = $base64;
     }
     $zip->close();
-    $json_path = $this->setting["tmp_dir"].".json";
+    $json_path = $this->setting["tmp_dir"].".". Common::$output_ext;
     $this->setting["page_count"] = count($jsons);
     $datas = [
       "setting" => $this->setting,

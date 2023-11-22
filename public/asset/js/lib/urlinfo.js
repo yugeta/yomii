@@ -20,6 +20,7 @@ export class Urlinfo{
   }
   // クエリを連想配列で取得
   get queries(){
+    if(!this.query){return {}}
     return Object.fromEntries(new Map(this.query.split('&').map(e => [e.split('=')[0],e.split('=').slice(1).join('=')]))) || {}
   }
   // ドメイン

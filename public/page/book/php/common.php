@@ -7,6 +7,8 @@ class Common{
   public static $setting_file  = "setting.json";
   public static $progress_file = "progress.json";
 
+  public static $output_ext    = "yomii";
+
   public static function get_uuid_dir($uuid=null){
     if(!$uuid){return;}
     $dir = dirname(__FILE__). "/../../../". Common::$temp . $uuid;
@@ -42,7 +44,7 @@ class Common{
   }
 
   public static function get_book_json($uuid=null){
-    return Common::get_uuid_dir($uuid) .".json";
+    return Common::get_uuid_dir($uuid) .".". Common::$output_ext;
   }
 
   public static function get_progress_path($uuid=null){
