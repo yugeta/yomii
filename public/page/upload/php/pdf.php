@@ -67,7 +67,6 @@ class Pdf{
     $png_image = imagecreatefrompng($png_path);
     $png_image = $this->resize_image($png_image);
     imagewebp($png_image , $webp_path, $quality);
-    // unlink($png_path);
   }
 
   function resize_image($image=null){
@@ -102,7 +101,6 @@ class Pdf{
     if(!$webp_path || !is_file($webp_path)){return;}
     $num  = sprintf("%03d" , $page);
     $base64 = base64_encode(file_get_contents($webp_path));
-    // unlink($webp_path);
     return $base64;
   }
 

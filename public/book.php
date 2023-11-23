@@ -14,11 +14,11 @@ if(!isset($_SERVER['SCRIPT_URI']) && isset($argv)){
   }
 }
 
-require_once dirname(__FILE__). "/page/book/php/common.php";
+require_once dirname(__FILE__). "/page/upload/php/common.php";
 
 switch(@$_POST["mode"]){
   case "upload":
-    require_once dirname(__FILE__). "/page/book/php/upload.php";
+    require_once dirname(__FILE__). "/page/upload/php/upload.php";
     $upload = new Upload($_FILES['book']);
     $datas = [
       "status"       => $upload->info ? "success" : "error",
@@ -50,7 +50,7 @@ switch(@$_POST["mode"]){
     break;
 
   case "convert":
-    require_once dirname(__FILE__). "/page/book/php/convert.php";
+    require_once dirname(__FILE__). "/page/upload/php/convert.php";
     new Convert($_POST);
     break;
 

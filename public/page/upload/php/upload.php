@@ -15,8 +15,6 @@ class Upload{
     $this->set_info();
     $this->mk_dir();
     $this->file_move();
-    // $this->save_info();
-    // $this->add_task();
   }
 
   function init(){
@@ -45,7 +43,6 @@ class Upload{
   }
 
   function file_move(){
-    // move_uploaded_file($this->files["tmp_name"] , $this->path. Common::$origin .".". $this->files["ext"]);
     $ext = $this->files["ext"];
     move_uploaded_file($this->files["tmp_name"] , $this->path .DIRECTORY_SEPARATOR. Common::get_original_file($ext));
   }
@@ -55,14 +52,4 @@ class Upload{
     $save_path = $this->info["path"] . DIRECTORY_SEPARATOR .Common::$setting_file;
     return file_put_contents($save_path , $json);
   }
-
-  // function add_task(){
-  //   $cmd = "php book.php mode=convert uuid={$this->info["uuid"]} ext={$this->files["ext"]}";
-  //   exec($cmd , $res);
-  //   // コマンド確認用（）
-
-  //   // $this->info["path"] = $this->path;
-  //   $this->info["cmd"] = $cmd;
-  //   $this->info["res"] = $res;
-  // }
 }

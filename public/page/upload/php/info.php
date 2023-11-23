@@ -19,7 +19,6 @@ class Info{
         break;
     }
     $this->info["ext"]  = $ext;
-    // $this->info["size"] = $this->info["size"] ? $this->info["size"] : $size;
     $this->info["size"] = filesize($path);
   }
 
@@ -31,23 +30,6 @@ class Info{
       "ext"   => "zip",
       "pages" => $zip->numFiles,
     ];
-    // for($i=0; $i<$page_count; $i++){
-    //   $name = $zip->getNameIndex($i);
-    //   $name = trim($name);
-    //   if(preg_match("/\/$/", $name)){continue;}
-    //   $ext = pathinfo($name, PATHINFO_EXTENSION);
-    //   switch($ext){
-    //     case "jpg":
-    //     case "jpeg":
-    //     case "png":
-    //     case "gif":
-    //     case "webp":
-    //       $data = $zip->statIndex($i);
-    //       $data["ext"] = $ext;
-    //       $datas["pages"][] = $data;
-    //       break;
-    //   }
-    // }
     $zip->close();
     return $datas;
   }
@@ -81,7 +63,6 @@ class Info{
       "book"  => $path,
       "ext"   => "pdf",
       "pages" => $datas["Pages"],
-      // "data"  => $datas,
     ];
   }
 
