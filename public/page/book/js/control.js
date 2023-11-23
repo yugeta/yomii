@@ -1,4 +1,5 @@
 import { Common } from "./common.js"
+import { Book }   from "./book.js"
 
 export class Control{
   constructor(){
@@ -15,10 +16,14 @@ export class Control{
   }
 
   click_left(){
-    console.log("left")
+    Book.change_page({
+      mode : "left"
+    })
   }
 
   click_right(){
-    console.log("right")
+    Book.change_page({
+      mode : "right"
+    })
   }
 }

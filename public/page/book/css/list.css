@@ -1,5 +1,5 @@
 main[rel="book"] section.book-list{
-  display:flex;
+  /* display:flex; */
   gap:10px;
   width:100%;
   /* height:120px; */
@@ -17,11 +17,12 @@ main[rel="book"] section.book-list{
   counter-reset: num 0;
 }
 
-#pages{
+/* header-menu */
+.book-list[data-status=""]{
   display:none;
 }
-#pages:target,
-#pages[data-status="active"]{
+/* #pages:target, */
+.book-list[data-status="active"]{
   display:flex;
 }
 

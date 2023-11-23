@@ -1,4 +1,4 @@
-
+import { Common } from './common.js'
 
 export class Book{
   static data  = null
@@ -13,12 +13,9 @@ export class Book{
     this.set_pages()
   }
 
-  main   = document.querySelector("main")
-  static area = document.querySelector(`.book-area`)
-
   set_system(){
     if(!Book.data){return}
-    this.main.setAttribute("rel" , "book")
+    Common.main.setAttribute("rel" , "book")
   }
 
   set_pages(){
@@ -56,7 +53,7 @@ export class Book{
   view_page(){
     const page = document.createElement("div")
     page.className = "page"
-    Book.area.appendChild(page)
+    Common.area.appendChild(page)
 
     Book.view_page_count = 0
 

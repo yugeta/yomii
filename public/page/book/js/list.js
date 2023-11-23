@@ -1,42 +1,15 @@
-import { Book } from './book.js'
-import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
+import { Common } from './common.js'
+import { Book }   from './book.js'
 
 export class List{
   data  = null
   pages = []
-  main  = document.querySelector(`main`)
-  area  = this.main.querySelector(`.book-list`)
   page_num = 0
-  elm_pages = document.querySelector(`.menu a[href="#pages"`)
 
   constructor(options){
     this.options = options || {}
     this.data = this.options.book
-    this.set_event()
     this.set_pages()
-  }
-
-  set_event(){
-    if(this.elm_pages){
-      this.elm_pages.onclick = (()=>{return false})
-      this.elm_pages.addEventListener("click" , this.click_pages.bind(this))
-
-    }
-  }
-  click_pages(){
-    const urlinfo = new Urlinfo()
-    if(urlinfo.hash === "#pages"){
-      const url = `${urlinfo.url}?${urlinfo.query}`
-      history.pushState(null , null , url);
-      // location.href = url
-      this.visible(false)
-    }
-    else{
-      const url = `${urlinfo.url}?${urlinfo.query}#pages`
-      history.pushState(null , null , url);
-      // location.href = url
-      this.visible(true)
-    }
   }
 
   set_pages(){
@@ -56,7 +29,7 @@ export class List{
       }
       div.appendChild(p)
       div.appendChild(img)
-      this.area.appendChild(div)
+      Common.list.appendChild(div)
       img.setAttribute("data-page" , i)
     }
   }
@@ -73,17 +46,6 @@ export class List{
   finish_images(){
     const loaded_count = this.pages.filter(e => e.status === "success").length
     if(loaded_count !== this.pages.length){return}
-  }
-
-  visible(flg){
-    switch(flg){
-      case true:
-        document.getElementById("pages").setAttribute("data-status", "active")
-        break
-      default:
-        document.getElementById("pages").removeAttribute("data-status")
-        break
-    }
   }
 
 }

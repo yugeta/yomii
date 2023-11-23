@@ -1,10 +1,12 @@
 import { Upload }  from './upload.js'
 import { Book }    from './book.js'
 import { Control } from './control.js'
+import { Header }  from './header.js'
 import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
 
 export class Main{
   constructor(){
+    new Header()
     new Control()
     this.check_address()
     // this.upload()
