@@ -4,6 +4,7 @@ export class Book{
   static data  = null
   static pages = []
   static page_num = 0
+  static view_page_count = 0
 
   constructor(options){
     this.options = options || {}
@@ -57,25 +58,25 @@ export class Book{
     page.className = "page"
     Book.area.appendChild(page)
 
-    let view_page_count = 0
+    Book.view_page_count = 0
 
     const current_page = this.get_current_page(Book.page_num)
     if(current_page){
       page.appendChild(current_page)
-      view_page_count++
+      Book.view_page_count++
     }
 
     // 見開き処理
     const next_data = this.get_next_page(Book.page_num)
     if(next_data){
       page.appendChild(next_data.img)
-      view_page_count++
+      Book.view_page_count++
     }
 
-    if(view_page_count === 1){
+    if(Book.view_page_count === 1){
       page.setAttribute("data-status", "single_page")
     }
-    else if(view_page_count === 2){
+    else if(Book.view_page_count === 2){
       page.setAttribute("data-status", "double_page_spread")
     }
 

@@ -18,6 +18,7 @@ html,body{
 main{
   /* height:100%; */
   height:calc(100vh - var(--size-header)  - var(--size-footer));
+  position:relative;
 }
 main > section{
   display:none;

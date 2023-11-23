@@ -1,4 +1,5 @@
 import { Book } from './book.js'
+import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
 
 export class List{
   data  = null
@@ -6,22 +7,44 @@ export class List{
   main  = document.querySelector(`main`)
   area  = this.main.querySelector(`.book-list`)
   page_num = 0
+  elm_pages = document.querySelector(`.menu a[href="#pages"`)
 
   constructor(options){
     this.options = options || {}
     this.data = this.options.book
-    this.set_system()
+    this.set_event()
     this.set_pages()
   }
-  set_system(){
-    if(!Book.data){return}
-    this.main.setAttribute("rel" , "list")
+
+  set_event(){
+    if(this.elm_pages){
+      this.elm_pages.onclick = (()=>{return false})
+      this.elm_pages.addEventListener("click" , this.click_pages.bind(this))
+
+    }
+  }
+  click_pages(){
+    const urlinfo = new Urlinfo()
+    if(urlinfo.hash === "#pages"){
+      const url = `${urlinfo.url}?${urlinfo.query}`
+      history.pushState(null , null , url);
+      // location.href = url
+      this.visible(false)
+    }
+    else{
+      const url = `${urlinfo.url}?${urlinfo.query}#pages`
+      history.pushState(null , null , url);
+      // location.href = url
+      this.visible(true)
+    }
   }
 
   set_pages(){
     if(!Book.data || !Book.data.datas || !Book.data.datas.length){return}
     
     for(let i=0; i<Book.data.datas.length; i++){
+      const div = document.createElement("div")
+      const p   = document.createElement("p")
       const img = new Image()
       img.onload = this.loaded_image.bind(this, i)
       img.src = `data:image/webp;base64,${Book.data.datas[i]}`
@@ -31,7 +54,9 @@ export class List{
         img : img,
         status : "loading"
       }
-      this.area.appendChild(img)
+      div.appendChild(p)
+      div.appendChild(img)
+      this.area.appendChild(div)
       img.setAttribute("data-page" , i)
     }
   }
@@ -48,17 +73,17 @@ export class List{
   finish_images(){
     const loaded_count = this.pages.filter(e => e.status === "success").length
     if(loaded_count !== this.pages.length){return}
-    // this.view_list()
   }
 
-  // view_list(){
-  //   console.log(this.pages)
-  //   this.area.appendChild(this.pages[this.page_num].img)
+  visible(flg){
+    switch(flg){
+      case true:
+        document.getElementById("pages").setAttribute("data-status", "active")
+        break
+      default:
+        document.getElementById("pages").removeAttribute("data-status")
+        break
+    }
+  }
 
-  //   // 見開き処理
-  //   if(Book.pages[Book.page_num].size_direction === "vertical"){return}
-  //   if(!Book.pages[Book.page_num+1] || Book.pages[Book.page_num+1].size_direction === "vertical"){return}
-  //   Book.area.appendChild(Book.pages[Book.page_num+1].img)
-
-  // }
 }

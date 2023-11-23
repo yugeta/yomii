@@ -29,9 +29,9 @@ export class Upload{
       new Book({
         book : data
       })
-      // new List({
-      //   book : data
-      // })
+      new List({
+        book : data
+      })
       this.finish()
 		})
 		fileReader.readAsText(e.target.files[0])
