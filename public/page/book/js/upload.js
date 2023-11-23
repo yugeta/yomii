@@ -1,5 +1,5 @@
 import { Book } from './book.js'
-import { Main } from './main.js'
+import { List } from './list.js'
 import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
 
 export class Upload{
@@ -29,12 +29,16 @@ export class Upload{
       new Book({
         book : data
       })
+      // new List({
+      //   book : data
+      // })
       this.finish()
 		})
 		fileReader.readAsText(e.target.files[0])
   }
 
   change_url(data){
+    console.log(data)
     const name = data.name
     new Urlinfo().add_query("book" , name)
   }

@@ -1,0 +1,12 @@
+main[rel="list"] .book-list{
+  display:block;
+}
+
+.book-list > img{
+  width:100px;
+  height:100px;
+  object-fit:contain;
+  display:inline-block;
+  margin:10px;
+  box-shadow:2px 2px 5px rgba(0,0,0,0.5);
+}

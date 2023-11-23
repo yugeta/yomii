@@ -1,22 +1,24 @@
+@import "header.css";
+@import "footer.css";
+@import "select.css";
+@import "book.css";
+@import "list.css";
+@import "control.css";
 
-.book-select{
-  padding:20px;
+:root{
+  --size-footer : var(--size-header);
 }
 
-.book-area{
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+main{
+  /* height:100%; */
+  height:calc(100vh - var(--size-header)  - var(--size-footer));
+}
+main > section{
   display:none;
-}
-
-
-main[rel="book"] .book-area{
-  display:flex;
-}
-
-main[rel="book"] .book-select{
-  display:none;
-}
-
-.book-area{
-  
-
 }

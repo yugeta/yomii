@@ -7,13 +7,12 @@ export class Book{
 
   constructor(options){
     this.options = options || {}
-    // console.log(Book.data);return
     Book.data = this.options.book || Book.data
     this.set_system()
     this.set_pages()
   }
 
-  main = document.querySelector("main")
+  main   = document.querySelector("main")
   static area = document.querySelector(`.book-area`)
 
   set_system(){
@@ -27,7 +26,7 @@ export class Book{
     for(let i=0; i<Book.data.datas.length; i++){
       const img = new Image()
       img.onload = this.loaded_image.bind(this, i)
-      img.src = `data:image/webp;base64,${Book.data.datas[0]}`
+      img.src = `data:image/webp;base64,${Book.data.datas[i]}`
       Book.pages[i] = {
         w : null,
         h : null,
@@ -54,17 +53,46 @@ export class Book{
   }
 
   view_page(){
-    console.log(Book.pages)
-    // const img = Book.pages[Book.page_num].img
-    // if(!img){return}
-    // img.setAttribute("data-page-num" , Book.page_num)
-    Book.area.appendChild(Book.pages[Book.page_num].img)
+    const page = document.createElement("div")
+    page.className = "page"
+    Book.area.appendChild(page)
+
+    let view_page_count = 0
+
+    const current_page = this.get_current_page(Book.page_num)
+    if(current_page){
+      page.appendChild(current_page)
+      view_page_count++
+    }
 
     // 見開き処理
-    if(Book.pages[Book.page_num].size_direction === "vertical"){return}
-    if(!Book.pages[Book.page_num+1] || Book.pages[Book.page_num+1].size_direction === "vertical"){return}
-    Book.area.appendChild(Book.pages[Book.page_num+1].img)
+    const next_data = this.get_next_page(Book.page_num)
+    if(next_data){
+      page.appendChild(next_data.img)
+      view_page_count++
+    }
 
+    if(view_page_count === 1){
+      page.setAttribute("data-status", "single_page")
+    }
+    else if(view_page_count === 2){
+      page.setAttribute("data-status", "double_page_spread")
+    }
+
+  }
+
+  // 見開き処理
+  get_double_page_spread(current_page_num){
+
+  }
+  get_current_page(current_page_num){
+    return Book.pages[current_page_num] ? Book.pages[current_page_num].img : null
+  }
+  get_next_page(current_page_num){
+    if(Book.pages[current_page_num].size_direction === "vertical"){return}
+    const next_page_num = current_page_num+1
+    if(!Book.pages[next_page_num] || Book.pages[next_page_num].size_direction === "vertical"){return}
+    return Book.pages[next_page_num]
   }
 
 

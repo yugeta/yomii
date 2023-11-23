@@ -1,0 +1,45 @@
+.control{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content: space-between;
+  height:100%;
+  
+}
+
+.control > *{
+  width:var(--size-footer);
+  height:var(--size-footer);
+  border:0;
+}
+.control .page-turn-over{
+  width:40px;
+  height:40px;
+  background-color:white;
+  position:relative;
+  border-radius:50%;
+  cursor:pointer;
+}
+.control .page-turn-over:hover{
+  opacity:0.5;
+}
+
+.control .page-turn-over::before{
+  content:"";
+  display:block;
+  width:50%;
+  height:50%;
+  position:absolute;
+  top:50%;
+  left:50%;
+  
+  border-color:black;
+  border-width:0 5px 5px 0;
+  border-style:solid;
+}
+.control .page-turn-over:nth-of-type(1)::before{
+  transform:translate(-40%,-50%) rotate(135deg);
+}
+.control .page-turn-over:nth-of-type(2)::before{
+  transform:translate(-60%,-50%) rotate(-45deg);
+}

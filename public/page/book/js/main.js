@@ -1,14 +1,14 @@
 import { Upload }  from './upload.js'
 import { Book }    from './book.js'
+import { Control } from './control.js'
 import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
 
 export class Main{
   constructor(){
+    new Control()
     this.check_address()
     // this.upload()
   }
-  static page_name = new Urlinfo().queries.p || 'book'
-  static book      = new Urlinfo().queries.book || null
 
   check_address(){
     const urlinfo = new Urlinfo()
