@@ -70,6 +70,6 @@ main[rel="book"] section.book-list{
 .book-list{
   flex-direction:row-reverse;
 }
-.book-list[data-direction="left"]{
+#direction:checked ~ main .book-list{
   flex-direction:row;
 }

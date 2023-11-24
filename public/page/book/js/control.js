@@ -16,14 +16,10 @@ export class Control{
   }
 
   click_left(){
-    Book.change_page({
-      mode : "left"
-    })
+    Book.change_page("left")
   }
 
   click_right(){
-    Book.change_page({
-      mode : "right"
-    })
+    Book.change_page("right")
   }
 }

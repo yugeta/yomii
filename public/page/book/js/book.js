@@ -47,52 +47,121 @@ export class Book{
     const loaded_count = Book.pages.filter(e => e.status === "success").length
     // console.log(loaded_count,Book.pages.length)
     if(loaded_count !== Book.pages.length){return}
-    this.view_page()
+    Book.view_page(Book.page_num)
   }
 
-  view_page(){
+  // view_page(){
+  //   const page = document.createElement("div")
+  //   page.className = "page"
+  //   Common.area.appendChild(page)
+
+  //   Book.view_page_count = 0
+
+  //   const current_page = Book.get_current_page(Book.page_num)
+  //   if(current_page){
+  //     page.appendChild(current_page)
+  //     Book.view_page_count++
+  //   }
+
+  //   // 見開き処理
+  //   const next_data = Book.get_next_page(Book.page_num)
+  //   if(next_data){
+  //     page.appendChild(next_data.img)
+  //     Book.view_page_count++
+  //   }
+
+  //   if(Book.view_page_count === 1){
+  //     page.setAttribute("data-status", "single_page")
+  //   }
+  //   else if(Book.view_page_count === 2){
+  //     page.setAttribute("data-status", "double_page_spread")
+  //   }
+
+  // }
+
+  // // 見開き処理
+  // get_double_page_spread(current_page_num){
+
+  // }
+  // get_current_page(current_page_num){
+  //   return Book.pages[current_page_num] ? Book.pages[current_page_num].img : null
+  // }
+  // get_next_page(current_page_num){
+  //   if(Book.pages[current_page_num].size_direction === "vertical"){return}
+  //   const next_page_num = current_page_num+1
+  //   if(!Book.pages[next_page_num] || Book.pages[next_page_num].size_direction === "vertical"){return}
+  //   return Book.pages[next_page_num]
+  // }
+
+
+  // 読む方向の取得
+  static get_direction(){
+    return Common.area.getAttribute("data-direction")
+  }
+
+  // 
+  static change_page(mode){
+    if(mode === "left"){
+      let go_page_num = Book.page_num - Book.view_page_count
+      go_page_num = go_page_num > 0 ? go_page_num : 0
+      Book.view_page(go_page_num)
+    }
+    else if(mode === "right"){
+      let go_page_num = Book.page_num + Book.view_page_count
+      go_page_num = go_page_num <= Book.pages.length - 1 ? go_page_num : Book.page_num
+      Book.view_page(go_page_num)
+    }
+    else if(typeof mode === "number"){
+
+    }
+  }
+
+  static view_page(next_page_num){
     const page = document.createElement("div")
     page.className = "page"
-    Common.area.appendChild(page)
+    page.setAttribute("data-page", next_page_num)
+    
+    let view_page_count = 0
 
-    Book.view_page_count = 0
-
-    const current_page = this.get_current_page(Book.page_num)
+    const current_page = Book.get_current_img(next_page_num)
     if(current_page){
       page.appendChild(current_page)
-      Book.view_page_count++
+      view_page_count++
     }
 
     // 見開き処理
-    const next_data = this.get_next_page(Book.page_num)
+    const next_data = Book.get_next_img(next_page_num)
     if(next_data){
       page.appendChild(next_data.img)
-      Book.view_page_count++
+      view_page_count++
     }
 
-    if(Book.view_page_count === 1){
+    if(view_page_count === 1){
       page.setAttribute("data-status", "single_page")
     }
-    else if(Book.view_page_count === 2){
+    else if(view_page_count === 2){
       page.setAttribute("data-status", "double_page_spread")
     }
 
+    const current_page_elm = Common.area.querySelector(".page")
+    if(current_page_elm){
+      current_page_elm.parentNode.removeChild(current_page_elm)
+    }
+    Common.area.appendChild(page)
+
+    Book.page_num = next_page_num
+    Book.view_page_count = view_page_count
   }
 
-  // 見開き処理
-  get_double_page_spread(current_page_num){
-
-  }
-  get_current_page(current_page_num){
+  static get_current_img(current_page_num){
     return Book.pages[current_page_num] ? Book.pages[current_page_num].img : null
   }
-  get_next_page(current_page_num){
+  static get_next_img(current_page_num){console.log(current_page_num,Book.pages[current_page_num])
+    if(!Book.pages[current_page_num]){return}
     if(Book.pages[current_page_num].size_direction === "vertical"){return}
     const next_page_num = current_page_num+1
     if(!Book.pages[next_page_num] || Book.pages[next_page_num].size_direction === "vertical"){return}
     return Book.pages[next_page_num]
   }
-
-
 
 }
