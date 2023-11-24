@@ -9,4 +9,7 @@ export class Common{
   static main       = document.querySelector(`main`)
   static list       = document.querySelector(`.book-list`)
   static area       = document.querySelector(`.book-area`)
+  static direction  = document.getElementById("direction")
+  static page_num   = document.getElementById("page_num")
+  static page_count = document.getElementById("page_count")
 }

@@ -42,7 +42,6 @@ label.direction::before{
   background-color:white;
   position:absolute;
   top:50%;
-  left:var(--size-direction-margin);
   transform:translate(0,-50%);
   mix-blend-mode:difference;
   z-index:1;
@@ -52,7 +51,10 @@ label.direction::before{
 label.direction:hover::before{
   opacity:0.7;
 }
-#direction:checked ~ header .direction::before{
+.direction::before{
   left:calc(var(--size-direction-w) - var(--size-direction-point) - var(--size-direction-margin));
+}
+#direction:checked ~ header .direction::before{
+  left:var(--size-direction-margin);
 }
 

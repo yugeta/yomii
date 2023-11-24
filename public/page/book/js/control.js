@@ -1,5 +1,6 @@
 import { Common } from "./common.js"
 import { Book }   from "./book.js"
+import { List }   from "./list.js"
 
 export class Control{
   constructor(){
@@ -12,6 +13,9 @@ export class Control{
     }
     if(Common.btn_right){
       Common.btn_right.addEventListener("click" , this.click_right.bind(this))
+    }
+    if(Common.direction){
+      Common.direction.addEventListener("click" , List.set_active.bind(this))
     }
   }
 

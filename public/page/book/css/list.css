@@ -1,8 +1,7 @@
 main[rel="book"] section.book-list{
-  /* display:flex; */
+  display:flex;
   gap:10px;
   width:100%;
-  /* height:120px; */
   padding:5px 0;
   overflow-x:scroll;
 }
@@ -10,20 +9,22 @@ main[rel="book"] section.book-list{
 .book-list{
   background-color:white;
   position:absolute;
-  top:0;
   left:0;
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-
+  scroll-behavior:smooth;
   counter-reset: num 0;
+  transition-property:transform;
+  transition-duration:0.3s;
 }
 
+
 /* header-menu */
-.book-list[data-status=""]{
-  display:none;
+.book-list{
+  transform:translateY(-100%);
 }
 /* #pages:target, */
 .book-list[data-status="active"]{
-  display:flex;
+  transform:translateY(0%);
 }
 
 /* Scroll */
@@ -44,7 +45,7 @@ main[rel="book"] section.book-list{
 .book-list > *:hover{
   border-color:red;
 }
-.book-list > * p{
+.book-list > * p.page-num{
   margin:0 0 5px 0;
   text-align:center;
   padding:0 5px;
@@ -66,8 +67,12 @@ main[rel="book"] section.book-list{
   margin:0px;
   box-shadow:2px 2px 5px rgba(0,0,0,0.5);
 }
+.book-list .page[data-status="active"] p.page-num{
+  background-color:red;
+}
 
-.book-list{
+
+#direction:not(:checked) ~ main .book-list{
   flex-direction:row-reverse;
 }
 #direction:checked ~ main .book-list{
