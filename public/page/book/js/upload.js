@@ -1,5 +1,6 @@
-import { Book } from './book.js'
-import { List } from './list.js'
+import { Common }  from './common.js'
+import { Book }    from './book.js'
+import { List }    from './list.js'
 import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
 
 export class Upload{
@@ -21,14 +22,15 @@ export class Upload{
     const filepath = e.target.value
     const fileReader = new FileReader();
     fileReader.onload = (e => {
+      Common.main.setAttribute("rel" , "book")
 			const json = e.target.result
       const data = JSON.parse(json)
       data.filepath = filepath
       Book.data = data
       this.change_url(data)
-      new Book({
-        book : data
-      })
+      // new Book({
+      //   book : data
+      // })
       new List({
         book : data
       })

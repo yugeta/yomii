@@ -12,4 +12,5 @@ export class Common{
   static direction  = document.getElementById("direction")
   static page_num   = document.getElementById("page_num")
   static page_count = document.getElementById("page_count")
+  static dimension  = document.getElementById("dimension")
 }

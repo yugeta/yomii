@@ -1,3 +1,4 @@
+import { Common }  from './common.js'
 import { Upload }  from './upload.js'
 import { Book }    from './book.js'
 import { Control } from './control.js'
@@ -19,6 +20,7 @@ export class Main{
     }
     else if(urlinfo.queries.book){
       if(Book.data){
+        Common.main.setAttribute("rel" , "book")
         new Book()
       }
       // bookクエリが指定されていて、bookデータがない場合はクエリを取ってリダイレクト

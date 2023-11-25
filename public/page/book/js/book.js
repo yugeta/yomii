@@ -10,39 +10,39 @@ export class Book{
   constructor(options){
     this.options = options || {}
     Book.data = this.options.book || Book.data
-    this.set_system()
-    this.set_pages()
+    // this.set_system()
+    // this.set_pages()
   }
 
-  set_system(){
-    if(!Book.data){return}
-    Common.main.setAttribute("rel" , "book")
-  }
+  // set_system(){
+  //   if(!Book.data){return}
+  //   Common.main.setAttribute("rel" , "book")
+  // }
 
-  set_pages(){
-    if(!Book.data || !Book.data.datas || !Book.data.datas.length){return}
-    Book.pages = []
-    for(let i=0; i<Book.data.datas.length; i++){
-      const img = new Image()
-      img.onload = this.loaded_image.bind(this, i)
-      img.src = `data:image/webp;base64,${Book.data.datas[i]}`
-      Book.pages[i] = {
-        w : null,
-        h : null,
-        img : img,
-        status : "loading"
-      }
-    }
-  }
-  loaded_image(num, e){
-    const w = e.target.naturalWidth
-    const h = e.target.naturalHeight
-    Book.pages[num].w = w
-    Book.pages[num].h = h
-    Book.pages[num].status = "success"
-    Book.pages[num].size_direction = w < h ? "horizontal" : "vertical"
-    this.finish_images()
-  }
+  // set_pages(){
+  //   if(!Book.data || !Book.data.datas || !Book.data.datas.length){return}
+  //   Book.pages = []
+  //   for(let i=0; i<Book.data.datas.length; i++){
+  //     const img = new Image()
+  //     img.onload = this.loaded_image.bind(this, i)
+  //     img.src = `data:image/webp;base64,${Book.data.datas[i]}`
+  //     Book.pages[i] = {
+  //       w : null,
+  //       h : null,
+  //       img : img,
+  //       status : "loading"
+  //     }
+  //   }
+  // }
+  // loaded_image(num, e){
+  //   const w = e.target.naturalWidth
+  //   const h = e.target.naturalHeight
+  //   Book.pages[num].w = w
+  //   Book.pages[num].h = h
+  //   Book.pages[num].status = "success"
+  //   Book.pages[num].size_direction = w < h ? "horizontal" : "vertical"
+  //   this.finish_images()
+  // }
 
   finish_images(){
     const loaded_count = Book.pages.filter(e => e.status === "success").length
@@ -94,6 +94,7 @@ export class Book{
   //   return Book.pages[next_page_num]
   // }
 
+  
 
   // 読む方向の取得
 
