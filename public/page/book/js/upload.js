@@ -26,14 +26,9 @@ export class Upload{
 			const json = e.target.result
       const data = JSON.parse(json)
       data.filepath = filepath
-      Book.data = data
+      Common.data = data
       this.change_url(data)
-      // new Book({
-      //   book : data
-      // })
-      new List({
-        book : data
-      })
+      new Book()
       this.finish()
 		})
 		fileReader.readAsText(e.target.files[0])

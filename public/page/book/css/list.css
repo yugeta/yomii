@@ -75,7 +75,7 @@ main[rel="book"] section.book-list{
   margin:0px;
   box-shadow:2px 2px 5px rgba(0,0,0,0.5);
 }
-.book-list .page[data-status="active"]::before{
+.book-list .group[data-status="active"] .page::before{
   background-color:red;
 }
 

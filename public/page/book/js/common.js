@@ -1,8 +1,15 @@
 import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
 
 export class Common{
+  // Data
+  static data       = null
+  static pages      = []
+  static groups     = []
   static page_name  = new Urlinfo().queries.p || 'book'
   static book       = new Urlinfo().queries.book || null
+  static group_num  = 0
+
+  // Element
   static btn_left   = document.querySelector(`.control .page-turn-over[data-type="left"]`)
   static btn_right  = document.querySelector(`.control .page-turn-over[data-type="right"]`)
   static menu_pages = document.querySelector(`.menu a[href="#pages"`)
