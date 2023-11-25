@@ -59,7 +59,7 @@ export class Book{
   }
 
   static view_page(go_group_num){
-
+    console.log(go_group_num)
   }
 
   // static view_page(go_page_num){

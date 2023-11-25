@@ -1,9 +1,11 @@
 import { Common } from './common.js'
+import { Book }   from './book.js'
 
 export class List{
   constructor(options){
     this.options = options || {}
     this.set_group()
+    this.set_event()
   }
 
   set_group(){
@@ -51,6 +53,20 @@ export class List{
       div_page.appendChild(img.img)
       elm_group.appendChild(div_page)
     }
+  }
+
+  set_event(){
+    if(Common.list){
+      Common.list.addEventListener("click" , this.click_list.bind(this))
+    }
+  }
+
+  click_list(e){
+    const elm = e.target.closest(`.group`)
+    if(!elm){return}
+    const group_num = elm.getAttribute("data-group")
+    if(!group_num || Common.group_num === Number(group_num)){return}
+    Book.view_page(Number(group_num))
   }
 
 
