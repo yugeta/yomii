@@ -12,7 +12,6 @@ main[rel="book"] section.book-list{
   left:0;
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   scroll-behavior:smooth;
-  counter-reset: num 0;
   transition-property:transform;
   transition-duration:0.3s;
 }
@@ -36,6 +35,7 @@ main[rel="book"] section.book-list{
   display:none;
 } */
 
+/* Group */
 .book-list .group{
   display:flex;
   flex-direction:row;
@@ -49,20 +49,24 @@ main[rel="book"] section.book-list{
 .book-list .group:hover{
   border-color:red;
 }
-.book-list .group p.page-num{
+
+/* Page-num */
+.book-list{
+  counter-reset : num 0;
+}
+.book-list .page::before{
+  counter-increment: num 1;
+  content: counter(num);
+  display:block;
   margin:0 0 5px 0;
-  text-align:center;
   padding:0 5px;
   background-color:black;
   color:white;
   font-size:0.8em;
-}
-.book-list .group p::before{
-  counter-increment: num 1;
-  content: counter(num);
-  font-size:0.8em;
+  text-align:center;
 }
 
+/* Page-Image */
 .book-list img{
   /* width:100px; */
   height:100px;
@@ -71,14 +75,15 @@ main[rel="book"] section.book-list{
   margin:0px;
   box-shadow:2px 2px 5px rgba(0,0,0,0.5);
 }
-.book-list .page[data-status="active"] p.page-num{
+.book-list .page[data-status="active"]::before{
   background-color:red;
 }
 
-
-#direction:not(:checked) ~ main .book-list{
+/* Direction */
+#direction:not(:checked) ~ main .book-list,
+#direction:not(:checked) ~ main .book-list .group{
   flex-direction:row-reverse;
 }
-#direction:checked ~ main .book-list{
+/* #direction:checked ~ main .book-list{
   flex-direction:row;
-}
+} */

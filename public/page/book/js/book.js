@@ -4,15 +4,16 @@ import { List }   from './list.js'
 export class Book{
   static data  = null
   static pages = []
+  static group_num = 0
   // static page_num = 0
   // static view_page_count = 0
 
-  constructor(options){
-    this.options = options || {}
-    Book.data = this.options.book || Book.data
-    // this.set_system()
-    // this.set_pages()
-  }
+  // constructor(options){
+  //   this.options = options || {}
+  //   Book.data = this.options.book || Book.data
+  //   // this.set_system()
+  //   // this.set_pages()
+  // }
 
   // set_system(){
   //   if(!Book.data){return}
@@ -44,12 +45,12 @@ export class Book{
   //   this.finish_images()
   // }
 
-  finish_images(){
-    const loaded_count = Book.pages.filter(e => e.status === "success").length
-    // console.log(loaded_count,Book.pages.length)
-    if(loaded_count !== Book.pages.length){return}
-    Book.view_page(Book.page_num)
-  }
+  // finish_images(){
+  //   const loaded_count = Book.pages.filter(e => e.status === "success").length
+  //   // console.log(loaded_count,Book.pages.length)
+  //   if(loaded_count !== Book.pages.length){return}
+  //   Book.view_page(Book.page_num)
+  // }
 
   // view_page(){
   //   const page = document.createElement("div")
@@ -121,15 +122,19 @@ export class Book{
   static change_page(mode){
     if((Common.direction.checked === false && mode === "left")
     || (Common.direction.checked === true && mode === "right")){
-      let go_page_num = Book.page_num - Book.view_page_count
+      // let go_page_num = Book.page_num - Book.view_page_count
+      // go_page_num = go_page_num > 0 ? go_page_num : 0
+      // Book.view_page(go_page_num)
+      let go_group_num = Book.group_num - Book.view_page_count
       go_page_num = go_page_num > 0 ? go_page_num : 0
       Book.view_page(go_page_num)
     }
     else if((Common.direction.checked === false && mode === "right")
     || (Common.direction.checked === true && mode === "left")){
-      let go_page_num = Book.page_num + Book.view_page_count
-      go_page_num = go_page_num <= Book.pages.length - 1 ? go_page_num : Book.page_num
-      Book.view_page(go_page_num)
+      // let go_page_num = Book.page_num + Book.view_page_count
+      // go_page_num = go_page_num <= Book.pages.length - 1 ? go_page_num : Book.page_num
+      // Book.view_page(go_page_num)
+
     }
     else if(typeof mode === "number"){
 
@@ -137,52 +142,60 @@ export class Book{
     List.set_active()
   }
 
-  static view_page(next_page_num){
-    const page = document.createElement("div")
-    page.className = "page"
-    page.setAttribute("data-page", next_page_num)
+  static view_page(go_page_num){
+
+  }
+
+  // static view_page(go_page_num){
+  //   const page = document.createElement("div")
+  //   page.className = "page"
+  //   page.setAttribute("data-page", go_page_num)
     
-    let view_page_count = 0
+  //   let view_page_count = 0
 
-    const current_page = Book.get_current_img(next_page_num)
-    if(current_page){
-      page.appendChild(current_page)
-      view_page_count++
-    }
+  //   const current_page = Book.get_current_img(go_page_num)
+  //   if(current_page){
+  //     const img = new Image()
+  //     img.src = current_page.src
+  //     page.appendChild(img)
+  //     view_page_count++
+  //   }
 
-    // 見開き処理
-    const next_data = Book.get_next_img(next_page_num)
-    if(next_data){
-      page.appendChild(next_data.img)
-      view_page_count++
-    }
+  //   // 見開き処理
+  //   const next_data = Book.get_next_img(go_page_num)
+  //   if(next_data){
+  //     const img = new Image()
+  //     img.src = next_data.src
+  //     page.appendChild(img)
+  //     view_page_count++
+  //   }
 
-    if(view_page_count === 1){
-      page.setAttribute("data-status", "single_page")
-    }
-    else if(view_page_count === 2){
-      page.setAttribute("data-status", "double_page_spread")
-    }
+  //   if(view_page_count === 1){
+  //     page.setAttribute("data-status", "single_page")
+  //   }
+  //   else if(view_page_count === 2){
+  //     page.setAttribute("data-status", "double_page_spread")
+  //   }
 
-    const current_page_elm = Common.area.querySelector(".page")
-    if(current_page_elm){
-      current_page_elm.parentNode.removeChild(current_page_elm)
-    }
-    Common.area.appendChild(page)
+  //   const current_page_elm = Common.area.querySelector(".page")
+  //   if(current_page_elm){
+  //     current_page_elm.parentNode.removeChild(current_page_elm)
+  //   }
+  //   Common.area.appendChild(page)
 
-    Book.page_num = next_page_num
-    Book.view_page_count = view_page_count
-  }
+  //   Book.page_num        = go_page_num
+  //   Book.view_page_count = view_page_count
+  // }
 
-  static get_current_img(current_page_num){
-    return Book.pages[current_page_num] ? Book.pages[current_page_num].img : null
-  }
-  static get_next_img(current_page_num){
-    if(!Book.pages[current_page_num]){return}
-    if(Book.pages[current_page_num].size_direction === "vertical"){return}
-    const next_page_num = current_page_num+1
-    if(!Book.pages[next_page_num] || Book.pages[next_page_num].size_direction === "vertical"){return}
-    return Book.pages[next_page_num]
-  }
+  // static get_current_img(current_page_num){
+  //   return Book.pages[current_page_num] ? Book.pages[current_page_num].img : null
+  // }
+  // static get_next_img(current_page_num){
+  //   if(!Book.pages[current_page_num]){return}
+  //   if(Book.pages[current_page_num].size_direction === "vertical"){return}
+  //   const next_page_num = current_page_num+1
+  //   if(!Book.pages[next_page_num] || Book.pages[next_page_num].size_direction === "vertical"){return}
+  //   return Book.pages[next_page_num]
+  // }
 
 }

@@ -48,18 +48,23 @@ export class List{
   }
 
   set_group(){
+    List.groups = []
     let group_num = 0
     for(let i=0; i<Book.pages.length; i++){
       const page = Book.pages[i]
       const next = Book.pages[i+1] || null
-      page.group = group_num
+      // page.group = group_num
+      List.groups[group_num] = [i]
+      // 見開き処理
       switch(page.dimension){
         case "vertical":
           break
         case "horizontal":
           if(next && next.dimension === "horizontal"){
-            next.group = group_num
+            // next.group = group_num
             i++
+
+            List.groups[group_num].push(i)
           }
           break
         default:
@@ -69,25 +74,28 @@ export class List{
     }
     // console.log(Book.pages)
     // console.log(Book.pages.map(e => e.group))
+    // Book.group_count = Array.from(new Set(Book.pages.map(e => e.group))).length
+    // Book.group_count = List.groups.length
     this.view_groups()
   }
 
   view_groups(){
-    const groups = Array.from(new Set(Book.pages.map(e => e.group)))
-    for(const group of groups){
-      
+    // const groups = Array.from(new Set(Book.pages.map(e => e.group)))
+    for(let i=0; i<List.groups.length; i++){
+      const group_num = i
       const div_group = document.createElement("div")
       Common.list.appendChild(div_group)
       div_group.className = "group"
-      div_group.setAttribute("data-group", group)
-      const imgs = Book.pages.filter(e => e.group === group)
-      for(const img of imgs){
+      div_group.setAttribute("data-group", group_num)
+      // const imgs = Book.pages.filter(e => e.group === group_num)
+      for(const page_num of List.groups[i]){
+        const img = Book.pages.find(e => e.page === page_num)
         const div_page = document.createElement("div")
         div_page.className = "page"
         div_page.setAttribute("data-page-num" , img.page)
-        const p   = document.createElement("p")
-        p.className = "page-num"
-        div_page.appendChild(p)
+        // const p   = document.createElement("p")
+        // p.className = "page-num"
+        // div_page.appendChild(p)
         div_page.appendChild(img.img)
         div_group.appendChild(div_page)
       }
