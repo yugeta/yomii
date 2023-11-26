@@ -6,7 +6,9 @@ export class Book{
   constructor(options){
     this.options = options || {}
     new Img({
-      callback : (()=>{
+      data     : Common.data,
+      callback : ((datas)=>{
+        Common.pages = datas
         new List()
         Book.view_page()
       }).bind(this)

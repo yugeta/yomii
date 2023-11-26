@@ -8,7 +8,6 @@ export class Upload{
     this.options = options || {}
     this.set_event()
   }
-  book = null
 
   elm_input_upload = document.querySelector(`input[type="file"][name="book"]`)
 
@@ -28,7 +27,7 @@ export class Upload{
       data.filepath = filepath
       Common.data = data
       this.change_url(data)
-      new Book()
+      new Book({data : data})
       this.finish()
 		})
 		fileReader.readAsText(e.target.files[0])
