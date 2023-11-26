@@ -87,3 +87,11 @@ main[rel="book"] section.book-list{
 /* #direction:checked ~ main .book-list{
   flex-direction:row;
 } */
+
+/* Carousel */
+.book-list{
+  scroll-snap-type: x mandatory;
+}
+.book-list > *{
+  scroll-snap-align: center;
+}

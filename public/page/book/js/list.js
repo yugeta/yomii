@@ -72,7 +72,8 @@ export class List{
 
 
   static set_active(){
-    const num = Common.groups.length
+    // const num = Common.groups.length
+    console.log("set_active")
     const groups = Common.list.querySelectorAll(`.group`)
     for(const group of groups){
       const group_num = Number(group.getAttribute("data-group"))

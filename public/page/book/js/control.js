@@ -15,15 +15,19 @@ export class Control{
       Common.btn_right.addEventListener("click" , this.click_right.bind(this))
     }
     if(Common.direction){
-      Common.direction.addEventListener("click" , List.set_active.bind(this))
+      Common.direction.addEventListener("click" , this.click_direction.bind(this))
     }
   }
 
   click_left(){
-    Book.change_page("left")
+    Book.next_page("left")
   }
 
   click_right(){
-    Book.change_page("right")
+    Book.next_page("right")
+  }
+
+  click_direction(){
+    List.set_active()
   }
 }

@@ -54,7 +54,7 @@ label.direction:hover::before{
 .direction::before{
   left:calc(var(--size-direction-w) - var(--size-direction-point) - var(--size-direction-margin));
 }
-#direction:checked ~ header .direction::before{
+#direction:not(:checked) ~ header .direction::before{
   left:var(--size-direction-margin);
 }
 
