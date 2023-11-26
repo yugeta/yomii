@@ -73,6 +73,7 @@ export class Book{
     const page = document.createElement("div")
     page.className = "page"
     page.setAttribute("data-group" , Common.group_num)
+    page.setAttribute("data-count" , images.length)
     for(const img_list of images){
       const img_book = new Image()
       img_book.src = img_list.src

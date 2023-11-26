@@ -67,6 +67,7 @@ export class List{
     const group_num = elm.getAttribute("data-group")
     if(!group_num || Common.group_num === Number(group_num)){return}
     Book.view_page(Number(group_num))
+    List.set_active()
   }
 
 
