@@ -1,0 +1,12 @@
+.info{
+  margin:10px;
+  padding:10px;
+  border:1px dashed black;
+  min-height:100px;
+  white-space:pre-wrap;
+  word-break:break-all;
+}
+
+.single-page{
+  cursor:pointer;
+}

@@ -1,5 +1,5 @@
 // import { Common }  from './common.js'
-// import { Book }    from './book.js'
+import { Info }    from './info.js'
 import { Data }    from './data.js'
 import { Img }     from '../../book/js/img.js'
 
@@ -22,33 +22,22 @@ export class Upload{
     const filepath = e.target.value
     const fileReader = new FileReader();
     fileReader.onload = (e => {
-      // Common.main.setAttribute("rel" , "book")
 			const json = e.target.result
       Data.data = JSON.parse(json)
       Data.data.filepath = filepath
-      // Common.data = data
-      // this.change_url(data)
-      // new Book()
       new Img({
         data     : Data.data,
         callback : this.loaded_image.bind(this)
       })
-      
-      // this.finish()
 		})
 		fileReader.readAsText(e.target.files[0])
   }
 
   loaded_image(datas){
     Data.pages = datas
+    Info.clear()
     this.finish()
   }
-
-  // change_url(data){
-  //   console.log(data)
-  //   const name = data.name
-  //   new Urlinfo().add_query("book" , name)
-  // }
 
   finish(){
     if(this.options.callback){

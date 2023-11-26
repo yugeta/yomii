@@ -2,12 +2,13 @@
 // import { Common }  from './common.js'
 import { Upload }  from './upload.js'
 import { View }    from './view.js'
-// import { Control } from './control.js'
+import { Event }   from './event.js'
 // import { Header }  from './header.js'
 // import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
 
 export class Main{
   constructor(){
+    new Event()
     this.upload()
   }
 

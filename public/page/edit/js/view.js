@@ -8,10 +8,10 @@ export class View{
     this.finish()
   }
 
-  area = document.querySelector(`.pages`)
+  static area = document.querySelector(`.pages`)
 
   clear(){
-    this.area.innerHTML = ""
+    View.area.innerHTML = ""
   }
   set_group(){
     Data.groups = []
@@ -21,17 +21,19 @@ export class View{
       const next = Data.pages[i+1] || null
       Data.groups[group_num] = [i]
       // 見開き処理
-      switch(page.dimension){
-        case "vertical":
-          break
-        case "horizontal":
-          if(next && next.dimension === "horizontal"){
-            i++
-            Data.groups[group_num].push(i)
-          }
-          break
-        default:
-          continue
+      if(!page.single){
+        switch(page.dimension){
+          case "vertical":
+            break
+          case "horizontal":
+            if(next && next.dimension === "horizontal" && !next.single){
+              i++
+              Data.groups[group_num].push(i)
+            }
+            break
+          default:
+            continue
+        }
       }
       group_num++
     }
@@ -42,7 +44,7 @@ export class View{
     for(let i=0; i<Data.groups.length; i++){
       const group_num = i
       const div_group = document.createElement("div")
-      this.area.appendChild(div_group)
+      View.area.appendChild(div_group)
       div_group.className = "group"
       div_group.setAttribute("data-group", group_num)
       this.view_pages(div_group, Data.groups[i])
@@ -54,6 +56,9 @@ export class View{
       const img = Data.pages.find(e => e.page === page_num)
       const div_page = document.createElement("div")
       div_page.className = "page"
+      if(img.single){
+        div_page.setAttribute("data-single","true")
+      }
       div_page.setAttribute("data-page-num" , img.page)
       div_page.appendChild(img.img)
       elm_group.appendChild(div_page)
@@ -63,6 +68,18 @@ export class View{
   finish(){
     if(this.options.callback){
       this.options.callback(this)
+    }
+  }
+
+  static set_active(group_num){
+    const groups = View.area.querySelectorAll(`:scope > .group`)
+    for(const group of groups){
+      if(Number(group.getAttribute("data-group")) === Number(group_num)){
+        group.setAttribute("data-status" , "active")
+      }
+      else{
+        group.setAttribute("data-status" , "passive")
+      }
     }
   }
 }

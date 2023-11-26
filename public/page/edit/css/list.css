@@ -55,6 +55,9 @@
   /* clip-path:polygon(0 100%, 0 0, 100% 0); */
   font-size:0.8em;
 }
+.pages .group .page[data-single="true"]::before{
+  content: counter(num) " *";
+}
 
 /* Carousel */
 .pages{
@@ -69,4 +72,11 @@
 #direction:not(:checked) ~ .pages .group{
   flex-direction:row-reverse;
 }
+
+
+/* Select-Status [active , passive] */
+.group[data-status="active"] .page::before{
+  background-color:red;
+}
+
 

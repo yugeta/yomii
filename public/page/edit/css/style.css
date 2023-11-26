@@ -1,2 +1,9 @@
 @import "list.css";
 @import "control.css";
+@import "info.css";
+
+input[name="book"],
+#save{
+  margin:10px;
+}
+
