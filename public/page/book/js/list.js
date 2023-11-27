@@ -16,17 +16,19 @@ export class List{
       const next = Common.pages[i+1] || null
       Common.groups[group_num] = [i]
       // 見開き処理
-      switch(page.dimension){
-        case "vertical":
-          break
-        case "horizontal":
-          if(next && next.dimension === "horizontal"){
-            i++
-            Common.groups[group_num].push(i)
-          }
-          break
-        default:
-          continue
+      if(!page.single){
+        switch(page.dimension){
+          case "vertical":
+            break
+          case "horizontal":
+            if(next && next.dimension === "horizontal" && !next.single){
+              i++
+              Common.groups[group_num].push(i)
+            }
+            break
+          default:
+            continue
+        }
       }
       group_num++
     }
