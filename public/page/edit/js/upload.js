@@ -10,11 +10,11 @@ export class Upload{
   }
   data = null
 
-  elm_input_upload = document.querySelector(`input[type="file"][name="book"]`)
+  static elm_input_upload = document.querySelector(`input[type="file"][name="book"]`)
 
   set_event(){
-    if(this.elm_input_upload){
-      this.elm_input_upload.addEventListener("change" , this.book_up.bind(this))
+    if(Upload.elm_input_upload){
+      Upload.elm_input_upload.addEventListener("change" , this.book_up.bind(this))
     }
   }
 
