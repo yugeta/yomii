@@ -5,6 +5,7 @@ import { Img }    from './img.js'
 export class Book{
   constructor(options){
     this.options = options || {}
+    this.set_direction()
     new Img({
       data     : Common.data,
       callback : ((datas)=>{
@@ -15,6 +16,11 @@ export class Book{
     })
   }
 
+  set_direction(){
+    const elm = document.getElementById(`direction`)
+    if(!elm){return}
+    elm.checked = Common.data.direction === "right" ? false : true
+  }
 
   // ページ送り
   static next_page(mode){
