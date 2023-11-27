@@ -1,9 +1,10 @@
-import { Data } from "./data.js"
+import { Data }   from "./data.js"
 
 export class View{
   constructor(options){
     this.options = options || {}
     this.clear()
+    this.set_direction()
     this.set_group()
     this.finish()
   }
@@ -13,6 +14,13 @@ export class View{
   clear(){
     View.area.innerHTML = ""
   }
+
+  set_direction(){
+    const elm = document.getElementById(`direction`)
+    if(!elm){return}
+    elm.checked = Data.data.direction === "right" ? false : true
+  }
+
   set_group(){
     Data.groups = []
     let group_num = 0

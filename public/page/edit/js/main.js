@@ -1,10 +1,6 @@
-
-// import { Common }  from './common.js'
 import { Upload }  from './upload.js'
 import { View }    from './view.js'
 import { Event }   from './event.js'
-// import { Header }  from './header.js'
-// import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
 
 export class Main{
   constructor(){
@@ -22,7 +18,6 @@ export class Main{
   }
 
 }
-
 
 switch(document.readyState){
   case "complete":

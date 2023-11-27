@@ -13,14 +13,21 @@ export class Img{
       img.onload = this.loaded.bind(this, i)
       img.src = `data:image/webp;base64,${this.options.data.datas[i]}`
       this.pages[i] = {
-        page : i,
-        w : null,
-        h : null,
-        img : img,
-        status : "loading",
+        page      : i,
+        w         : null,
+        h         : null,
+        img       : img,
+        status    : "loading",
         dimension : null,
+        single    : this.get_single(i),
       }
     }
+  }
+
+  get_single(num){
+    if(!this.options.data.pages){return false}
+    const data = this.options.data.pages[num]
+    return data.single ? true : false
   }
 
   loaded(num, e){
