@@ -3,11 +3,14 @@ import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
 export class Common{
   // Data
   static data       = null
+  static images     = []
   static pages      = []
   static groups     = []
   static page_name  = new Urlinfo().queries.p || 'book'
   static book       = new Urlinfo().queries.book || null
   static group_num  = 0
+  static page_num   = null
+  static page_sub   = null
 
   // Element
   static btn_left   = document.querySelector(`.control .page-turn-over[data-type="left"]`)
@@ -17,7 +20,8 @@ export class Common{
   static list       = document.querySelector(`.book-list`)
   static area       = document.querySelector(`.book-area`)
   static direction  = document.getElementById("direction")
-  static page_num   = document.getElementById("page_num")
+  static page_elm   = document.getElementById("page_num")
   static page_count = document.getElementById("page_count")
   static dimension  = document.getElementById("dimension")
+
 }

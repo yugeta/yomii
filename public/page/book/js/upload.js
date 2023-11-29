@@ -34,7 +34,7 @@ export class Upload{
   }
 
   change_url(data){
-    console.log(data)
+// console.log(data)
     const name = data.name
     new Urlinfo().add_query("book" , name)
   }

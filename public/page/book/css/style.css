@@ -1,8 +1,11 @@
+@charset "UTF-8";
 @import "header.css";
 @import "footer.css";
 @import "select.css";
-@import "book.css";
-@import "list.css";
+@import "book_landscape.css";
+@import "book_portrait.css";
+@import "list_landscape.css";
+@import "list_portrait.css";
 @import "control.css";
 
 :root{

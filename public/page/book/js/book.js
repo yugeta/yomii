@@ -9,9 +9,9 @@ export class Book{
     new Img({
       data     : Common.data,
       callback : ((datas)=>{
-        Common.pages = datas
+        Common.images = datas
         new List()
-        Book.view_page()
+        Book.view_group()
       }).bind(this)
     })
   }
@@ -24,17 +24,50 @@ export class Book{
 
   // ページ送り
   static next_page(mode){
-    if((Common.direction.checked === true && mode === "left")
+    if((Common.direction.checked === true  && mode === "left")
     || (Common.direction.checked === false && mode === "right")){
-      let go_group_num = Common.group_num - 1
-      go_group_num = go_group_num > 0 ? go_group_num : 0
-      Book.view_page(go_group_num)
+      if(Book.is_portrait){
+        if(Common.page_num === 0 && Common.page_sub === null){return}
+        Common.page_num = Common.page_num || 0
+        let go_page_num = Common.page_num
+        if(Common.data.pages[Common.page_num].dimension === "vertical" && Common.page_sub){
+          Common.page_sub = null
+        }
+        else{
+          go_page_num--
+          Common.page_sub = 1
+        }
+        Common.group_num = Book.get_page2group_num(go_page_num)
+        go_page_num = go_page_num > 0 ? go_page_num : 0
+        Book.view_page(go_page_num , Common.page_sub)
+      }
+      else{
+        let go_group_num = Common.group_num - 1
+        go_group_num = go_group_num > 0 ? go_group_num : 0
+        Book.view_group(go_group_num)
+      }
     }
-    else if((Common.direction.checked === true && mode === "right")
-    || (Common.direction.checked === false && mode === "left")){
-      let go_group_num = Common.group_num + 1
-      go_group_num = go_group_num <= Common.groups.length - 1 ? go_group_num : Common.group_num
-      Book.view_page(go_group_num)
+    else if((Common.direction.checked === true  && mode === "right")
+         || (Common.direction.checked === false && mode === "left")){
+      if(Book.is_portrait){
+        Common.page_num = Common.page_num || 0
+        let go_page_num = Common.page_num
+        if(Common.data.pages[Common.page_num].dimension === "vertical" && !Common.page_sub){
+          Common.page_sub = 1
+        }
+        else{
+          go_page_num++
+          Common.page_sub = null
+        }
+        Common.group_num = Book.get_page2group_num(go_page_num)
+        go_page_num = go_page_num <= Common.images.length - 1 ? go_page_num : Common.go_page_num
+        Book.view_page(go_page_num , Common.page_sub)
+      }
+      else{
+        let go_group_num = Common.group_num + 1
+        go_group_num = go_group_num <= Common.groups.length - 1 ? go_group_num : Common.group_num
+        Book.view_group(go_group_num)
+      }
     }
     else if(typeof mode === "number"){
 
@@ -42,13 +75,30 @@ export class Book{
     List.set_active()
   }
 
+
   static clear_current_page(){
     const page = Common.area.querySelector(`.page`)
     if(!page){return}
     page.parentNode.removeChild(page)
   }
 
-  static view_page(go_group_num){
+  static view_page(go_page_num, sub_flg){
+    // if(Common.page_num === go_page_num){return}
+    Book.clear_current_page()
+    Common.page_num = go_page_num ?? 0
+    const img = Book.get_page_image(Common.page_num)
+    if(!img){return}
+    const page = document.createElement("div")
+    page.className = "page"
+    page.setAttribute("data-count" , 1)
+    const dimension = Common.data.pages[Common.page_num].dimension
+    page.setAttribute("data-dimension" , dimension)
+    const canvas = Book.set_canvas(img , 1, sub_flg)
+    page.appendChild(canvas)
+    Common.area.appendChild(page)
+  }
+
+  static view_group(go_group_num){
     if(Common.group_num === go_group_num){return}
     Book.clear_current_page()
     Common.group_num = go_group_num ?? Common.group_num
@@ -56,17 +106,61 @@ export class Book{
     if(!images || !images.length){return}
     const page = document.createElement("div")
     page.className = "page"
-    page.setAttribute("data-group" , Common.group_num)
     page.setAttribute("data-count" , images.length)
-    for(const img_list of images){
-      const img_book = new Image()
-      img_book.src = img_list.src
-      page.appendChild(img_book)
+    if(images.length === 1){
+      const page_num = this.get_page_num(go_group_num,0)
+      const dimension = Common.data.pages[page_num].dimension
+      page.setAttribute("data-dimension" , dimension)
+    }
+    for(const img of images){
+      const canvas = Book.set_canvas(img , images.length)
+      page.appendChild(canvas)
     }
     Common.area.appendChild(page)
+  }
+
+  static set_canvas(img , page_count , page_sub_flg){
+    const canvas  = document.createElement("canvas")
+    const ctx     = canvas.getContext("2d")
+    const w       = img.naturalWidth
+    const h       = img.naturalHeight
+    canvas.width  = w
+    canvas.height = h
+    let x = 0
+    if(Book.is_portrait && page_count === 1 && w > h){
+      canvas.width  = w / 2
+      if((page_sub_flg && Common.direction.checked)
+      || (!page_sub_flg && !Common.direction.checked)){
+        x = -(w / 2)
+      }
+    }
+    ctx.drawImage(img, x, 0, w, h)
+    return canvas
+  }
+
+  static get_page_image(page_num){
+    return Common.list.querySelector(`.page[data-page-num="${page_num}"] img`)
   }
 
   static get_group_images(group_num){
     return Common.list.querySelectorAll(`.group[data-group="${group_num}"] .page img`)
   }
+
+  static get_page_num(group_num , group_page_num){
+    group_num = group_num || 0
+    return Common.groups[group_num][group_page_num]
+  }
+
+  // portrait処理
+  static get is_portrait(){
+    return screen.width < screen.height ? true : false
+  }
+
+  static get_group2page_num(group_num){
+    return Common.groups[group_num] ? Common.groups[group_num][0] : 0
+  }
+  static get_page2group_num(page_num){
+    return Common.groups.find(e => e.indexOf(page_num) !== -1)
+  }
+
 }

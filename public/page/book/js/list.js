@@ -11,9 +11,9 @@ export class List{
   set_group(){
     Common.groups = []
     let group_num = 0
-    for(let i=0; i<Common.pages.length; i++){
-      const page = Common.pages[i]
-      const next = Common.pages[i+1] || null
+    for(let i=0; i<Common.images.length; i++){
+      const page = Common.images[i]
+      const next = Common.images[i+1] || null
       Common.groups[group_num] = [i]
       // 見開き処理
       if(!page.single){
@@ -48,11 +48,12 @@ export class List{
 
   view_pages(elm_group, pages){
     for(const page_num of pages){
-      const img = Common.pages.find(e => e.page === page_num)
+      const page_data = Common.images.find(e => e.page === page_num)
       const div_page = document.createElement("div")
       div_page.className = "page"
-      div_page.setAttribute("data-page-num" , img.page)
-      div_page.appendChild(img.img)
+      div_page.setAttribute("data-page-num" , page_data.page)
+      // div_page.setAttribute("data-dimension" , page_data.dimension)
+      div_page.appendChild(page_data.img)
       elm_group.appendChild(div_page)
     }
   }
@@ -87,14 +88,19 @@ export class List{
     setTimeout(List.set_center , 0)
   }
   static set_center(){
-    const book_list = Common.list
-    const page_elm  = book_list.querySelector(`[data-group="${Common.group_num}"]`)
-    const left      = page_elm.offsetLeft
-    const width     = page_elm.offsetWidth
-    const scroll    = book_list.scrollWidth
-    const view_w    = book_list.offsetWidth
-    const center    = left + width/2 - view_w/2
-    Common.list.scrollLeft = center
+    try{
+      const book_list = Common.list
+      const page_elm  = book_list.querySelector(`[data-group="${Common.group_num}"]`)
+      const left      = page_elm.offsetLeft
+      const width     = page_elm.offsetWidth
+      const scroll    = book_list.scrollWidth
+      const view_w    = book_list.offsetWidth
+      const center    = left + width/2 - view_w/2
+      Common.list.scrollLeft = center
+    }
+    catch(err){
+      console.warn("list:set_center",err)
+    }
   }
 
 }
