@@ -60,12 +60,12 @@ export class Book{
           Common.page_sub = null
         }
         Common.group_num = Book.get_page2group_num(go_page_num)
-        go_page_num = go_page_num <= Common.images.length - 1 ? go_page_num : Common.go_page_num
+        go_page_num = go_page_num <= Common.images.length - 1 ? go_page_num : Common.images.length - 1
         Book.view_page(go_page_num , Common.page_sub)
       }
       else{
         let go_group_num = Common.group_num + 1
-        go_group_num = go_group_num <= Common.groups.length - 1 ? go_group_num : Common.group_num
+        go_group_num = go_group_num <= Common.groups.length - 1 ? go_group_num : Common.groups.length - 1
         Book.view_group(go_group_num)
       }
     }
@@ -91,7 +91,7 @@ export class Book{
     const page = document.createElement("div")
     page.className = "page"
     page.setAttribute("data-count" , 1)
-    const dimension = Common.data.pages[Common.page_num].dimension
+    const dimension = Book.get_page_dimension(page_num)
     page.setAttribute("data-dimension" , dimension)
     const canvas = Book.set_canvas(img , 1, sub_flg)
     page.appendChild(canvas)
@@ -109,7 +109,7 @@ export class Book{
     page.setAttribute("data-count" , images.length)
     if(images.length === 1){
       const page_num = this.get_page_num(go_group_num,0)
-      const dimension = Common.data.pages[page_num].dimension
+      const dimension = Book.get_page_dimension(page_num)
       page.setAttribute("data-dimension" , dimension)
     }
     for(const img of images){
@@ -163,4 +163,16 @@ export class Book{
     return Common.groups.find(e => e.indexOf(page_num) !== -1)
   }
 
+  static get_page_dimension(page_num){
+    if(Common.images && Common.images[page_num] && Common.images[page_num].dimension){
+      return Common.images[page_num].dimension
+    }
+    if(Common.data.pages && Common.data.pages[page_num] && Common.data.pages[page_num].dimension){
+      return Common.data.pages[page_num].dimension
+    }
+    else{
+      // console.log(Common.images)
+      return ""
+    }
+  }
 }

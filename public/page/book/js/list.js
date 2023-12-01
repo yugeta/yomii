@@ -75,25 +75,64 @@ export class List{
 
 
   static set_active(){
+    if(Book.is_portrait){
+      List.set_active_page(Common.page_num)
+      List.set_active_group()
+    }
+    else{
+      List.set_active_page()
+      List.set_active_group(Common.group_num)
+    }
+  }
+
+  static set_active_page(page_num){
+    const pages = Common.list.querySelectorAll(`.page`)
+    for(const page of pages){
+      if(Number(page.getAttribute("data-group")) === Number(page_num)){
+        page.setAttribute("data-status","active")
+      }
+      else{
+        page.setAttribute("data-status","passive")
+      }
+    }
+    setTimeout(List.set_center_group , 0)
+  }
+
+  static set_center_page(){
+    try{
+      const book_list = Common.list
+      const page_elm  = book_list.querySelector(`[data-page-num="${Common.page_num}"]`)
+      const left      = page_elm.offsetLeft
+      const width     = page_elm.offsetWidth
+      const view_w    = book_list.offsetWidth
+      const center    = left + width/2 - view_w/2
+      Common.list.scrollLeft = center
+    }
+    catch(err){
+      console.warn("list:set_center",err)
+    }
+  }
+
+  static set_active_group(group_num){
     const groups = Common.list.querySelectorAll(`.group`)
+    console.log(group_num)
     for(const group of groups){
-      const group_num = Number(group.getAttribute("data-group"))
-      if(Number(group_num) === Number(Common.group_num)){
+      if(Number(group.getAttribute("data-group")) === Number(group_num)){
         group.setAttribute("data-status","active")
       }
       else{
         group.setAttribute("data-status","passive")
       }
     }
-    setTimeout(List.set_center , 0)
+    setTimeout(List.set_center_group , 0)
   }
-  static set_center(){
+
+  static set_center_group(){
     try{
       const book_list = Common.list
       const page_elm  = book_list.querySelector(`[data-group="${Common.group_num}"]`)
       const left      = page_elm.offsetLeft
       const width     = page_elm.offsetWidth
-      const scroll    = book_list.scrollWidth
       const view_w    = book_list.offsetWidth
       const center    = left + width/2 - view_w/2
       Common.list.scrollLeft = center
