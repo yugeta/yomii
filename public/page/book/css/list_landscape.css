@@ -92,7 +92,7 @@
   .book-list{
     scroll-snap-type: x mandatory;
   }
-  .book-list > *{
+  .book-list .group{
     scroll-snap-align: center;
   }
 }
