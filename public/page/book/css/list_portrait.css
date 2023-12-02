@@ -23,7 +23,8 @@
   }
   /* #pages:target, */
   .book-list[data-status="active"]{
-    transform:translateY(0%);
+    transform: translateY(-50%);
+    top: 50%;
   }
 
   /* Group */

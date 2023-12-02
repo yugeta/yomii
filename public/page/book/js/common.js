@@ -9,7 +9,7 @@ export class Common{
   static page_name  = new Urlinfo().queries.p || 'book'
   static book       = new Urlinfo().queries.book || null
   static group_num  = 0
-  static page_num   = null
+  static page_num   = 0
   static page_sub   = null
 
   // Element

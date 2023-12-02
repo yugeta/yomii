@@ -20,6 +20,7 @@
   <script type='module' src='page/common/js/main.js'></script>
 </head>
 <body>
+  <input type='checkbox' id='hamburger' style='display:none;'/>
   <input type="checkbox" id="direction" style="display:none;" checked=true/>
   <input type="hidden" id="page_num" value="0"/>
   <input type="hidden" id="page_count" value="1"/>
@@ -37,6 +38,14 @@
       </label></li>
       <li><a href='#pages'>pages</a></li>
     </ul>
+
+    <div class='hamburger-menu'>
+      <label class='hamburger' for='hamburger'>
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+    </div>
   </header>
   <main rel=""></main>
   <footer data-direction="right">

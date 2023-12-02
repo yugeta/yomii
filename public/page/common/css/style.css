@@ -3,6 +3,7 @@
 @import "header.css";
 @import "footer.css";
 @import "main.css";
+@import "hamburger.css";
 
 html,body{
   margin:0;
