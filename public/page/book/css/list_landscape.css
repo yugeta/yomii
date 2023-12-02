@@ -68,6 +68,7 @@
   }
 
   /* Page-Image */
+  .book-list .img,
   .book-list img{
     height:100px;
     object-fit:contain;

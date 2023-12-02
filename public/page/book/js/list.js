@@ -52,10 +52,28 @@ export class List{
       const div_page = document.createElement("div")
       div_page.className = "page"
       div_page.setAttribute("data-page-num" , page_data.page)
-      // div_page.setAttribute("data-dimension" , page_data.dimension)
-      div_page.appendChild(page_data.img)
+      div_page.appendChild(this.canvas(page_data.img))
       elm_group.appendChild(div_page)
     }
+  }
+  canvas(img){
+    const canvas  = document.createElement("canvas")
+    canvas.className = "img"
+    const ctx     = canvas.getContext("2d")
+    const w       = img.naturalWidth
+    const h       = img.naturalHeight
+    canvas.width  = w
+    canvas.height = h
+    let x = 0
+    // if(Book.is_portrait && page_count === 1 && w > h){
+    //   canvas.width  = w / 2
+    //   if((page_sub_flg && Common.direction.checked)
+    //   || (!page_sub_flg && !Common.direction.checked)){
+    //     x = -(w / 2)
+    //   }
+    // }
+    ctx.drawImage(img, x, 0, w, h)
+    return canvas
   }
 
   set_event(){
@@ -104,7 +122,6 @@ export class List{
     page_num = page_num || 0
     const pages = Common.list.querySelectorAll(`.page`)
     for(const page of pages){
-      // console.log(page.getAttribute("data-page-num"),page_num)
       if(Number(page.getAttribute("data-page-num")) === Number(page_num)){
         page.setAttribute("data-status","active")
       }

@@ -143,7 +143,14 @@ export class Book{
   }
 
   static get_group_images(group_num){
-    return Common.list.querySelectorAll(`.group[data-group="${group_num}"] .page img`)
+    const page_nums = Common.groups[group_num]
+    const images = []
+    for(const page_num of page_nums){
+      const page_data = Common.images.find(e => e.page === page_num)
+      if(!page_data){continue}
+      images.push(page_data.img)
+    }
+    return images
   }
 
   static get_page_num(group_num , group_page_num){
