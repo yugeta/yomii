@@ -49,14 +49,24 @@ export class List{
   view_pages(elm_group, pages){
     for(const page_num of pages){
       const page_data = Common.images.find(e => e.page === page_num)
-      const div_page = document.createElement("div")
-      div_page.className = "page"
-      div_page.setAttribute("data-page-num" , page_data.page)
-      div_page.appendChild(this.canvas(page_data.img))
+      const div_page = this.create_page(page_data)
       elm_group.appendChild(div_page)
+      if(page_data.dimension === "vertical"){
+        const div_page2 = this.create_page(page_data , true)
+        elm_group.appendChild(div_page2)
+      }
     }
   }
-  canvas(img){
+  create_page(page_data , page_sub_flg){
+    const div_page = document.createElement("div")
+    div_page.className = "page"
+    div_page.setAttribute("data-page-num" , page_data.page)
+    div_page.setAttribute("data-page-sub" , !page_sub_flg ? "" : 1)
+    const canvas = this.canvas(page_data.img , page_sub_flg)
+    div_page.appendChild(canvas)
+    return div_page
+  }
+  canvas(img , page_sub_flg){
     const canvas  = document.createElement("canvas")
     canvas.className = "img"
     const ctx     = canvas.getContext("2d")
@@ -65,13 +75,13 @@ export class List{
     canvas.width  = w
     canvas.height = h
     let x = 0
-    // if(Book.is_portrait && page_count === 1 && w > h){
-    //   canvas.width  = w / 2
-    //   if((page_sub_flg && Common.direction.checked)
-    //   || (!page_sub_flg && !Common.direction.checked)){
-    //     x = -(w / 2)
-    //   }
-    // }
+    if(w > h){
+      canvas.width  = w / 2
+      if((page_sub_flg && Common.direction.checked)
+      || (!page_sub_flg && !Common.direction.checked)){
+        x = -(w / 2)
+      }
+    }
     ctx.drawImage(img, x, 0, w, h)
     return canvas
   }
@@ -87,10 +97,11 @@ export class List{
       const elm = e.target.closest(`.page`)
       if(!elm){return}
       const page_num = elm.getAttribute("data-page-num")
-      if(!page_num || Common.page_num === Number(page_num)){return}
-      Book.view_page(Number(page_num))
+      // if(!page_num || Common.page_num === Number(page_num)){return}
+      Book.view_page(Number(page_num) , Number(elm.getAttribute("data-page-sub") || 0))
       Common.group_num = Book.get_page2group_num(page_num)
-      Common.page_num  = page_num
+      Common.page_num  = Number(page_num || 0)
+      Common.page_sub  = Number(elm.getAttribute("data-page-sub") || 0)
       List.set_active(page_num)
     }
     else{
@@ -101,28 +112,30 @@ export class List{
       Book.view_group(Number(group_num))
       Common.group_num = group_num
       Common.page_num  = Book.get_group2page_num(group_num)
+      Common.page_sub  = 0
       List.set_active()
     }
   }
 
   static set_active(){
     if(Book.is_portrait){
-      List.set_active_page(Common.page_num)
+      List.set_active_page(Common.page_num , Common.page_sub)
       List.set_active_group(Common.group_num)
       setTimeout(List.set_center_page , 0)
     }
     else{
-      List.set_active_page(Common.page_num)
+      List.set_active_page(Common.page_num , Common.page_sub)
       List.set_active_group(Common.group_num)
       setTimeout(List.set_center_group , 0)
     }
   }
 
-  static set_active_page(page_num){
+  static set_active_page(page_num , page_sub){
     page_num = page_num || 0
     const pages = Common.list.querySelectorAll(`.page`)
     for(const page of pages){
-      if(Number(page.getAttribute("data-page-num")) === Number(page_num)){
+      if(Number(page.getAttribute("data-page-num")) === Number(page_num)
+      && Number(page.getAttribute("data-page-sub") || 0) === Number(page_sub || 0)){
         page.setAttribute("data-status","active")
       }
       else{

@@ -11,7 +11,12 @@ export class Book{
       callback : ((datas)=>{
         Common.images = datas
         new List()
-        Book.view_group()
+        if(Book.is_portrait){
+          Book.view_page()
+        }
+        else{
+          Book.view_group()
+        }
       }).bind(this)
     })
   }
@@ -83,7 +88,6 @@ export class Book{
   }
 
   static view_page(go_page_num, sub_flg){
-    // if(Common.page_num === go_page_num){return}
     Book.clear_current_page()
     Common.page_num = go_page_num ?? 0
     const img = Book.get_page_image(Common.page_num)
@@ -139,7 +143,8 @@ export class Book{
   }
 
   static get_page_image(page_num){
-    return Common.list.querySelector(`.page[data-page-num="${page_num}"] img`)
+    const page_data = Common.images.find(e => e.page === page_num)
+    return page_data ? page_data.img : null
   }
 
   static get_group_images(group_num){
