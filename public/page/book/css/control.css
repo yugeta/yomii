@@ -43,3 +43,12 @@
 .control .page-turn-over:nth-of-type(2)::before{
   transform:translate(-60%,-50%) rotate(-45deg);
 }
+
+.page-numbers{
+  display:flex;
+  width:150px;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+  /* letter-spacing:0.2em; */
+}

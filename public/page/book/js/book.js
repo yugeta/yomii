@@ -100,6 +100,7 @@ export class Book{
     const canvas = Book.set_canvas(img , 1, sub_flg)
     page.appendChild(canvas)
     Common.area.appendChild(page)
+    Common.page_nums.textContent = `${Common.page_num}.${Common.page_sub}`
   }
 
   static view_group(go_group_num){
@@ -121,6 +122,7 @@ export class Book{
       page.appendChild(canvas)
     }
     Common.area.appendChild(page)
+    Common.page_nums.textContent = `${Common.group_num}`
   }
 
   static set_canvas(img , page_count , page_sub_flg){

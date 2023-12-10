@@ -23,5 +23,6 @@ export class Common{
   static page_elm   = document.getElementById("page_num")
   static page_count = document.getElementById("page_count")
   static dimension  = document.getElementById("dimension")
+  static page_nums  = document.querySelector(".page-numbers")
 
 }

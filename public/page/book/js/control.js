@@ -19,14 +19,17 @@ export class Control{
     }
   }
 
+  // 1ページ移動（左）
   click_left(){
     Book.next_page("left")
   }
 
+  // 1ページ移動（右）
   click_right(){
     Book.next_page("right")
   }
 
+  // 方向切替
   click_direction(){
     List.set_active()
   }
