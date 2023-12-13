@@ -96,24 +96,51 @@ export class List{
     if(Book.is_portrait){
       const elm = e.target.closest(`.page`)
       if(!elm){return}
-      const page_num = elm.getAttribute("data-page-num")
+      const page_num = Number(elm.getAttribute("data-page-num") || 0)
+      const page_sub = Number(elm.getAttribute("data-page-sub") || 0)
       // if(!page_num || Common.page_num === Number(page_num)){return}
-      Book.view_page(Number(page_num) , Number(elm.getAttribute("data-page-sub") || 0))
+      const mode = List.get_next_page_direction(page_num + page_sub*0.1)
+      Book.view_page(mode, page_num , page_sub)
       Common.group_num = Book.get_page2group_num(page_num)
-      Common.page_num  = Number(page_num || 0)
-      Common.page_sub  = Number(elm.getAttribute("data-page-sub") || 0)
+      Common.page_num  = page_num
+      Common.page_sub  = page_sub
       List.set_active(page_num)
     }
     else{
       const elm = e.target.closest(`.group`)
       if(!elm){return}
-      const group_num = elm.getAttribute("data-group")
-      if(!group_num || Common.group_num === Number(group_num)){return}
-      Book.view_group(Number(group_num))
+      const group_num = Number(elm.getAttribute("data-group") || 0)
+      if(Common.group_num === group_num){return}
+      const mode = List.get_next_page_direction(group_num)
+      Book.view_group(mode, group_num)
       Common.group_num = group_num
       Common.page_num  = Book.get_group2page_num(group_num)
       Common.page_sub  = 0
       List.set_active()
+    }
+  }
+
+  static get_next_page_direction(next_num){
+    // →
+    if(Common.direction.checked === true){
+      const current_page = List.get_active_page()
+      return current_page < next_num ? "right" : "left"
+    }
+    // ←
+    else{
+      const current_group = List.get_active_group()
+      return current_group < next_num ? "left" : "right"
+    }
+  }
+  static get_next_group_direction(next_group){
+    const current_group = List.get_active_group()
+    // →
+    if(Common.direction.checked === true){
+      return current_group < next_group ? "right" : "left"
+    }
+    // ←
+    else{
+      return current_group < next_group ? "left" : "right"
     }
   }
 
@@ -127,6 +154,16 @@ export class List{
       List.set_active_page(Common.page_num , Common.page_sub)
       List.set_active_group(Common.group_num)
       setTimeout(List.set_center_group , 0)
+    }
+  }
+
+  static get_active_page(){
+    const elm = Common.list.querySelector(`.page[data-status="active"]`)
+    if(elm){
+      return Number(elm.getAttribute("data-page-num") || 0) + Number(elm.getAttribute("data-page-sub") || 0) * 0.1
+    }
+    else{
+      return null
     }
   }
 
@@ -156,6 +193,16 @@ export class List{
     }
     catch(err){
       console.warn("list:set_center",err)
+    }
+  }
+
+  static get_active_group(){
+    const elm = Common.list.querySelector(`.group[data-status="active"]`)
+    if(elm){
+      return Number(elm.getAttribute("data-group"))
+    }
+    else{
+      return null
     }
   }
 

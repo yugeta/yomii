@@ -2,6 +2,8 @@
   main[rel="book"] .book-area{
     display:flex;
     align-items:center;
+    /* white-space:nowrap;
+    overflow:hidden; */
   }
 
   .book-area{
@@ -17,7 +19,11 @@
     align-items:center;
     justify-content:center;
     width:100%;
+    min-width:100%;
     height:100%;
+    background-color:inherit;
+    /* transition-property:margin;
+    transition-duration:0.3s; */
   }
 
   .book-area .page > *{

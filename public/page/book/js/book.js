@@ -1,6 +1,7 @@
-import { Common } from './common.js'
-import { List }   from './list.js'
-import { Img }    from './img.js'
+import { Common }  from './common.js'
+import { List }    from './list.js'
+import { Img }     from './img.js'
+import { Setting } from './setting.js'
 
 export class Book{
   constructor(options){
@@ -44,12 +45,12 @@ export class Book{
         }
         Common.group_num = Book.get_page2group_num(go_page_num)
         go_page_num = go_page_num > 0 ? go_page_num : 0
-        Book.view_page(go_page_num , Common.page_sub)
+        Book.view_page(mode, go_page_num , Common.page_sub)
       }
       else{
         let go_group_num = Common.group_num - 1
         go_group_num = go_group_num > 0 ? go_group_num : 0
-        Book.view_group(go_group_num)
+        Book.view_group(mode, go_group_num)
       }
     }
     else if((Common.direction.checked === true  && mode === "right")
@@ -66,12 +67,12 @@ export class Book{
         }
         Common.group_num = Book.get_page2group_num(go_page_num)
         go_page_num = go_page_num <= Common.images.length - 1 ? go_page_num : Common.images.length - 1
-        Book.view_page(go_page_num , Common.page_sub)
+        Book.view_page(mode, go_page_num , Common.page_sub)
       }
       else{
         let go_group_num = Common.group_num + 1
         go_group_num = go_group_num <= Common.groups.length - 1 ? go_group_num : Common.groups.length - 1
-        Book.view_group(go_group_num)
+        Book.view_group(mode, go_group_num)
       }
     }
     else if(typeof mode === "number"){
@@ -87,8 +88,8 @@ export class Book{
     page.parentNode.removeChild(page)
   }
 
-  static view_page(go_page_num, sub_flg){
-    Book.clear_current_page()
+  static view_page(mode, go_page_num, sub_flg){console.log(mode)
+    // Book.clear_current_page()
     Common.page_num = go_page_num ?? 0
     const img = Book.get_page_image(Common.page_num)
     if(!img){return}
@@ -99,13 +100,23 @@ export class Book{
     page.setAttribute("data-dimension" , dimension)
     const canvas = Book.set_canvas(img , 1, sub_flg)
     page.appendChild(canvas)
-    Common.area.appendChild(page)
-    Common.page_nums.textContent = `${Common.page_num}.${Common.page_sub}`
+    switch(mode){
+      case "left":
+        img.parentNode.insertBefore(page , img)
+        break
+      case "right":
+      default:
+        Common.area.appendChild(page)
+        break
+    }
+    const page_count = Common.page_num + 1
+    Common.page_nums.textContent = `${page_count}.${Common.page_sub}`
   }
 
-  static view_group(go_group_num){
+  static view_group(mode, go_group_num){
     if(Common.group_num === go_group_num){return}
-    Book.clear_current_page()
+    const elm = Common.area.querySelector(".page")
+    // Book.clear_current_page()
     Common.group_num = go_group_num ?? Common.group_num
     const images = Book.get_group_images(Common.group_num)
     if(!images || !images.length){return}
@@ -121,8 +132,52 @@ export class Book{
       const canvas = Book.set_canvas(img , images.length)
       page.appendChild(canvas)
     }
-    Common.area.appendChild(page)
-    Common.page_nums.textContent = `${Common.group_num}`
+    switch(mode){
+      case "left":
+        // page.style.setProperty("margin-left","-100%","")
+        Common.area.insertBefore(page, elm)
+
+        if(elm){
+          Common.area.animate({
+            // "margin-left" : ['-100%', '0%']
+            transform : ["translateX(-100%)","translateX(0%)"]
+          }, {
+            id         : "page-move",
+            duration   : Setting.duration,
+            iterations : 1,
+          });
+          for(const anim of Common.area.getAnimations()){
+            if(anim.id !== 'page-move'){continue}
+            Promise.all([anim.finished]).then(e => {
+              elm.parentNode.removeChild(elm)
+            })
+          }
+        }
+        break
+
+      case "right":
+      default:
+        Common.area.appendChild(page)
+        if(elm){
+          Common.area.animate({
+            // "margin-left" : ['0%', '-100%']
+            transform : ["translateX(0%)","translateX(-100%)"]
+          }, {
+            id         : "page-move",
+            duration   : Setting.duration,
+            iterations : 1,
+          });
+          for(const anim of Common.area.getAnimations()){
+            if(anim.id !== 'page-move'){continue}
+            Promise.all([anim.finished]).then(e => {
+              elm.parentNode.removeChild(elm)
+            })
+          }
+        }
+        break
+    }
+    const page_count = Common.group_num+1
+    Common.page_nums.textContent = `${page_count}`
   }
 
   static set_canvas(img , page_count , page_sub_flg){

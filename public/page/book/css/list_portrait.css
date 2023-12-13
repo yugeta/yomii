@@ -5,6 +5,7 @@
     width:100%;
     padding:5px 0;
     overflow-x:scroll;
+    z-index:5;
   }
 
   .book-list{
