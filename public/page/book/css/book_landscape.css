@@ -11,7 +11,7 @@
     height:100%;
     background-color:#999;
     /* border:5px solid blue; */
-    pointer-events:none;
+    /* pointer-events:none; */
   }
 
   .book-area .page{

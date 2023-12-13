@@ -17,6 +17,12 @@ export class Control{
     if(Common.direction){
       Common.direction.addEventListener("click" , this.click_direction.bind(this))
     }
+    // touch対応デバイスの確認
+    if(navigator.maxTouchPoints){console.log("touch")
+      Common.area.addEventListener("touchstart" , this.touch_start.bind(this))
+      Common.area.addEventListener("touchmove"  , this.touch_move.bind(this))
+      Common.area.addEventListener("touchend"   , this.touch_end.bind(this))
+    }
   }
 
   // 1ページ移動（左）
@@ -32,5 +38,16 @@ export class Control{
   // 方向切替
   click_direction(){
     List.set_active()
+  }
+
+  // Touch
+  touch_start(e){
+    console.log("start")
+  }
+  touch_move(e){
+    console.log("move")
+  }
+  touch_end(e){
+    console.log("end")
   }
 }
