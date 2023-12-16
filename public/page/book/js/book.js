@@ -30,8 +30,10 @@ export class Book{
 
   // ページ送り
   static next_page(mode){
+    // ページ戻り
     if((Common.direction.checked === true  && mode === "left")
     || (Common.direction.checked === false && mode === "right")){
+      // 縦画面
       if(Book.is_portrait){
         if(Common.page_num === 0 && Common.page_sub === null){return}
         Common.page_num = Common.page_num || 0
@@ -47,14 +49,17 @@ export class Book{
         go_page_num = go_page_num > 0 ? go_page_num : 0
         Book.view_page(mode, go_page_num , Common.page_sub)
       }
+      // 横画面
       else{
         let go_group_num = Common.group_num - 1
         go_group_num = go_group_num > 0 ? go_group_num : 0
         Book.view_group(mode, go_group_num)
       }
     }
+    // ページ進み
     else if((Common.direction.checked === true  && mode === "right")
          || (Common.direction.checked === false && mode === "left")){
+      // 縦画面
       if(Book.is_portrait){
         Common.page_num = Common.page_num || 0
         let go_page_num = Common.page_num
@@ -69,6 +74,7 @@ export class Book{
         go_page_num = go_page_num <= Common.images.length - 1 ? go_page_num : Common.images.length - 1
         Book.view_page(mode, go_page_num , Common.page_sub)
       }
+      // 横画面
       else{
         let go_group_num = Common.group_num + 1
         go_group_num = go_group_num <= Common.groups.length - 1 ? go_group_num : Common.groups.length - 1
@@ -88,9 +94,10 @@ export class Book{
     page.parentNode.removeChild(page)
   }
 
-  static view_page(mode, go_page_num, sub_flg){console.log(mode)
+  static view_page(mode, go_page_num, sub_flg){
+// console.log(mode,go_page_num,sub_flg)
     // Book.clear_current_page()
-    Common.page_num = go_page_num ?? 0
+    Common.page_num = go_page_num ?? Common.page_num
     const img = Book.get_page_image(Common.page_num)
     if(!img){return}
     const page = document.createElement("div")
@@ -102,7 +109,12 @@ export class Book{
     page.appendChild(canvas)
     switch(mode){
       case "left":
-        img.parentNode.insertBefore(page , img)
+        if(Common.area.firstChild){
+          Common.area.insertBefore(page , Common.area.firstChild)
+        }
+        else{
+          Common.area.appendChild(page)
+        }
         break
       case "right":
       default:
@@ -110,7 +122,8 @@ export class Book{
         break
     }
     const page_count = Common.page_num + 1
-    Common.page_nums.textContent = `${page_count}.${Common.page_sub}`
+    Common.page_nums.textContent = page_count
+    // Common.page_nums.textContent = Common.page_sub ? `${page_count}+` : page_count
   }
 
   static view_group(mode, go_group_num){
@@ -135,7 +148,6 @@ export class Book{
     switch(mode){
       case "left":
         Common.area.insertBefore(page, elm)
-
         if(elm){
           Common.area.animate({
             transform : ["translateX(-100%)","translateX(0%)"]
@@ -152,7 +164,6 @@ export class Book{
           }
         }
         break
-
       case "right":
       default:
         Common.area.appendChild(page)

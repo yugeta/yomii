@@ -36,30 +36,37 @@ export class List{
   }
 
   view_groups(){
+    let page_id = 0
     for(let i=0; i<Common.groups.length; i++){
       const group_num = i
       const div_group = document.createElement("div")
       Common.list.appendChild(div_group)
       div_group.className = "group"
       div_group.setAttribute("data-group", group_num)
-      this.view_pages(div_group, Common.groups[i])
+      const page_count = this.view_pages(page_id, div_group, Common.groups[i])
+      page_id += page_count
     }
   }
 
-  view_pages(elm_group, pages){
+  view_pages(page_id, elm_group, pages){
+    let page_count = 0
     for(const page_num of pages){
       const page_data = Common.images.find(e => e.page === page_num)
-      const div_page = this.create_page(page_data)
+      const div_page = this.create_page(page_id + page_count, page_data)
+      page_count++
       elm_group.appendChild(div_page)
       if(page_data.dimension === "vertical"){
-        const div_page2 = this.create_page(page_data , true)
+        const div_page2 = this.create_page(page_id + page_count, page_data , true)
         elm_group.appendChild(div_page2)
+        page_count++
       }
     }
+    return page_count
   }
-  create_page(page_data , page_sub_flg){
+  create_page(page_id, page_data , page_sub_flg){
     const div_page = document.createElement("div")
     div_page.className = "page"
+    div_page.setAttribute("data-page"     , page_id)
     div_page.setAttribute("data-page-num" , page_data.page)
     div_page.setAttribute("data-page-sub" , !page_sub_flg ? "" : 1)
     const canvas = this.canvas(page_data.img , page_sub_flg)
