@@ -24,5 +24,7 @@ export class Common{
   static page_count = document.getElementById("page_count")
   static dimension  = document.getElementById("dimension")
   static page_nums  = document.querySelector(".page-numbers")
+  // static get area_group(){return Common.area.querySelector(`.group`)}
+  static get area_page(){return Common.area.querySelector(`.page`)}
 
 }

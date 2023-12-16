@@ -18,7 +18,7 @@ export class Control{
       Common.direction.addEventListener("click" , this.click_direction.bind(this))
     }
     // touch対応デバイスの確認
-    if(navigator.maxTouchPoints){console.log("touch")
+    if(navigator.maxTouchPoints){
       Common.area.addEventListener("touchstart" , this.touch_start.bind(this))
       Common.area.addEventListener("touchmove"  , this.touch_move.bind(this))
       Common.area.addEventListener("touchend"   , this.touch_end.bind(this))
@@ -41,13 +41,58 @@ export class Control{
   }
 
   // Touch
+  touch = null
   touch_start(e){
-    console.log("start")
+    const pos = {
+      x : e.touches[0].pageX,
+      y : e.touches[0].pageY,
+    }
+    const diff = {
+      x : 0,
+      y : 0,
+    }
+    this.touch = {
+      pos  : pos,
+      diff : diff,
+    }
   }
   touch_move(e){
-    console.log("move")
+    if(!this.touch){return}
+    const diff = {
+      x : e.touches[0].pageX - this.touch.pos.x,
+      y : e.touches[0].pageY - this.touch.pos.y,
+    }
+    this.touch.diff = diff
+    Common.area_page.style.setProperty("margin-left",`${diff.x}px`,"")
+
   }
   touch_end(e){
-    console.log("end")
+    let direction = null
+    if(this.touch && this.touch.diff && this.touch.diff.x && Math.abs(this.touch.diff.x) > 50){
+      if(this.touch.diff.x > 0){
+        direction = "left"
+      }
+      else{
+        direction = "right"
+      }
+    }
+// console.log(1,direction)
+
+    if((direction === "left" && Book.is_last) || direction === "right" && Book.is_first){
+      direction = "start"
+    }
+// console.log(2,direction)
+
+    switch(direction){
+      case "left":
+        Book.next_page("left")
+        break
+      case "right":
+        Book.next_page("right")
+        break
+      default:
+        Common.area_page.style.removeProperty("margin-left")
+    }
+    this.touch = null
   }
 }

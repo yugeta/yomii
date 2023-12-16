@@ -1,4 +1,7 @@
 @media (orientation:landscape){
+  main[rel="book"]{
+    background-color:#999;
+  }
   main[rel="book"] .book-area{
     display:flex;
     align-items:center;

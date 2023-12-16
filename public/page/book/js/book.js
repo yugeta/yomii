@@ -134,12 +134,10 @@ export class Book{
     }
     switch(mode){
       case "left":
-        // page.style.setProperty("margin-left","-100%","")
         Common.area.insertBefore(page, elm)
 
         if(elm){
           Common.area.animate({
-            // "margin-left" : ['-100%', '0%']
             transform : ["translateX(-100%)","translateX(0%)"]
           }, {
             id         : "page-move",
@@ -158,10 +156,10 @@ export class Book{
       case "right":
       default:
         Common.area.appendChild(page)
+        const drag = Common.area_page.style.getPropertyValue("margin-left") || "0px"
         if(elm){
           Common.area.animate({
-            // "margin-left" : ['0%', '-100%']
-            transform : ["translateX(0%)","translateX(-100%)"]
+            transform : ["translateX(0%)", `translateX(calc(-100% - ${drag}))`]
           }, {
             id         : "page-move",
             duration   : Setting.duration,
@@ -242,6 +240,27 @@ export class Book{
     else{
       // console.log(Common.images)
       return ""
+    }
+  }
+
+  static get is_first(){
+    // page
+    if(Book.is_portrait && Common.page_num === 0){
+      return true
+    }
+    // group
+    if(!Book.is_portrait && Common.group_num === 0){
+      return true
+    }
+  }
+
+  static get is_last(){
+    // page
+    if(Book.is_portrait && Common.page_num === Common.pages.length-1){
+      return true
+    }
+    if(!Book.is_portrait && Common.group_num === Common.groups.length-1){
+      return true
     }
   }
 }
