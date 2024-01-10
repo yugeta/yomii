@@ -1,68 +1,58 @@
 @media (orientation:portrait){
-  main[rel="book"] .book-area{
-    display:flex;
-    align-items:center;
-    /* white-space:nowrap;
-    overflow-x:scroll; */
+  .list[data-status="active"]{
+    transform: translateY(-50%);
+    top: 50%;
   }
 
-  .book-area{
-    width:100%;
-    height:100%;
-    background-color:#999;
-    /* border:5px solid blue; */
-    pointer-events:none;
+  /* Page */
+  .book .page{
+    width:100vw;
+    min-width:100vw;
+    scroll-snap-stop: always; /* スクロールし過ぎ防止 */
+    position:relative;
+  }
+  .book .page:empty{
+    background-color:#eee;
+  }
+  .book .page:hover{
+    /* border-color:red; */
   }
 
-  .book-area .page{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:100%;
-    min-width:100%;
-    height:100%;
-    background-color:inherit;
+  /* Page-num */
+  .book{
+    counter-reset : num 0;
+  }
+  .book .page::before{
+    counter-increment: num 1;
+    content: counter(num);
+    display:block;
+    width:40px;
+    height:40px;
+    line-height:24px;
+    background-color:black;
+    color:white;
+    font-size:0.7em;
+    /* text-align:center; */
+    position:absolute;
+    /* transform:translate(-5px,-5px); */
   }
 
-  .book-area .page[data-status="single_page"] > *{
-    width:50%;
-  }
-
-  .book-area .page[data-count="2"] > *{
-    width:50%;
+  /* Page-Image */
+  .book .page[data-status="active"]::before{
+    background-color:red;
   }
 
   
-  .book-area .page[data-count="2"] > *:nth-of-type(1){
-    object-position:left center;
+  #direction:checked ~ main .book .page::before{
+    left:0;
+    clip-path:polygon(0 0, 100% 0, 0 100%);
+    padding-left:2px;
+    text-align:left;
   }
-  .book-area .page[data-count="2"] > *:nth-of-type(2){
-    object-position:right center;
-  }
-  #direction:checked ~ main .book-area .page[data-count="2"] > *:nth-of-type(1){
-    object-position:right center;
-  }
-  #direction:checked ~ main .book-area .page[data-count="2"] > *:nth-of-type(2){
-    object-position:left center;
-  }
-
-  .book-area .page > *,
-  .book-area img{
-    max-width:100%;
-    max-height:100%;
-    object-fit:contain;
-  }
-
-  .book-area .page{
-    flex-direction:row-reverse;
-  }
-
-  #direction:checked ~ main .book-area .page{
-    flex-direction:row;
-  }
-
-  .book-area .page[data-dimension="vertical"] img{
-    /* clip-path:polygon(0 0, 50% 0, 50% 100%, 0 100%); */
-    /* object-position:center; */
+  #direction:not(:checked) ~ main .book .page::before{
+    right:0;
+    clip-path:polygon(0 0, 100% 0, 100% 100%);
+    padding-right:2px;
+    text-align:right;
   }
 }

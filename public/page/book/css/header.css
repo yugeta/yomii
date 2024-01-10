@@ -58,3 +58,8 @@ label.direction:hover::before{
   left:var(--size-direction-margin);
 }
 
+@media (max-width:768px){
+  header .menu{
+    gap:0px;
+  }
+}

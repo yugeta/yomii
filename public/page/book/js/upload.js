@@ -1,47 +1,69 @@
-import { Common }  from './common.js'
-import { Book }    from './book.js'
-import { List }    from './list.js'
-import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
+import { Data }    from "./data.js"
+import { Element } from "./element.js"
+import { Img }     from "./img.js"
+// import { List }    from "./list.js"
+import { Book }    from "./book.js"
+import { Common }  from "./common.js"
 
 export class Upload{
   constructor(options){
-    this.options = options || {}
-    this.set_event()
+    // this.options = options || {}
+    // new Event({
+    //   uploaded : this.uploaded.bind(this)
+    // })
+    this.uploaded(options)
   }
 
-  elm_input_upload = document.querySelector(`input[type="file"][name="book"]`)
+  uploaded(e){
+    if(!e 
+    || !e.target 
+    || !e.target.files 
+    || !e.target.files.length){return}
 
-  set_event(){
-    if(this.elm_input_upload){
-      this.elm_input_upload.addEventListener("change" , this.book_up.bind(this))
-    }
-  }
-
-  book_up(e){
-    const filepath = e.target.value
+    const file_data = e.target.files[0]
     const fileReader = new FileReader();
     fileReader.onload = (e => {
-      Common.main.setAttribute("rel" , "book")
 			const json = e.target.result
       const data = JSON.parse(json)
-      data.filepath = filepath
-      Common.data = data
-      this.change_url(data)
-      new Book({data : data})
-      this.finish()
+      Data.data = data
+      new Img({
+        callback : (()=>{
+          Common.header_menu_close()
+          // new List()
+          new Book()
+        })
+      })
+      console.log(Data.data)
+      this.name_view()
+      // this.finish()
 		})
-		fileReader.readAsText(e.target.files[0])
+		fileReader.readAsText(file_data)
   }
 
-  change_url(data){
-// console.log(data)
-    const name = data.name
-    new Urlinfo().add_query("book" , name)
+  name_view(){
+    if(!Data.data){return}
+    Element.file_name.textContent = Data.data.setting.files.name
   }
 
-  finish(){
-    if(this.options.callback){
-      this.options.callback(this)
-    }
-  }
+  // finish(){
+  //   if(this.options.callback){
+  //     this.options.callback()
+  //   }
+  // }
 }
+
+const UploadElement = {
+  input : document.querySelector(`input[name="book"][type="file"]`)
+}
+
+// class Event{
+//   constructor(options){
+//     if(Element.upload && options.uploaded){
+//       Element.upload.addEventListener("change" , options.uploaded)
+//     }
+//     // if(UploadElement.input && options.uploaded){
+//     //   UploadElement.input.addEventListener("change" , options.uploaded)
+//     // }
+//   }
+// }
+

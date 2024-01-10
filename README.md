@@ -58,6 +58,12 @@ cd docker
 docker-compose up -d
 ```
 
+# Start-up
+> cd docker
+> docker-compose up -d
+- http://localhost:8001/
+
+
 # Plugin
 - TCPDF
 > git clone https://github.com/tecnickcom/TCPDF
@@ -85,5 +91,7 @@ docker-compose up -d
 - 変換後のjsonデータをサーバープールしてある場合、1ページずつの画像データをブラウザで読むことができる。（軽量でスピードが早い）
 - 無料で使い続けたければ、ローカルjsonデータがオススメ。
 
-
+# FUnction
+- Page rate change : Landscape（横長）: 見開き , Portrait（縦長）: 単一ページ
+- Reading-page : 対象書籍の読みかけページの保存(localStorage)
 

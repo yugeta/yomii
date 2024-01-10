@@ -1,0 +1,43 @@
+.upload{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.upload .upload-button{
+  border:1px solid black;
+  border-radius:17.5px;
+  padding:0px 10px;
+  background-color:#ddd;
+  color:black;
+  cursor:pointer;
+  height:35px;
+  display:flex;
+  align-items:center;
+}
+.upload .upload-button:hover{
+  opacity:0.5;
+}
+.upload .upload-button::before{
+  content:"upload";
+}
+
+.upload input[type="file"]{
+  display:none;
+}
+
+.upload .name:not(:empty) ~ label{
+  display:none;
+}
+.upload .name{
+  background-color:#ddd;
+  display:flex;
+  height:35px;
+  align-items:center;
+  color:black;
+  border-radius:17.5px;
+  padding:0px 10px;
+}
+.upload .name:empty{
+  display:none;
+}

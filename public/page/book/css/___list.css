@@ -1,0 +1,45 @@
+@import "list_landscape.css";
+@import "list_portrait.css";
+
+.area .list{
+  min-height:100px;
+}
+
+.list{
+  overflow-x:scroll;
+  z-index:5;
+  background-color:white;
+  scroll-behavior:smooth;
+  transition-property:transform;
+  transition-duration:0.3s;
+
+  display:flex;
+  width:100%;
+  overflow-x:scroll;
+  z-index:5;
+}
+
+/* Page-Image */
+.list canvas,
+.list img{
+  height:100px;
+  object-fit:contain;
+  display:inline-block;
+  margin:0px;
+  box-shadow:2px 2px 5px rgba(0,0,0,0.5);
+}
+
+/* Direction */
+#direction:not(:checked) ~ main .list,
+#direction:not(:checked) ~ main .list .group{
+  flex-direction:row-reverse;
+}
+
+/* Carousel */
+.list{
+  scroll-snap-type: x mandatory;
+}
+.list .group{
+  scroll-snap-align: center;
+}
+

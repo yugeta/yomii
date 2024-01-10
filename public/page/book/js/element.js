@@ -1,0 +1,20 @@
+export const Element = {
+  btn_left   : document.querySelector(`.page-turn-over[data-type="left"]`),
+  btn_right  : document.querySelector(`.page-turn-over[data-type="right"]`),
+  menu_pages : document.querySelector(`.menu a[href="#pages"]`),
+  main       : document.querySelector(`main`),
+  list       : document.querySelector(`.list`),
+  book       : document.querySelector(`.book`),
+  area       : document.querySelector(`.area`),
+  direction  : document.getElementById("direction"), // checked : [true: right（小説） , false: left（マンガ）]
+  page_elm   : document.getElementById("page_num"),
+  page_count : document.getElementById("page_count"),
+ //  dimension  : document.getElementById("dimension"),
+  page_nums  : document.querySelector(".page-numbers"),
+  area_page  : document.querySelector(".page"),
+  elm_upload : document.querySelector(`input[type="file"][name="book"]`),
+  file_name  : document.querySelector(`.upload .name`),
+  upload     : document.querySelector(`input[name="book"][type="file"]`),
+  menu_open  : document.getElementById(`hamburger`),
+  dimension  : document.getElementById(`dimension`),
+}

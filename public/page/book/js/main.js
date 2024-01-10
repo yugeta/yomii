@@ -1,44 +1,17 @@
-import { Common }  from './common.js'
-import { Upload }  from './upload.js'
-import { Book }    from './book.js'
-import { Control } from './control.js'
-import { Header }  from './header.js'
-import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
+import { Upload }    from "./upload.js"
+import { Direction } from "./direction.js"
+import { Event }     from "./event.js"
 
-export class Main{
+class Main{
   constructor(){
-    new Header()
-    new Control()
-    this.check_address()
-    // this.upload()
+    new Event()
+    new Upload({
+      callback : (()=>new Direction())
+    })
   }
 
-  check_address(){
-    const urlinfo = new Urlinfo()
-    if(!urlinfo.queries || !Object.keys(urlinfo.queries).length){
-      this.upload()
-    }
-    else if(urlinfo.queries.book){
-      if(Book.data){
-        Common.main.setAttribute("rel" , "book")
-        new Book()
-      }
-      // bookクエリが指定されていて、bookデータがない場合はクエリを取ってリダイレクト
-      else{
-        location.href = urlinfo.url
-      }
-    }
-    else{
-      this.upload()
-    }
-  }
-
-  upload(){
-    new Upload()
-  }
-
+  static data = null
 }
-
 
 switch(document.readyState){
   case "complete":

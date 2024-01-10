@@ -1,38 +1,36 @@
-import { Data } from "./data.js"
+import { Data }     from "./data.js"
 
-export class Img{
-  constructor(options){
-    this.options = options || {}
-    this.load()
+export class Book{
+  constructor(){
+    this.image_load()
   }
 
-  load(){
+  image_load(){console.log(Data.data)
     if(!Data.data || !Data.data.datas || !Data.data.datas.length){return}
     for(let i=0; i<Data.data.datas.length; i++){
       const img = new Image()
       img.setAttribute("data-num" , i)
-      img.onload = this.loaded.bind(this, i)
-      img.onerror = (e => {e.target.setAttribute("data-error" , "true")})
+      img.onload = this.image_loaded.bind(this, i)
+      img.onerror = (e => {alert("Error. image-load fail.")})
       img.src = `data:image/webp;base64,${Data.data.datas[i]}`
     }
   }
-  loaded(id, e){
+
+  image_loaded(num, e){
+    const id = Number(e.target.getAttribute("data-num"))
     const w  = e.target.naturalWidth
     const h  = e.target.naturalHeight
-    Data.images[id] = {
+    Data.images[num] = {
       status    : "complete",
       id        : id,
       w         : w,
       h         : h,
       img       : e.target,
-      dimension : this.get_dimension(id ,w,h),
-      single    : this.get_single_flg(id,w,h),
+      dimension : this.get_dimension(id,w,h),
+      single    : this.get_single_flg(id,w,h)
     }
-    Data.images[id].dimension = w < h ? "horizontal" : "vertical"
-    if(Data.images.length >= Data.data.datas.length){
-      this.set_page_groups()
-      this.finish()
-    }
+    Data.images[num].dimension = w < h ? "horizontal" : "vertical"
+    this.image_load_finish()
   }
 
   // ページの縦横判定: 編集前と編集後の互換性担保処理
@@ -59,6 +57,13 @@ export class Img{
     }
   }
 
+  // 画像読み込み処理終了判定
+  image_load_finish(){
+    if(Data.images.length !== Data.data.datas.length){return}
+    this.set_page_groups()
+    // console.log(Data.groups,Data.data.groups,Data.images)
+  }
+
   set_page_groups(){
     let page_num  = 0
     let group_num = 0
@@ -83,20 +88,13 @@ export class Img{
             if(next && next.dimension === "horizontal" && !next.single){
               i++ // ページを進める
               Data.images[i].group_num = group_num
-              Data.images[i].page_num  = [page_num]
+              Data.images[i].page_num  = page_num
               Data.groups[group_num].push(page_num++)
             }
           break
         }
       }
       group_num++
-    }
-  }
-
-  finish(){
-
-    if(this.options.callback){
-      this.options.callback()
     }
   }
 }

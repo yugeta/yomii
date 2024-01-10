@@ -43,7 +43,7 @@ header .menu{
   margin-left:auto;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:20px;
 }
 
 header .menu a{
@@ -63,6 +63,7 @@ header .menu a{
     transition-property : left;
     transition-duration: 0.3s;
     /* box-shadow:2px 2px 10px rgba(0,0,0,0.5); */
+    width:100%;
   }
   input#hamburger[type='checkbox']:checked ~ header .menu{
     left:0%;

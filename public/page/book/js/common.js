@@ -1,28 +1,30 @@
-import { Urlinfo } from '../../../asset/js/lib/urlinfo.js'
+import { Element } from "./element.js"
+import { Data }    from "./data.js"
 
 export class Common{
-  // Data
-  static data       = null
-  static images     = []
-  static pages      = []
-  static groups     = []
-  static page_name  = new Urlinfo().queries.p || 'book'
-  static book       = new Urlinfo().queries.book || null
-  static group_num  = 0
-  static page_num   = 0
-  static page_sub   = null
+  static header_menu_close(){
+    Element.menu_open.checked = false
+  }
 
-  // Element
-  static btn_left   = document.querySelector(`.control .page-turn-over[data-type="left"]`)
-  static btn_right  = document.querySelector(`.control .page-turn-over[data-type="right"]`)
-  static menu_pages = document.querySelector(`.menu a[href="#pages"`)
-  static main       = document.querySelector(`main`)
-  static list       = document.querySelector(`.book-list`)
-  static area       = document.querySelector(`.book-area`)
-  static direction  = document.getElementById("direction")
-  static page_elm   = document.getElementById("page_num")
-  static page_count = document.getElementById("page_count")
-  static dimension  = document.getElementById("dimension")
-  static page_nums  = document.querySelector(".page-numbers")
+  // ページ番号から画像データを取得
+  static page2Info(page_num){
+    return Data.images.find(e => typeof e.page_num === "number" ? e.page_num === page_num : e.page_num.indexOf(page_num) !== -1)
+  }
 
+  // 読み進める方向を取得 [left , right]
+  static get direction(){
+    return Element.direction.checked ? "left" : "right"
+  }
+
+  // 画面サイズ [landscape（横） , portrait（縦）]
+  static get dimension(){
+    return window.innerWidth > window.innerHeight ? "landscape" : "portrait"
+  }
+
+  static group_num2page_num(group_num){
+    return Data.groups[group_num][0]
+  }
+  static page_num2group_num(page_num){
+    return Data.groups.findIndex(e => e.indexOf(page_num) !== -1)
+  }
 }

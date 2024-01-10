@@ -1,247 +1,391 @@
-import { Common }  from './common.js'
-import { List }    from './list.js'
-import { Img }     from './img.js'
-import { Setting } from './setting.js'
+import { Data }      from "./data.js"
+import { Common }    from "./common.js"
+import { Element }   from "./element.js"
+import { Direction } from "./direction.js"
 
 export class Book{
+  pages = []
+
   constructor(options){
+    Data.flg_setting = true
+
+// console.log("Book",Data.group_num,Data.page_num)
     this.options = options || {}
-    this.set_direction()
-    new Img({
-      data     : Common.data,
-      callback : ((datas)=>{
-        Common.images = datas
-        new List()
-        if(Book.is_portrait){
-          Book.view_page()
-        }
-        else{
-          Book.view_group()
-        }
-      }).bind(this)
+    this.clear()
+    switch(Common.dimension){
+      case "landscape":
+        this.view_groups()
+      break
+      case "portrait":
+        this.view_pages()
+      break
+    }
+    new View()
+    new Direction()
+
+    setTimeout((()=>{Data.flg_setting = false}) , 500)
+  }
+
+  clear(){
+    Element.book.innerHTML = ""
+  }
+
+  view_groups(){
+    for(let i=0; i<Data.groups.length; i++){
+      const div_group = document.createElement("div")
+      Element.book.appendChild(div_group)
+      div_group.className = "group"
+      div_group.setAttribute("data-group", i)
+      for(const page_num of Data.groups[i]){
+        const sub_flg = Data.groups[i].findIndex(e => e === page_num) === 1 ? true : false
+        const elm_page = this.view_page(i, page_num, sub_flg)
+        if(!elm_page){continue}
+        div_group.appendChild(elm_page)
+      }
+    }
+  }
+  view_pages(){
+    for(let i=0; i<Data.groups.length; i++){
+      for(const page_num of Data.groups[i]){
+        const sub_flg = Data.groups[i].findIndex(e => e === page_num) === 1 ? true : false
+        const elm_page = this.view_page(i, page_num, sub_flg)
+        if(!elm_page){continue}
+        Element.book.appendChild(elm_page)
+      }
+    }
+  }
+
+  view_page(group_num, page_num, sub_flg){
+    const page_data = Common.page2Info(page_num)
+    if(!page_data){return}
+
+    const div_page = this.create_page(page_num, page_data)
+
+    this.pages.push({
+      group_num : group_num,
+      page_num  : page_num,
+      data      : page_data,
+      sub_flg   : sub_flg,
     })
+
+    return div_page
   }
 
-  set_direction(){
-    const elm = document.getElementById(`direction`)
-    if(!elm){return}
-    elm.checked = Common.data.direction === "right" ? false : true
+  create_page(page_id, page_data){
+    const img = page_data.img
+    const div_page = document.createElement("div")
+    div_page.className = "page"
+    div_page.setAttribute("data-page"     , page_id)
+    return div_page
   }
 
-  // ページ送り
-  static next_page(mode){
-    if((Common.direction.checked === true  && mode === "left")
-    || (Common.direction.checked === false && mode === "right")){
-      if(Book.is_portrait){
-        if(Common.page_num === 0 && Common.page_sub === null){return}
-        Common.page_num = Common.page_num || 0
-        let go_page_num = Common.page_num
-        if(Common.data.pages[Common.page_num].dimension === "vertical" && Common.page_sub){
-          Common.page_sub = null
-        }
-        else{
-          go_page_num--
-          Common.page_sub = 1
-        }
-        Common.group_num = Book.get_page2group_num(go_page_num)
-        go_page_num = go_page_num > 0 ? go_page_num : 0
-        Book.view_page(mode, go_page_num , Common.page_sub)
-      }
-      else{
-        let go_group_num = Common.group_num - 1
-        go_group_num = go_group_num > 0 ? go_group_num : 0
-        Book.view_group(mode, go_group_num)
-      }
+  create_canvas(img, sub_flg){
+    const canvas   = document.createElement("canvas")
+    const size     = {
+      w : img.naturalWidth,
+      h : img.naturalHeight,
     }
-    else if((Common.direction.checked === true  && mode === "right")
-         || (Common.direction.checked === false && mode === "left")){
-      if(Book.is_portrait){
-        Common.page_num = Common.page_num || 0
-        let go_page_num = Common.page_num
-        if(Common.data.pages[Common.page_num].dimension === "vertical" && !Common.page_sub){
-          Common.page_sub = 1
-        }
-        else{
-          go_page_num++
-          Common.page_sub = null
-        }
-        Common.group_num = Book.get_page2group_num(go_page_num)
-        go_page_num = go_page_num <= Common.images.length - 1 ? go_page_num : Common.images.length - 1
-        Book.view_page(mode, go_page_num , Common.page_sub)
-      }
-      else{
-        let go_group_num = Common.group_num + 1
-        go_group_num = go_group_num <= Common.groups.length - 1 ? go_group_num : Common.groups.length - 1
-        Book.view_group(mode, go_group_num)
-      }
-    }
-    else if(typeof mode === "number"){
-
-    }
-    List.set_active()
-  }
-
-
-  static clear_current_page(){
-    const page = Common.area.querySelector(`.page`)
-    if(!page){return}
-    page.parentNode.removeChild(page)
-  }
-
-  static view_page(mode, go_page_num, sub_flg){console.log(mode)
-    // Book.clear_current_page()
-    Common.page_num = go_page_num ?? 0
-    const img = Book.get_page_image(Common.page_num)
-    if(!img){return}
-    const page = document.createElement("div")
-    page.className = "page"
-    page.setAttribute("data-count" , 1)
-    const dimension = Book.get_page_dimension(page_num)
-    page.setAttribute("data-dimension" , dimension)
-    const canvas = Book.set_canvas(img , 1, sub_flg)
-    page.appendChild(canvas)
-    switch(mode){
-      case "left":
-        img.parentNode.insertBefore(page , img)
-        break
-      case "right":
-      default:
-        Common.area.appendChild(page)
-        break
-    }
-    const page_count = Common.page_num + 1
-    Common.page_nums.textContent = `${page_count}.${Common.page_sub}`
-  }
-
-  static view_group(mode, go_group_num){
-    if(Common.group_num === go_group_num){return}
-    const elm = Common.area.querySelector(".page")
-    // Book.clear_current_page()
-    Common.group_num = go_group_num ?? Common.group_num
-    const images = Book.get_group_images(Common.group_num)
-    if(!images || !images.length){return}
-    const page = document.createElement("div")
-    page.className = "page"
-    page.setAttribute("data-count" , images.length)
-    if(images.length === 1){
-      const page_num = this.get_page_num(go_group_num,0)
-      const dimension = Book.get_page_dimension(page_num)
-      page.setAttribute("data-dimension" , dimension)
-    }
-    for(const img of images){
-      const canvas = Book.set_canvas(img , images.length)
-      page.appendChild(canvas)
-    }
-    switch(mode){
-      case "left":
-        // page.style.setProperty("margin-left","-100%","")
-        Common.area.insertBefore(page, elm)
-
-        if(elm){
-          Common.area.animate({
-            // "margin-left" : ['-100%', '0%']
-            transform : ["translateX(-100%)","translateX(0%)"]
-          }, {
-            id         : "page-move",
-            duration   : Setting.duration,
-            iterations : 1,
-          });
-          for(const anim of Common.area.getAnimations()){
-            if(anim.id !== 'page-move'){continue}
-            Promise.all([anim.finished]).then(e => {
-              elm.parentNode.removeChild(elm)
-            })
-          }
-        }
-        break
-
-      case "right":
-      default:
-        Common.area.appendChild(page)
-        if(elm){
-          Common.area.animate({
-            // "margin-left" : ['0%', '-100%']
-            transform : ["translateX(0%)","translateX(-100%)"]
-          }, {
-            id         : "page-move",
-            duration   : Setting.duration,
-            iterations : 1,
-          });
-          for(const anim of Common.area.getAnimations()){
-            if(anim.id !== 'page-move'){continue}
-            Promise.all([anim.finished]).then(e => {
-              elm.parentNode.removeChild(elm)
-            })
-          }
-        }
-        break
-    }
-    const page_count = Common.group_num+1
-    Common.page_nums.textContent = `${page_count}`
-  }
-
-  static set_canvas(img , page_count , page_sub_flg){
-    const canvas  = document.createElement("canvas")
-    const ctx     = canvas.getContext("2d")
-    const w       = img.naturalWidth
-    const h       = img.naturalHeight
-    canvas.width  = w
-    canvas.height = h
+    const vertical = size.w > size.h ? true : false
+    canvas.width   = vertical ? size.w / 2 : size.w
+    canvas.height  = size.h
     let x = 0
-    if(Book.is_portrait && page_count === 1 && w > h){
-      canvas.width  = w / 2
-      if((page_sub_flg && Common.direction.checked)
-      || (!page_sub_flg && !Common.direction.checked)){
-        x = -(w / 2)
+    if((sub_flg === true  && Element.direction.checked)
+    || (sub_flg === false && !Element.direction.checked)){
+      x = -size.w / 2
+    }
+    canvas.getContext("2d").drawImage(img, x, 0, size.w, size.h)
+    return canvas
+  }
+}
+
+export class View{
+  constructor(){
+    switch(Common.dimension){
+      case "landscape":
+        this.group(Data.group_num)
+        // next
+        this.group(Data.group_num+1)
+        // prev
+        this.group(Data.group_num-1)
+      break
+      case "portrait":
+        this.page(Data.page_num)
+        // next
+        this.page(Data.page_num+1)
+        // prev
+        this.page(Data.page_num-1)
+      break
+    }
+  }
+  // 対象のグループ要素に画像が挿入されているか確認（要素がない場合も処理をしない）
+  check_group_image(group_num){
+    const elm_group = this.elm_group(group_num)
+    if(!elm_group){return true}
+    return elm_group.querySelector("canvas") ? true : false
+  }
+  group(group_num){
+    if(group_num < 0 || !Data.groups[group_num]){return}
+    if(this.check_group_image(group_num) === true){return}
+    const page_nums = Data.groups[group_num]
+    if(!page_nums){return}
+    for(const page_num of page_nums){
+      const data = Common.page2Info(page_num)
+      const img  = data.img
+      const elm_page = this.elm_page(page_num)
+      if(img.naturalWidth > img.naturalHeight){
+        const sub_flg = page_nums.findIndex(e => e === page_num) === 1 ? true : false
+        const canvas = new Canvas(img, sub_flg).canvas
+        elm_page.appendChild(canvas)
+      }
+      else{
+        const canvas = new Canvas(img).canvas
+        if(!canvas){continue}
+        elm_page.appendChild(canvas)
       }
     }
-    ctx.drawImage(img, x, 0, w, h)
+  }
+  check_page_image(page_num){
+    const elm_page = this.elm_page(page_num)
+    if(!elm_page){return true}
+    return elm_page.querySelector("canvas") ? true : false
+  }
+  page(page_num){
+    if(page_num < 0 || page_num > Math.max(Data.groups.length)){return}
+    if(this.check_page_image(page_num) === true){return}
+    const data      = Common.page2Info(page_num)
+    const img       = data.img
+    const elm_page  = this.elm_page(page_num)
+    const page_nums = Data.groups.find(e => e.indexOf(page_num) !== -1)
+    if(img.naturalWidth > img.naturalHeight){
+      const sub_flg = page_nums.findIndex(e => e === page_num) === 1 ? true : false
+      const canvas = new Canvas(img, sub_flg).canvas
+      elm_page.appendChild(canvas)
+    }
+    else{
+      const canvas = new Canvas(img).canvas
+      if(canvas){
+        elm_page.appendChild(canvas)
+      }
+    }
+  }
+
+  page_data(page_num){
+    return Data.images[page_num]
+  }
+
+  elm_page(page_num){
+    return Element.book.querySelector(`.page[data-page="${page_num}"]`)
+  }
+  elm_group(group_num){
+    return Element.book.querySelector(`.group[data-group="${group_num}"]`)
+  }
+  elm_group_pages(group_num){
+    const elm_group = this.elm_group(group_num)
+    return elm_group.querySelectorAll(`.page`)
+  }
+}
+
+class Canvas{
+  constructor(img , sub_flg){
+    if(!img){return null}
+    this.img = img
+    this.w   = img.naturalWidth
+    this.h   = img.naturalHeight
+
+    if(sub_flg !== undefined){
+      this.canvas = this.half(sub_flg)
+    }
+    else{
+      this.canvas = this.full()
+    }
+  }
+  full(){
+    const canvas  = document.createElement("canvas")
+    canvas.width  = this.w
+    canvas.height = this.h
+    let x = 0
+    canvas.getContext("2d").drawImage(this.img, x, 0, this.w, this.h)
     return canvas
   }
 
-  static get_page_image(page_num){
-    const page_data = Common.images.find(e => e.page === page_num)
-    return page_data ? page_data.img : null
-  }
-
-  static get_group_images(group_num){
-    const page_nums = Common.groups[group_num]
-    const images = []
-    for(const page_num of page_nums){
-      const page_data = Common.images.find(e => e.page === page_num)
-      if(!page_data){continue}
-      images.push(page_data.img)
+  half(sub_flg){
+    const canvas  = document.createElement("canvas")
+    canvas.width  = ~~(this.w / 2)
+    canvas.height = this.h
+    let x = 0
+    if((sub_flg  &&  Element.direction.checked)
+    || (!sub_flg && !Element.direction.checked)){
+      x = -canvas.width
     }
-    return images
+    canvas.getContext("2d").drawImage(this.img, x, 0, this.w, this.h)
+    return canvas
+  }
+}
+
+export class Page{
+  constructor(type, options){
+    this.options = options || {}
+    switch(type){
+      case "left":
+        this.turn_left()
+      break
+      case "right":
+        this.turn_right()
+      break
+      case "scroll":
+        switch(Common.dimension){
+          case "landscape":
+            this.turn_scroll_landscape(options)
+            break
+          case "portrait":
+            this.turn_scroll_portrait(options)
+            break
+        }
+      case "page_num":
+        this.turn_num(this.options.page_num || null)
+      break
+    }
+  }
+  // ページめくり（左）
+  turn_left(){
+    switch(Common.dimension){
+      case "landscape":
+        Data.group_num = this.check_group_num_over(Element.direction.checked ? Data.group_num-1 : Data.group_num+1)
+        // Data.page_num  = this.get_group2page_num(Data.group_num)
+// console.log("turn_left-landscape",Data.group_num,Data.page_num)
+        new View()
+        Element.book.scrollLeft = this.get_scrollLeft_group(Data.group_num)
+      break
+      case "portrait":
+        Data.page_num  = this.check_page_num_over(Element.direction.checked ? Data.page_num-1 : Data.page_num+1)
+        // Data.group_num = this.get_page2group_num(Data.page_num)
+// console.log("turn_left-portrait",Data.group_num,Data.page_num)
+        new View()
+        Element.book.scrollLeft = this.get_scrollLeft_page(Data.page_num)
+      break
+    }
+  }
+  // ページめくり（右）
+  turn_right(){
+    switch(Common.dimension){
+      case "landscape":
+        Data.group_num = this.check_group_num_over(Element.direction.checked ? Data.group_num+1 : Data.group_num-1)
+        // Data.page_num  = this.get_group2page_num(Data.group_num)
+// console.log("turn_right-landscape",Data.group_num,Data.page_num)
+        new View()
+        Element.book.scrollLeft = this.get_scrollLeft_group(Data.group_num)
+      break
+      case "portrait":
+        Data.page_num  = this.check_page_num_over(Element.direction.checked ? Data.page_num+1 : Data.page_num-1)
+        // Data.group_num = this.get_page2group_num(Data.page_num)
+// console.log("turn_right-portrait",Data.group_num,Data.page_num)
+        new View()
+        Element.book.scrollLeft = this.get_scrollLeft_page(Data.page_num)
+      break
+    }
   }
 
-  static get_page_num(group_num , group_page_num){
-    group_num = group_num || 0
-    return Common.groups[group_num][group_page_num]
+  // ページめくり（ページ番号）
+  turn_num(page_num){
+    if(page_num === null){return}
+    Data.page_num = page_num
+// console.log("turn-num",Data.page_num)
+  }
+  check_page_num_over(page_num){
+    if(page_num < 0){
+      return 0  
+    }
+    const   page_count = Math.max(Data.groups.flat())
+    if(page_num > page_count){
+      return page_count
+    }
+    return page_num
+  }
+  check_group_num_over(group_num){
+    if(group_num < 0){
+      return 0
+    }
+    const page_count = Math.max(Data.groups.length)
+    if(group_num > Data.groups.length-1){
+      return Data.groups.length-1
+    }
+    return group_num
   }
 
-  // portrait処理
-  static get is_portrait(){
-    return screen.width < screen.height ? true : false
+  turn_scroll_landscape(options){
+    // 画面内にあるページをスキャンする。
+    const groups = Element.book.querySelectorAll(".group")
+    let group_num = null
+    for(const group of groups){
+      const st = group.offsetLeft - (document.body.offsetWidth / 2)
+      const ed = group.offsetLeft + (document.body.offsetWidth / 2)
+      if(options.scrollLeft >=st && options.scrollLeft <= ed && group.hasAttribute("data-group")){
+        group_num = Number(group.getAttribute("data-group"))
+        break
+      }
+    }
+    if(group_num === Data.group_num){return}
+    Data.group_num = group_num
+    // Data.page_num  = this.get_group2page_num(Data.group_num)
+// console.log("turn_scroll_landscape",Data.group_num,Data.page_num,options)
+    new View()
+  }
+  turn_scroll_portrait(options){
+    // 画面内にあるページをスキャンする。
+    const pages = Element.book.querySelectorAll(".page")
+    let page_num = null
+    for(const page of pages){
+      const st = page.offsetLeft - (document.body.offsetWidth / 2)
+      const ed = page.offsetLeft + (document.body.offsetWidth / 2)
+      if(options.scrollLeft >=st && options.scrollLeft <= ed && page.hasAttribute("data-page")){
+        page_num = Number(page.getAttribute("data-page"))
+        break
+      }
+    }
+    if(page_num === Data.page_num){return}
+    Data.page_num  = page_num
+    // Data.group_num = this.get_page2group_num(Data.page_num)
+// console.log("turn_scroll_portrait",Data.group_num,Data.page_num)
+    new View()
+  }
+  get_scrollLeft_group(group_num){
+    // return Element.book.querySelector(`.group[data-group="${group_num}"]`).offsetLeft
+    return Page.get_scrollLeft_group(group_num)
+  }
+  get_scrollLeft_page(page_num){
+    // return Element.book.querySelector(`.page[data-page="${page_num}"]`).offsetLeft
+    return Page.get_scrollLeft_page(page_num)
+  }
+  static get_scrollLeft_group(group_num){
+    return Element.book.querySelector(`.group[data-group="${group_num}"]`).offsetLeft
+  }
+  static get_scrollLeft_page(page_num){
+    return Element.book.querySelector(`.page[data-page="${page_num}"]`).offsetLeft
   }
 
+  get_group2page_num(group_num){
+    // return Data.groups[group_num][0]
+    return Page.get_group2page_num(group_num)
+  }
+  get_page2group_num(page_num){
+    // return Data.groups.findIndex(e => e.indexOf(page_num) !== -1)
+    return Page.get_page2group_num(page_num)
+  }
   static get_group2page_num(group_num){
-    return Common.groups[group_num] ? Common.groups[group_num][0] : 0
+    return Data.groups[group_num][0]
   }
   static get_page2group_num(page_num){
-    return Common.groups.find(e => e.indexOf(page_num) !== -1)
+    return Data.groups.findIndex(e => e.indexOf(page_num) !== -1)
   }
 
-  static get_page_dimension(page_num){
-    if(Common.images && Common.images[page_num] && Common.images[page_num].dimension){
-      return Common.images[page_num].dimension
-    }
-    if(Common.data.pages && Common.data.pages[page_num] && Common.data.pages[page_num].dimension){
-      return Common.data.pages[page_num].dimension
-    }
-    else{
-      // console.log(Common.images)
-      return ""
+  static transition(){
+    switch(Common.dimension){
+      case "landscape":
+        Element.book.scrollLeft = Page.get_scrollLeft_group(Data.group_num)
+      break
+      case "portrait":
+        Element.book.scrollLeft = Page.get_scrollLeft_page(Data.page_num)
+      break
     }
   }
 }

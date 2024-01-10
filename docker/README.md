@@ -32,4 +32,4 @@ Author : Yugeta.Koji
 > docker rmi %image-id
 
 - dockerを起動したら次のURLでアクセスできる
-> http://localhost:8088/
+> http://localhost:8001/

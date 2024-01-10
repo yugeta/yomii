@@ -2,14 +2,15 @@
 <script type="module" src="page/{{page_name}}/js/main.js"></script>
 
 
-<section class="book-select">
+<!-- <section class="book-select">
   <div>Book(変換したJSONファイル)を選択してください。</div>
   <input type="file" name="book" accept=".yomii"/>
   <a href="./">Top</a>
-</section>
+</section> -->
+<div class="area">
+  <section class="book"></section>
+  <!-- <section class="list"></section> -->
+</div>
 
-<section class="book-list" id="pages"></section>
-
-<section class="book-area"></section>
-
-
+<button class='page-turn-over' data-type="left"></button>
+<button class='page-turn-over' data-type="right"></button>

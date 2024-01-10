@@ -1,0 +1,20 @@
+@media (orientation:portrait){
+  .book .page[data-count="2"] > *{
+    width:50%;
+  }
+
+  .book .page > *{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+  }
+
+  /* .book-ea .page{
+    flex-direction:row-reverse;
+  } */
+
+  .book .page[data-dimension="vertical"] img{
+    /* clip-path:polygon(0 0, 50% 0, 50% 100%, 0 100%); */
+    /* object-position:center; */
+  }
+}
