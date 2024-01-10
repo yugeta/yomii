@@ -15,6 +15,10 @@
   z-index:5;
 }
 
+.book[data-scroll="auto"]{
+  scroll-behavior:auto;
+}
+
 /* Scroll bar hidden */
 .book{
   -ms-overflow-style: none;

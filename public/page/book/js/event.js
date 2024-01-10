@@ -1,5 +1,5 @@
 import { Element }   from "./element.js"
-import { Page }      from "./book.js"
+import { Page }      from "./page.js"
 import { Data }      from "./data.js"
 import { Common }    from "./common.js"
 import { Upload }    from "./upload.js"

@@ -1,16 +1,11 @@
 import { Data }    from "./data.js"
 import { Element } from "./element.js"
 import { Img }     from "./img.js"
-// import { List }    from "./list.js"
 import { Book }    from "./book.js"
 import { Common }  from "./common.js"
 
 export class Upload{
   constructor(options){
-    // this.options = options || {}
-    // new Event({
-    //   uploaded : this.uploaded.bind(this)
-    // })
     this.uploaded(options)
   }
 
@@ -20,35 +15,46 @@ export class Upload{
     || !e.target.files 
     || !e.target.files.length){return}
 
+    
+
     const file_data = e.target.files[0]
     const fileReader = new FileReader();
     fileReader.onload = (e => {
 			const json = e.target.result
       const data = JSON.parse(json)
       Data.data = data
+// console.log(data)
+      // Data.book_name = this.filepath2name(Data.data.filepath)
+
+      // ファイル名確定(book_name)
+      Data.set_name()
+
+      // localStorageデータの読み込み
+      new Data()
+
       new Img({
         callback : (()=>{
           Common.header_menu_close()
-          // new List()
           new Book()
         })
       })
-      console.log(Data.data)
       this.name_view()
-      // this.finish()
 		})
 		fileReader.readAsText(file_data)
   }
 
   name_view(){
     if(!Data.data){return}
-    Element.file_name.textContent = Data.data.setting.files.name
+    // Element.file_name.textContent = Data.data.setting.files.name
+    Element.file_name.textContent = Data.book_name
   }
 
-  // finish(){
-  //   if(this.options.callback){
-  //     this.options.callback()
-  //   }
+  // filepath2name(filepath=""){
+  //   const sp = filepath.split("\\")
+  //   const name = sp.pop()
+  //   const sp2 = name.split(".")
+  //   sp2.pop()
+  //   return sp2.join(".")
   // }
 }
 
