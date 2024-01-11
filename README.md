@@ -76,8 +76,16 @@ docker-compose up -d
 
 
 # Server modules
-- php : zipArchive
 - Linux : lang-ja
+- php : zipArchive
+- ※ Dockerで起動する必要があります。
+
+```
+ssh -i ~/docs/job/mynt/server/webArena/key/ideacompo.ssh-c8yvdxog.pem ubuntu@140.227.12.116
+login-id : ubuntu
+login-pw : 3dnffw7y
+```
+
 
 # Upload(convert)
 - 使っているPCやスマホなどからのzipやpdfファイルをアップロードして、jsonデータ(yomi)を取得する。

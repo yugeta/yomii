@@ -55,7 +55,7 @@ export class Data{
   }
   static load_all(){
     const str  = window.localStorage.getItem(Data.storage_name)
-    return str ? JSON.parse(decodeURIComponent(atob(str))) : null
+    return str ? JSON.parse(decodeURIComponent(atob(str))) : []
   }
 
 
