@@ -12,20 +12,14 @@ export class Archive{
   }
 
   async create(){
-<<<<<<< HEAD
     const zip = new Zlib.Zip()
 
     // images
     const images = this.get_images()
-=======
-    const images = this.get_images()
-    const zip = new Zlib.Zip()
->>>>>>> main
     for(let i=0; i<images.length; i++){
       const data = await this.src2buffer(images[i].src);
       const num = ("0000"+i).slice(-4)
       zip.addFile(data, {
-<<<<<<< HEAD
         filename: this.stringToByteArray(`${num}.webp`),
       })
     }
@@ -38,11 +32,6 @@ export class Archive{
     })
 
     // create link file
-=======
-        filename: this.stringToByteArray(`foo_${num}.webp`),
-      })
-    }
->>>>>>> main
     const buf  = zip.compress()
     const blob = new Blob([buf], {type: "application/zip"})
     const url  = URL.createObjectURL(blob);
@@ -76,7 +65,6 @@ export class Archive{
     })
   }
 
-<<<<<<< HEAD
   async txt2buffer(txt){
     return new Promise((resolve, reject) =>{
       fetch(txt)
@@ -96,8 +84,6 @@ export class Archive{
     })
   }
 
-=======
->>>>>>> main
   set_link(data){
     const a = document.createElement("a")
     a.textContent = `${this.filename}.${Common.download_ext}`

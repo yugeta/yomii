@@ -7,16 +7,11 @@ h1{
 }
 
 .pages{
-<<<<<<< HEAD
   padding:20px;
-=======
-  padding:10px;
->>>>>>> main
   display:flex;
   flex-wrap:wrap;
   gap:10px;
   counter-reset:num;
-<<<<<<< HEAD
   max-height:calc(100vh - 350px);
   overflow-y:auto;
   border:1px dashed black;
@@ -25,8 +20,6 @@ h1{
 }
 .pages:empty{
   display:none;
-=======
->>>>>>> main
 }
 
 .pages > .page{
