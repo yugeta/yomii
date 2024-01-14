@@ -103,3 +103,7 @@ login-pw : 3dnffw7y
 - Page rate change : Landscape（横長）: 見開き , Portrait（縦長）: 単一ページ
 - Reading-page : 対象書籍の読みかけページの保存(localStorage)
 
+# install
+- plugins
+> git clone git@github.com:imaya/zlib.js.git
+

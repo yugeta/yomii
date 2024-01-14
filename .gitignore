@@ -6,6 +6,6 @@ Thumbs.db
 
 bak/
 trash/
-data/
-plugin/
-vendor/
+public/data/
+public/plugin/
+public/vendor/
