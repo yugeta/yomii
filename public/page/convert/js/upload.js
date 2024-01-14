@@ -2,7 +2,6 @@ import { Common } from "./common.js"
 import { Zip }    from "./zip.js"
 import { Pdf }    from "./pdf.js"
 import { Info }   from "./info.js"
-import { Main }   from "./main.js"
 
 export class Upload{
   constructor(){
