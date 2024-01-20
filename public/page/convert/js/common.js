@@ -7,8 +7,29 @@ export class Common{
   static img_area      = document.querySelector(".pages")
   static download_area = document.querySelector(".control .download")
   static download_ext  = "yomii"
+  static button_save   = document.querySelector(`button.save`)
+  static elm_direction = document.getElementById("direction")
   
-  static max_size      = 1000
+  // 画像の最大サイズ（縦横兼用）
+  static max_size      = 1500
+
+  // yomiiファイルに格納する設定ファイル
+  static setting_file  = "___setting.json"
+  // 設定ファイルのデータ格納用
+  static setting_data  = {}
+
+  // 読み込んだファイルのデータ
+  static file_info = {
+    filename  : null,
+    name      : null,
+    dimension : null,
+    singles   : [],
+    deletes   : [],
+  }
+
+  // 読み込んだ画像データ
+  static images = []
+
   static adjust_size(size){
     switch(size.w > size.h){
       // landscape
@@ -28,5 +49,29 @@ export class Common{
         }
       break
     }
+  }
+
+  static get_file_ext(filename){
+    if(!filename){return}
+    const sp = filename.split(".")
+    return sp.pop()
+  }
+
+  static set_file_info(datas){
+    for(const key in Common.file_info){
+      Common.file_info[key] = datas[key] !== undefined ? datas[key] : Common.file_info[key]
+    }
+  }
+
+  static init(){
+    Common.file_info = {
+      filename  : null,
+      name      : null,
+      dimension : null,
+      singles   : [],
+      deletes   : [],
+    }
+    Common.setting_data = {}
+    Common.images = []
   }
 }

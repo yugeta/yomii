@@ -3,31 +3,27 @@
   --size-direction-h: 30px;
   --size-direction-point: 25px;
   --size-direction-margin: 3px;
+  --size-raund : 5px;
 }
-
-
-.direction-area{
-  display:flex;
-  align-items:center;
-  gap:5px;
-}
-
 label.direction{
   width:var(--size-direction-w);
   height:var(--size-direction-h);
   background-color:white;
-  border-radius:var(--size-direction-h);
-  padding:5px;
+  border-radius:var(--size-raund);
+  padding:0;
   display:flex;
   align-items:center;
   justify-content:space-between;
   position:relative;
   cursor:pointer;
+  border:2px solid black;
+  overflow:hidden;
 }
 label.direction .left,
 label.direction .right{
-  width:20px;
-  height:20px;
+  width:50%;
+  height:100%;
+  margin:5px 2px;
   background-color:black;
   clip-path:polygon(95% 40%, 50% 40%, 50% 10%, 5% 50%, 50% 90%, 50% 60%, 95% 60%);
 }
@@ -37,30 +33,17 @@ label.direction .right{
 label.direction::before{
   content:"";
   display:block;
-  width:var(--size-direction-point);
-  height:var(--size-direction-point);
-  border-radius:50%;
+  width:50%;
+  height:100%;
   background-color:white;
   position:absolute;
-  top:50%;
-  transform:translate(0,-50%);
+  top:0;
+  left:50%;
   mix-blend-mode:difference;
   z-index:1;
-  transition-property:left,right;
-  transition-duration:0.3s;
+  transition-property:left;
+  transition-duration:0.2s;
 }
-label.direction:hover::before{
-  opacity:0.7;
-}
-.direction::before{
-  left:calc(var(--size-direction-w) - var(--size-direction-point) - var(--size-direction-margin));
-}
-#direction:not(:checked) ~ header .direction::before{
-  left:var(--size-direction-margin);
-}
-
-@media (max-width:768px){
-  header .menu{
-    gap:0px;
-  }
+#direction:not(:checked) ~ .setting .direction::before{
+  left:0%;
 }

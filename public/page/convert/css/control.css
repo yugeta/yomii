@@ -1,0 +1,27 @@
+form[name="upload"]{
+  display:none;
+}
+
+label.file_upload{
+  background-color:black;
+  color:white;
+  padding:10px;
+  border-radius:5px;
+  cursor:pointer;
+}
+label.file_upload:hover{
+  opacity:0.5;
+}
+
+.control{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.control .download{
+
+}
+
+.save[data-hidden="1"]{
+  display:none;
+}

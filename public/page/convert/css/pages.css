@@ -1,0 +1,100 @@
+.pages{
+  --size-page : 100px;
+  --size-gap  : 10px;
+
+  padding:20px;
+  display:flex;
+  flex-wrap:wrap;
+  gap: var(--size-gap);
+  counter-reset:num;
+  max-height:calc(100vh - 350px);
+  overflow-y:auto;
+  border:1px dashed black;
+  /* border-radius:5px; */
+  margin-top:10px;
+}
+.pages:empty{
+  display:none;
+}
+
+.pages .page{
+  display:flex;
+  border:1px solid black;
+  background-color:#ddd;
+  position:relative;
+  height:var(--size-page);
+}
+
+/* .pages .page[data-img-count="1"]{
+  width: calc(var(--size-page) * 1);
+}
+.pages .page[data-img-count="2"]{
+  width: calc(var(--size-page) * 2);
+} */
+
+.pages .page > img{
+  height:100%;
+  object-fit:contain;
+  cursor:pointer;
+}
+.pages .page > img:hover{
+  opacity:0.5;
+}
+
+
+.pages .page > img[data-dimension="portrait"]{
+  width:var(--size-page);
+}
+
+.pages .page > img[data-dimension="landscape"]{
+  width:calc(var(--size-page) * 2);
+}
+
+.pages .page::before,
+.pages .page[data-img-count="2"]::after{
+  content:counter(num);
+  counter-increment:num 1;
+  display:flex;
+  position:absolute;
+  top:0;
+  width:20px;
+  height:20px;
+  padding:4px;
+  color:white;
+  background-color:black;
+  font-size:0.6em;
+  align-items:center;
+  justify-content:center;
+}
+.pages .page[data-img-count="1"] img[data-dimension="portrait"]{
+  width:calc(var(--size-page) * 2);
+}
+
+/* checked */
+#direction:not(:checked) ~ .pages .page[data-img-count="1"]::before,
+#direction:checked ~ .pages .page::before,
+#direction:not(:checked) ~ .pages .page::before{
+  right:0;
+}
+
+#direction:checked ~ .pages .page[data-img-count="1"]::before,
+#direction:checked ~ .pages .page[data-img-count="2"]::after,
+#direction:not(:checked) ~ .pages .page[data-img-count="2"]::after{
+  left:0;
+}
+
+#direction:not(:checked) ~ .pages,
+#direction:not(:checked) ~ .pages .page{
+  flex-direction:row-reverse;
+}
+
+
+#direction:checked ~ .pages .page[data-img-count="2"] img:nth-of-type(1),
+#direction:not(:checked) ~ .pages .page[data-img-count="2"] img:nth-of-type(2){
+  object-position:right;
+}
+#direction:not(:checked) ~ .pages .page[data-img-count="2"] img:nth-of-type(1),
+#direction:checked ~ .pages .page[data-img-count="2"] img:nth-of-type(2){
+  object-position:left;
+}
+

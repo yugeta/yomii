@@ -3,7 +3,8 @@ import { Common }  from "./common.js"
 export class Archive{
   constructor(options){
     this.options = options || {}
-    this.filename = this.options.name || `book_`+(+new Date())
+    this.filename = Common.file_info.name || `book_`+(+new Date())
+    this.loading_start()
     this.create()
   }
 
@@ -24,11 +25,9 @@ export class Archive{
       })
     }
 
-    // setting.json
-    const setting_json = JSON.stringify(this.options , null , "  ")
-    // const setting_bin  = this.txt2buffer(setting_json)
-    zip.addFile(this.stringToByteArray(setting_json), {
-      filename: this.stringToByteArray(`setting.json`),
+    // ___setting.json
+    zip.addFile(this.create_setting_data(), {
+      filename: this.stringToByteArray(Common.setting_file),
     })
 
     // create link file
@@ -65,35 +64,44 @@ export class Archive{
     })
   }
 
-  async txt2buffer(txt){
-    return new Promise((resolve, reject) =>{
-      fetch(txt)
-      .then(response => response.blob())
-      .then(blob => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const arrayBuffer = reader.result;
-          const uint8Array = new Uint8Array(arrayBuffer);
-          resolve(uint8Array)
-        };
-        reader.readAsArrayBuffer(blob);
-      })
-      .catch(error => {
-        console.error('画像の取得に失敗しました:', error);
-      });
-    })
-  }
-
   set_link(data){
     const a = document.createElement("a")
     a.textContent = `${this.filename}.${Common.download_ext}`
     a.download    = `${this.filename}.${Common.download_ext}`
     a.href        = data
 
+    // delete-loading
+    this.loading_finish()
+
     // 自動ダウンロード
-    // a.click() 
+    a.click() 
 
     // リンク表示
-    Common.download_area.appendChild(a)
+    // Common.download_area.appendChild(a)
+  }
+
+  get direction(){
+    return Common.elm_direction.checked ? "left" : "right"
+  }
+
+  create_setting_data(){
+    const setting_data = {
+      base_filename : Common.file_info.filename,
+      name          : Common.file_info.name,
+      direction     : this.direction,
+      singles       : Common.file_info.singles,
+      deletes       : Common.file_info.deletes,
+    }
+    const setting_json = JSON.stringify(setting_data , null , "  ")
+    const str = unescape(encodeURIComponent(setting_json))
+    return this.stringToByteArray(str)
+  }
+  
+  loading_start(){
+    Common.download_area.setAttribute("data-loading" , "progress")
+  }
+
+  loading_finish(){
+    Common.download_area.setAttribute("data-loading" , "finish")
   }
 }

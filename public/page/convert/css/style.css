@@ -1,3 +1,14 @@
+@import "pages.css";
+@import "control.css";
+@import "popup.css";
+@import "setting.css";
+@import "direction.css";
+@import "loading.css";
+
+body{
+  overflow:hidden;
+}
+
 main{
   padding:20px;
 }
@@ -5,100 +16,3 @@ main{
 h1{
   font-size:2.0em;
 }
-
-.pages{
-  padding:20px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  counter-reset:num;
-  max-height:calc(100vh - 350px);
-  overflow-y:auto;
-  border:1px dashed black;
-  border-radius:5px;
-  margin-top:10px;
-}
-.pages:empty{
-  display:none;
-}
-
-.pages > .page{
-  display:flex;
-  border:1px solid black;
-  background-color:#ddd;
-  position:relative;
-  width:100px;
-  height:100px;
-}
-
-.pages > .page > img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-}
-.pages > .page::before{
-  content:counter(num);
-  counter-increment:num 1;
-  display:flex;
-  position:absolute;
-  min-width:20px;
-  height:20px;
-  padding:4px;
-  color:white;
-  background-color:black;
-  font-size:0.7em;
-  align-items:center;
-  justify-content:center;
-}
-
-
-form[name="upload"]{
-  display:none;
-}
-
-label.file_upload{
-  background-color:black;
-  color:white;
-  padding:10px;
-  border-radius:5px;
-  cursor:pointer;
-}
-label.file_upload:hover{
-  opacity:0.5;
-}
-
-.control{
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-.control .download{
-
-}
-
-.base{
-  position:fixed;
-  top:0;
-  left:0;
-  display:flex;
-  width:100vw;
-  height:100vh;
-  background-color:rgba(0,0,0,0.7);
-  padding:50px;
-  align-items:center;
-  justify-content:center;
-  z-index:100;
-}
-.base img{
-  max-width:100%;
-  min-height:100%;
-  object-fit:contain;
-}
-.base .info{
-  position:absolute;
-  top:10px;
-  left:10px;
-  color:white;
-  font-size:1.2em;
-}
-

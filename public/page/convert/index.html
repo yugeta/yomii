@@ -1,21 +1,32 @@
 <link rel="stylesheet" href="page/{{page_name}}/css/style.css"/>
 <script type="module" src="page/{{page_name}}/js/main.js"></script>
-<script type="module" src="../../asset/js/loading/loading.js"></script>
+<!-- <script type="module" src="../../asset/js/loading/loading.js"></script> -->
 
 <script src="page/{{page_name}}/js/plugin/zip/zip.min.js"></script>
 <script src="page/{{page_name}}/js/plugin/zip/unzip.min.js"></script>
 
-<h1>Uploader</h1>
+<!-- <h1>Uploader</h1> -->
+<input type="checkbox" id="direction" style="display:none;" checked=true/>
 
 <form name="upload" method="post" enctype="multipart/form-data">
   <input type="hidden" name="mode" value="upload"/>
-  <input type="file" id="book" name="book" accept="application/zip, application/pdf"/>
+  <input type="file" id="book" name="book" accept="application/zip, application/pdf, .yomii"/>
 </form>
 
 <section class="control">
   <label class="file_upload" for="book" >Book アップロード</label>
-  <div class="download"></div>
+  <button class="save" data-hidden="1">保存</button>
+  <div class="download">書籍ファイルをアップロードしてください。</div>
+</section>
+
+<section class="setting">
+  <label class="direction" for="direction">
+    <div class="left"></div>
+    <div class="right"></div>
+  </label>
 </section>
 
 <section class="pages"></section>
+
+<section class="loading"></section>
 

@@ -64,6 +64,7 @@ export class Data{
     return Data.book_name
   }
   static set_name(){
+    console.log(Data.data)
     const sp =  Data.data.filepath.split("\\")
     const name = sp.pop()
     const sp2 = name.split(".")
