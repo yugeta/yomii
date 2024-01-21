@@ -5,7 +5,8 @@ export class Loading{
   static time_end   = 0
   static time_range = 0
 
-  constructor(){
+  constructor(options){
+    this.options = options || {}
     Loading.clear()
     Loading.set_css()
     Loading.set_elm()
@@ -13,6 +14,7 @@ export class Loading{
     Loading.set_bar()
     Loading.set_rate(0)
     Loading.set_status()
+    this.set_type(this.options.type)
   }
   static class_name_root     = 'loading'
   static class_name_progress = 'loading-progress'
@@ -100,5 +102,10 @@ export class Loading{
     // this.set_rate(0)
     if(!Loading.root){return}
     Loading.root.parentNode.removeChild(Loading.root)
+  }
+
+  set_type(type){
+    if(!type){return}
+    Loading.root.setAttribute("data-type" , type)
   }
 }

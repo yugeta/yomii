@@ -3,12 +3,12 @@ import { Info }    from "./info.js"
 import { Common }  from "./common.js"
 import { Loading } from "./loading.js"
 // import { Archive } from "./archive.js"
-import * as PdfJs  from "./plugin/pdf/build/pdf.js"
+import * as PdfJs  from "../../../asset/js/pdf/build/pdf.js"
 
 export class Pdf{
   constructor(pdf_file, callback){
     this.callback = callback || null
-    PdfJs.GlobalWorkerOptions.workerSrc = `page/${Main.page_name}/js/plugin/pdf/build/pdf.worker.js`;
+    PdfJs.GlobalWorkerOptions.workerSrc = `asset/js/pdf/build/pdf.worker.js`;
     Common.set_file_info(new Info(pdf_file))
     const reader = new FileReader();
     reader.onload = this.file_loaded.bind(this)
@@ -19,7 +19,7 @@ export class Pdf{
     const data = e.target.result
     PdfJs.getDocument({
       data       : data,
-      cMapUrl    : `page/${Main.page_name}/js/plugin/pdf/cmaps/`,
+      cMapUrl    : `asset/js/pdf/cmaps/`,
       cMapPacked : true,
     }).promise.then(this.set_images.bind(this))
   }

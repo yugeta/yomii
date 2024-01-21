@@ -105,7 +105,6 @@ export class Zip{
     })
     canvas.width   = size.w
     canvas.height  = size.h
-    const ctx = canvas.getContext('2d')
     canvas.getContext("2d").drawImage(img, 0, 0, size.w, size.h)
     return canvas
   }

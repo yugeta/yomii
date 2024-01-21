@@ -85,5 +85,7 @@ div.loading .loading-progress .loading-bar{
   transition-property: width;
   transition-duration:1.5s;
 }
-
+div.loading[data-type="plane"] .loading-progress .loading-bar{
+  transition-duration:0.1s;
+}
 

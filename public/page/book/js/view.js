@@ -12,6 +12,7 @@ export class View{
         // prev
         this.group(Data.group_num-1)
       break
+
       case "portrait":
         this.page(Data.page_num)
         // next
@@ -27,18 +28,20 @@ export class View{
     if(!elm_group){return true}
     return elm_group.querySelector("canvas") ? true : false
   }
+
   group(group_num){
     if(group_num < 0 || !Data.groups[group_num]){return}
     if(this.check_group_image(group_num) === true){return}
     const page_nums = Data.groups[group_num]
     if(!page_nums){return}
     for(const page_num of page_nums){
-      const data = Common.page2Info(page_num)
-      const img  = data.img
-      const elm_page = this.elm_page(page_num)
+      const page_data = Common.page2Info(page_num)
+      const img       = page_data.img
+      const elm_page  = this.elm_page(page_num)
+      // console.log(group_num,page_num,elm_page)
       if(img.naturalWidth > img.naturalHeight){
         const sub_flg = page_nums.findIndex(e => e === page_num) === 1 ? true : false
-        const canvas = new Canvas(img, sub_flg).canvas
+        const canvas  = new Canvas(img, sub_flg).canvas
         elm_page.appendChild(canvas)
       }
       else{
@@ -48,21 +51,23 @@ export class View{
       }
     }
   }
+
   check_page_image(page_num){
     const elm_page = this.elm_page(page_num)
     if(!elm_page){return true}
     return elm_page.querySelector("canvas") ? true : false
   }
+
   page(page_num){
     if(page_num < 0 || page_num > Math.max(Data.groups.length)){return}
     if(this.check_page_image(page_num) === true){return}
-    const data      = Common.page2Info(page_num)
-    const img       = data.img
+    const page_data = Common.page2Info(page_num)
+    const img       = page_data.img
     const elm_page  = this.elm_page(page_num)
     const page_nums = Data.groups.find(e => e.indexOf(page_num) !== -1)
     if(img.naturalWidth > img.naturalHeight){
       const sub_flg = page_nums.findIndex(e => e === page_num) === 1 ? true : false
-      const canvas = new Canvas(img, sub_flg).canvas
+      const canvas  = new Canvas(img, sub_flg).canvas
       elm_page.appendChild(canvas)
     }
     else{
@@ -74,7 +79,7 @@ export class View{
   }
 
   page_data(page_num){
-    return Data.images[page_num]
+    return Data.page[page_num]
   }
 
   elm_page(page_num){

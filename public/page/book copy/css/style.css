@@ -1,0 +1,42 @@
+@charset "UTF-8";
+
+@import "header.css";
+@import "select.css";
+@import "book.css";
+/* @import "list.css"; */
+@import "control.css";
+@import "page_turn.css";
+@import "upload.css";
+
+:root{
+  --size-list-height:140px;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+main{
+  height:calc(100vh - var(--size-header));
+  position:relative;
+}
+
+.area{
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  z-index:1;
+}
+.area .book{
+  flex:1;
+}
+.area > *{
+  min-height: 0;
+}
+.area .list .group{
+  position:relative;
+}

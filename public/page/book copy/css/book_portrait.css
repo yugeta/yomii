@@ -1,0 +1,58 @@
+@media (orientation:portrait){
+  .list[data-status="active"]{
+    transform: translateY(-50%);
+    top: 50%;
+  }
+
+  /* Page */
+  .book .page{
+    width:100vw;
+    min-width:100vw;
+    scroll-snap-stop: always; /* スクロールし過ぎ防止 */
+    position:relative;
+  }
+  .book .page:empty{
+    background-color:#eee;
+  }
+  .book .page:hover{
+    /* border-color:red; */
+  }
+
+  /* Page-num */
+  .book{
+    counter-reset : num 0;
+  }
+  .book .page::before{
+    counter-increment: num 1;
+    content: counter(num);
+    display:block;
+    width:40px;
+    height:40px;
+    line-height:24px;
+    background-color:black;
+    color:white;
+    font-size:0.7em;
+    /* text-align:center; */
+    position:absolute;
+    /* transform:translate(-5px,-5px); */
+  }
+
+  /* Page-Image */
+  .book .page[data-status="active"]::before{
+    background-color:red;
+  }
+
+  
+  #direction:checked ~ main .book .page::before{
+    left:0;
+    clip-path:polygon(0 0, 100% 0, 0 100%);
+    padding-left:2px;
+    text-align:left;
+  }
+  #direction:not(:checked) ~ main .book .page::before{
+    right:0;
+    clip-path:polygon(0 0, 100% 0, 100% 100%);
+    padding-right:2px;
+    text-align:right;
+  }
+}

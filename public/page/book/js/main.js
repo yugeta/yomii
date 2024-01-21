@@ -1,8 +1,9 @@
 import { Upload }    from "./upload.js"
 import { Direction } from "./direction.js"
 import { Event }     from "./event.js"
+import { Urlinfo } from "../../../asset/js/lib/urlinfo.js"
 
-class Main{
+export class Main{
   constructor(){
     new Event()
     new Upload({
@@ -11,6 +12,8 @@ class Main{
   }
 
   static data = null
+  static mime      = "image/webp"
+  static page_name = new Urlinfo().queries.p || "index"
 }
 
 switch(document.readyState){

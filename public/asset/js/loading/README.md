@@ -15,6 +15,11 @@ Author : Yugeta.Koji
 import { Loading } from "./asset/js/loading/loading.js"
 ```
 
+- 初期設定
+```
+new Loading()
+```
+
 - 開始（階層はjsの場所によって相対パスに変更する）
 ```
 Loading.set_status('active')

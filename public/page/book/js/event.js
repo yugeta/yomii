@@ -9,8 +9,8 @@ export class Event{
   constructor(){
     this.set_upload()
     this.set_direction()
-    this.set_mouse()
-    this.set_touch()
+    // this.set_mouse()
+    // this.set_touch()
     this.set_left_button()
     this.set_right_button()
     this.set_page_scroll()
@@ -32,63 +32,63 @@ export class Event{
     Common.header_menu_close()
   }
 
-  // Mouse
-  set_mouse(){
-    window.addEventListener("mousedown"  , this.mousedown.bind(this))
-    window.addEventListener("mousemove"  , this.mousemove.bind(this))
-    window.addEventListener("mouseup"    , this.mouseup.bind(this))
-  }
+  // // Mouse
+  // set_mouse(){
+  //   window.addEventListener("mousedown"  , this.mousedown.bind(this))
+  //   window.addEventListener("mousemove"  , this.mousemove.bind(this))
+  //   window.addEventListener("mouseup"    , this.mouseup.bind(this))
+  // }
 
-  exist_page(){
-    const pages = Element.book.querySelectorAll(".page")
-    return pages.length ? true : false
-  }
-  get elm_page(){
-    return Element.book.querySelector(".page")
-  }
+  // exist_page(){
+  //   const pages = Element.book.querySelectorAll(".page")
+  //   return pages.length ? true : false
+  // }
+  // get elm_page(){
+  //   return Element.book.querySelector(".page")
+  // }
 
-  mousedown(e){
-    if(!this.exist_page()){return}
-    this.page_data = {
-      x : e.pageX,
-      y : e.pageY,
-    }
-    Element.book.setAttribute("data-move" , "true")
-  }
-  mousemove(e){
-    if(!this.page_data){return}
-    const move = e.pageX - this.page_data.x
-    this.elm_page.style.setProperty("margin-left" , `${move}px` , "")
-  }
-  mouseup(e){
-    if(this.page_data){
-      // if(Element.book.hasAttribute("data-move")){
-      //   Element.book.removeAttribute("data-move")
-      // }
-      // if(this.elm_page.style.getPropertyValue("margin-left")){
-      //   // this.elm_page.style.removeProperty("margin-left")
-      //   this.elm_page.style.setProperty("margin-left" , "0px" , "")
-      // }
-      delete this.page_data
-    }
-  }
+  // mousedown(e){
+  //   if(!this.exist_page()){return}
+  //   this.page_data = {
+  //     x : e.pageX,
+  //     y : e.pageY,
+  //   }
+  //   Element.book.setAttribute("data-move" , "true")
+  // }
+  // mousemove(e){
+  //   if(!this.page_data){return}
+  //   const move = e.pageX - this.page_data.x
+  //   this.elm_page.style.setProperty("margin-left" , `${move}px` , "")
+  // }
+  // mouseup(e){
+  //   if(this.page_data){
+  //     // if(Element.book.hasAttribute("data-move")){
+  //     //   Element.book.removeAttribute("data-move")
+  //     // }
+  //     // if(this.elm_page.style.getPropertyValue("margin-left")){
+  //     //   // this.elm_page.style.removeProperty("margin-left")
+  //     //   this.elm_page.style.setProperty("margin-left" , "0px" , "")
+  //     // }
+  //     delete this.page_data
+  //   }
+  // }
 
-  // Touch
-  set_touch(){
-    window.addEventListener("touchstart" , this.touchstart.bind(this))
-    window.addEventListener("touchmove"  , this.touchmove.bind(this))
-    window.addEventListener("touchend"   , this.touchend.bind(this))
-  }
+  // // Touch
+  // set_touch(){
+  //   window.addEventListener("touchstart" , this.touchstart.bind(this))
+  //   window.addEventListener("touchmove"  , this.touchmove.bind(this))
+  //   window.addEventListener("touchend"   , this.touchend.bind(this))
+  // }
 
-  touchstart(e){
+  // touchstart(e){
     
-  }
-  touchmove(e){
+  // }
+  // touchmove(e){
 
-  }
-  touchend(e){
+  // }
+  // touchend(e){
 
-  }
+  // }
 
 
   // Button
@@ -117,8 +117,7 @@ export class Event{
     new Page("scroll", {scrollLeft: e.target.scrollLeft})
   }
   can_scroll(){
-// console.log("can scroll",Data.flg_setting,Data.flg_resize)
-    if(Data.flg_setting){return false}
+    if(!Data.is_scroll){return false}
     if(Data.flg_resize){return false}
     return true
   }

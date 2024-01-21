@@ -2,8 +2,9 @@ import { Common } from "./common.js"
 
 export class Data{
   static data         = null
+  static file_info    = {}
   static images       = []
-  static groups       = []
+  // static groups       = []
   static pages        = []
   static group_num    = 0
   static page_num     = 0
@@ -12,9 +13,13 @@ export class Data{
   static duration     = 300
   static list_height  = 100
   static dimension    = Common.dimension
-  static flg_setting  = null
+  static is_scroll    = null
   static flg_resize   = null
   static storage_name = "yomii"
+  static mime         = "image/webp"
+
+  // yomiiファイルに格納する設定ファイル
+  static setting_file  = "___setting.json"
 
   constructor(){
    this.init()
@@ -44,8 +49,6 @@ export class Data{
     else{
       datas[index] = book_data
     }
-    // console.log(datas)
-    // return
     const json = btoa(encodeURIComponent(JSON.stringify(datas)))
     window.localStorage.setItem(Data.storage_name , json)
   }
@@ -60,7 +63,6 @@ export class Data{
 
 
   static get_name(){
-    // return Data.data.setting.files.name
     return Data.book_name
   }
   static set_name(){
@@ -70,6 +72,20 @@ export class Data{
     const sp2 = name.split(".")
     sp2.pop()
     Data.book_name = sp2.join(".")
+  }
+
+  static get_file_ext(filename){
+    if(!filename){return}
+    const sp = filename.split(".")
+    return sp.pop()
+  }
+
+  static get groups(){
+    return Object.values(Data.pages.reduce((acc, obj) => {
+      acc[obj.group_id] = acc[obj.group_id] || [];
+      acc[obj.group_id].push(obj.page_id);
+      return acc;
+    }, {}));
   }
 }
 

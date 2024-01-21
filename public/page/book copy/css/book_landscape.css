@@ -1,0 +1,67 @@
+@media (orientation:landscape){
+  /* Group */
+  .book .group{
+    width:100%;
+    min-width:100%;
+    /* flex:1; */
+    display:flex;
+    /* flex-wrap: wrap; */
+    flex-direction:row;
+    /* cursor:pointer; */
+    justify-content:center;
+    /* border:1px solid black; */
+    position:relative;
+    scroll-snap-stop: always; /* スクロールし過ぎ防止 */
+  }
+  /* .book .group .page{
+    width:50%;
+  } */
+  /* .book .group .page[data-count="2"]{
+    width:100%;
+    display:flex;
+    flex-direction:row;
+  }
+  #direction:not(:checked) ~ main .book .group .page[data-count="2"]{
+    flex-direction:row-reverse;
+  } */
+
+  /* Page-num */
+  .book{
+    counter-reset : num 0;
+  }
+
+  .book .group[data-status="active"] .page::before{
+    display:none;
+  }
+
+  .book .group::before{
+    counter-increment: num 1;
+    content: counter(num);
+    display:block;
+    width:40px;
+    height:40px;
+    line-height:24px;
+    background-color:black;
+    color:white;
+    font-size:0.7em;
+    position:absolute;
+  }
+
+  /* Page-Image */
+  .book .group[data-status="active"]::before{
+    background-color:red;
+  }
+
+  #direction:checked ~ main .book .group::before{
+    left:0;
+    clip-path:polygon(0 0, 100% 0, 0 100%);
+    padding-left:2px;
+    text-align:left;
+  }
+  #direction:not(:checked) ~ main .book .group::before{
+    right:0;
+    clip-path:polygon(0 0, 100% 0, 100% 100%);
+    padding-right:2px;
+    text-align:right;
+  }
+}

@@ -1,0 +1,61 @@
+@import "book_landscape.css";
+@import "book_portrait.css";
+
+.book{
+  width:100%;
+  height:100%;
+
+  overflow-x:scroll;
+  z-index:5;
+  background-color:white;
+  scroll-behavior:smooth;
+
+  display:flex;
+  overflow-x:scroll;
+  z-index:5;
+}
+
+.book[data-scroll="auto"]{
+  scroll-behavior:auto;
+}
+
+/* Scroll bar hidden */
+.book{
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.book::-webkit-scrollbar{
+  display:none;
+}
+
+
+/* Page-Image */
+.book canvas,
+.book img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  margin:0px;
+  padding:0;
+  /* box-shadow:2px 2px 5px rgba(0,0,0,0.5); */
+}
+.book .page[data-count="2"] canvas,
+.book .page[data-count="2"] img{
+  width:50%;
+}
+
+/* Direction */
+#direction:not(:checked) ~ main .book,
+#direction:not(:checked) ~ main .book > *{
+  flex-direction:row-reverse;
+}
+
+/* Carousel */
+.book{
+  scroll-snap-type: x mandatory;
+}
+.book > *{
+  scroll-snap-align: center;
+}
+
