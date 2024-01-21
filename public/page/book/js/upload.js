@@ -45,7 +45,6 @@ export class Upload{
   loaded_images(images){
     Data.images = images
     Data.pages  = this.get_pages(images)
-    console.log(Data.pages,Data.groups)
     new Book()
   }
 
