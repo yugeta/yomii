@@ -82,16 +82,30 @@ docker-compose up -d
 
 - 取得したjsonデータはローカルに保存しておくか、サーバーにプール（有料）することが選択できる。
 
+# Request
+- 大量に自炊してある、pdfブックデータをバッチ方式で、zip形式（webp圧縮）に変換する処理。
+  - 有料でのサービス提供も考慮する。
+  - 大きなストレージが必要になるかも・・・
+  
+
 # Data
 - 変換前のbookデータ(zipやpdf)ファイルをサーバーにプールしておくことができる（有料）
 - 変換後のjsonデータをサーバープールしてある場合、1ページずつの画像データをブラウザで読むことができる。（軽量でスピードが早い）
 - 無料で使い続けたければ、ローカルjsonデータがオススメ。
 
-# FUnction
+# Function
 - Page rate change : Landscape（横長）: 見開き , Portrait（縦長）: 単一ページ
 - Reading-page : 対象書籍の読みかけページの保存(localStorage)
 
 # install
 - plugins
 > git clone git@github.com:imaya/zlib.js.git
+
+
+# Converter
+- サーバーで、書籍ファイル(.zip, .pdf)を.yomiに変換する処理
+- 順番待ち処理
+- PHP処理にてバックグラウンド実行
+- 登録されたメールアドレスに完了通知を送信する。
+- 
 
