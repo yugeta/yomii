@@ -5,6 +5,7 @@ Thumbs.db
 *.bak
 
 bak/
+data/
 trash/
 public/data/
 public/plugin/
