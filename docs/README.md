@@ -37,3 +37,7 @@ Yomii（ヨミー）は、スキャンした書籍やPDFファイルをブラウ
 | [docker.md](./docker.md) | Docker環境構築 |
 | [data-format.md](./data-format.md) | データフォーマット仕様 |
 | [improvements.md](./improvements.md) | 改善点・課題一覧 |
+| [storage-strategy.md](./storage-strategy.md) | 書籍ストレージ戦略の検討 |
+| [legal-risk.md](./legal-risk.md) | 著作権リスクと対策 |
+| [monetization.md](./monetization.md) | マネタイズ計画（有料ストレージ / Stripe） |
+| [sync-strategy.md](./sync-strategy.md) | 端末・Webストレージ同期戦略 |
