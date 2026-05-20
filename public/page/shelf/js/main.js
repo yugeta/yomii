@@ -59,19 +59,47 @@ export class Main{
       datas: load_cls.datas,
     })
 
+    // 直前に読んでいた本をハイライト＆スクロール
+    this.highlight_current_book()
+
     // キャッシュタブの場合、容量情報を表示
     if(source === "cache" && toolbar){
       this.update_cache_info()
     }
   }
 
+  /**
+   * URLパラメータ current に一致する本をハイライトしてスクロール
+   */
+  highlight_current_book(){
+    const current = new URLSearchParams(location.search).get("current")
+    if(!current) return
+
+    const lists = document.querySelector("ul.lists")
+    if(!lists) return
+
+    const items = lists.querySelectorAll("li[data-name]")
+    for(const li of items){
+      if(li.getAttribute("data-name") === current){
+        li.setAttribute("data-current", "true")
+        // 少し待ってからスクロール（レンダリング完了後）
+        requestAnimationFrame(() => {
+          li.scrollIntoView({ behavior: "smooth", block: "center" })
+        })
+        break
+      }
+    }
+  }
+
   async update_cache_info(){
     const { BookCache } = await import("../../storage/js/book_cache.js")
-    const total = await BookCache.get_total_size()
+    const all = await BookCache.list()
+    const total = all.reduce((sum, item) => sum + (item.size || 0), 0)
     const info_el = document.querySelector(".cache-info")
     if(info_el){
       const mb = (total / (1024 * 1024)).toFixed(1)
-      info_el.textContent = `使用量: ${mb} MB`
+      const max_mb = (BookCache.MAX_CACHE_SIZE / (1024 * 1024)).toFixed(0)
+      info_el.textContent = `${all.length} 冊 / ${mb} MB（上限 ${max_mb} MB）`
     }
   }
 

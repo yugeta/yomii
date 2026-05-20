@@ -36,20 +36,32 @@ export class Event{
 
   update_delete_button(){
     const btn = document.querySelector(".btn-cache-delete")
-    if(!btn) return
+    const btn_source = document.querySelector(".btn-cache-source")
     const selected = this.elm_lists.querySelector('li[data-status="active"]')
-    btn.disabled = !selected
+
+    if(btn){
+      btn.disabled = !selected
+    }
+    if(btn_source){
+      // source_path がある場合のみ有効
+      const has_source = selected && selected.getAttribute("data-source-path")
+      btn_source.disabled = !has_source
+    }
   }
 
   bind_cache_toolbar(){
     const btn_delete = document.querySelector(".btn-cache-delete")
     const btn_clear = document.querySelector(".btn-cache-clear")
+    const btn_source = document.querySelector(".btn-cache-source")
 
     if(btn_delete){
       btn_delete.addEventListener("click", this.on_cache_delete.bind(this))
     }
     if(btn_clear){
       btn_clear.addEventListener("click", this.on_cache_clear.bind(this))
+    }
+    if(btn_source){
+      btn_source.addEventListener("click", this.on_cache_source.bind(this))
     }
   }
 
@@ -91,6 +103,33 @@ export class Event{
 
     await BookCache.clear()
     location.reload()
+  }
+
+  /**
+   * 選択中のキャッシュ書籍の元の場所（pCloud タブ）に移動
+   */
+  on_cache_source(){
+    const li = this.elm_lists.querySelector('li[data-status="active"]')
+    if(!li) return
+
+    const source_path = li.getAttribute("data-source-path") || ""
+    const name = li.getAttribute("data-name") || ""
+    if(!source_path) return
+
+    // source_path からソースとディレクトリを抽出
+    // 例: /yomii/dir1/dir2/book.yomii → source=pcloud, dir=dir1/dir2, current=book.yomii
+    const path_parts = source_path.replace(/^\/yomii\//, "").split("/")
+    const filename = path_parts.pop() // ファイル名
+    const dir = path_parts.join("/")
+
+    const params = new URLSearchParams()
+    params.set("p", "shelf")
+    params.set("source", "pcloud")
+    if(dir){
+      params.set("dir", dir)
+    }
+    params.set("current", filename || name)
+    location.search = params.toString()
   }
 
   dbl_click_icon(e){

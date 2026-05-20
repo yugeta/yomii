@@ -90,7 +90,17 @@ export class BookCache{
       const request = store.get(id)
       request.onsuccess = () => {
         const result = request.result
-        resolve(result ? result.blob : null)
+        if(!result || !result.blob){
+          resolve(null)
+          return
+        }
+        // Blob の整合性チェック
+        const blob = result.blob
+        if(!(blob instanceof Blob) || blob.size === 0){
+          resolve(null)
+          return
+        }
+        resolve(blob)
       }
       request.onerror = () => resolve(null)
     })
@@ -226,14 +236,21 @@ export class BookCache{
 
   /**
    * source_path から一意の ID を生成
+   * Base64 エンコードでパスをそのまま ID に変換（衝突なし）
    */
   static generate_id(source_path){
-    // シンプルなハッシュ
+    return "cache_" + btoa(unescape(encodeURIComponent(source_path)))
+  }
+
+  /**
+   * source_path から一意の ID を生成（旧方式 - マイグレーション用）
+   */
+  static generate_id_legacy(source_path){
     let hash = 0
     for(let i = 0; i < source_path.length; i++){
       const char = source_path.charCodeAt(i)
       hash = ((hash << 5) - hash) + char
-      hash = hash & hash // 32bit integer
+      hash = hash & hash
     }
     return "cache_" + Math.abs(hash).toString(36)
   }
@@ -250,12 +267,23 @@ export class BookCache{
     const meta = await BookCache.get_meta(source_path)
     if(meta){
       const blob = await BookCache.get_data(meta.id)
-      if(blob){
+      if(blob && blob.size > 0){
         // 最終閲覧日時を更新
         await BookCache.touch(source_path)
         console.log(`[BookCache] キャッシュから読み込み: ${name}`)
         return blob
       }
+    }
+
+    // 旧ID形式でも試す（マイグレーション対応）
+    const legacy_id = BookCache.generate_id_legacy(source_path)
+    const legacy_blob = await BookCache.get_data(legacy_id)
+    if(legacy_blob && legacy_blob.size > 0){
+      console.log(`[BookCache] 旧キャッシュから読み込み、新形式に移行: ${name}`)
+      // 旧データを削除して新形式で保存し直す
+      await BookCache.remove(legacy_id)
+      await BookCache.save(source_path, name, legacy_blob)
+      return legacy_blob
     }
 
     // キャッシュなし → ダウンロード

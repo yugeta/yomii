@@ -6,9 +6,18 @@ export class View{
     this.options = options || {}
     // this.folders = this.options.datas.filter(e => e.type === 'dir')
     // this.files   = this.options.datas.filter(e => e.type === 'file')
+    this.sort_items()
     this.clear()
     this.view_items()
     this.set_icons()
+  }
+
+  sort_items(){
+    if(!this.options.datas) return
+    this.options.datas.sort((a, b) => {
+      if(a.type !== b.type) return a.type === "dir" ? -1 : 1
+      return a.name.localeCompare(b.name)
+    })
   }
 
   elm_root = document.querySelector(`ul.lists`)

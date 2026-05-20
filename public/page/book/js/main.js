@@ -12,6 +12,8 @@ export class Main{
     const params = new URLSearchParams(location.search)
     const source = params.get("source")
 
+    this.set_shelf_link(params, source)
+
     if(source === "pcloud"){
       this.load_from_pcloud(params)
     }else if(source === "cache"){
@@ -69,6 +71,19 @@ export class Main{
     try{
       const meta = await BookCache.get_meta(source_path)
       if(!meta){
+        // 旧ID形式でも試す
+        const legacy_id = BookCache.generate_id_legacy(source_path)
+        const legacy_blob = await BookCache.get_data(legacy_id)
+        if(legacy_blob && legacy_blob.size > 0){
+          // 旧形式から新形式にマイグレーション
+          await BookCache.remove(legacy_id)
+          await BookCache.save(source_path, name, legacy_blob)
+          const file = new File([legacy_blob], name, { type: "application/zip" })
+          new Upload({ target: { files: [file] } })
+          new Direction()
+          return
+        }
+
         alert("キャッシュが見つかりません。pCloud から再ダウンロードします。")
         const blob = await BookCache.get_or_download(source_path, name, async () => {
           return await PCloud.download_file(source_path)
@@ -80,7 +95,7 @@ export class Main{
       }
 
       const blob = await BookCache.get_data(meta.id)
-      if(!blob){
+      if(!blob || blob.size === 0){
         alert("キャッシュデータが破損しています。再ダウンロードします。")
         await BookCache.remove(meta.id)
         const new_blob = await BookCache.get_or_download(source_path, name, async () => {
@@ -157,6 +172,48 @@ export class Main{
   static data = null
   static mime      = "image/webp"
   static page_name = new Urlinfo().queries.p || "index"
+
+  /**
+   * 本棚リンクを設定（現在の本と同じソース・ディレクトリに戻る）
+   */
+  set_shelf_link(params, source){
+    const link = document.getElementById("shelf-link")
+    if(!link) return
+
+    if(!source){
+      // ソース不明の場合はデフォルトの本棚リンク
+      return
+    }
+
+    const shelf_params = new URLSearchParams()
+    shelf_params.set("p", "shelf")
+    shelf_params.set("source", source)
+
+    // パスからディレクトリを抽出
+    const path = params.get("path") || ""
+    const dir = params.get("dir") || ""
+    const book = params.get("book") || ""
+
+    if(dir){
+      // sample ソースの場合は dir パラメータがそのまま使える
+      shelf_params.set("dir", dir)
+    }else if(path){
+      // pCloud / cache の場合はパスからディレクトリを抽出
+      // 例: /yomii/dir1/dir2/book.yomii → dir1/dir2
+      const path_parts = path.replace(/^\/yomii\//, "").split("/")
+      path_parts.pop() // ファイル名を除去
+      if(path_parts.length > 0 && path_parts[0] !== ""){
+        shelf_params.set("dir", path_parts.join("/"))
+      }
+    }
+
+    // 直前に読んでいた本の名前を渡す（本棚でハイライト用）
+    if(book){
+      shelf_params.set("current", book)
+    }
+
+    link.href = `./?${shelf_params.toString()}`
+  }
 }
 
 switch(document.readyState){

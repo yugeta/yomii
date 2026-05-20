@@ -22,6 +22,16 @@ ul.lists li{
 ul.lists li[data-status="active"]{
   border:1px dashed #666;
 }
+
+ul.lists li[data-current="true"]{
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+}
+ul.lists[data-view="list"] li[data-current="true"]{
+  background-color: #fff3cd;
+  border-bottom: 1px solid #ffc107;
+}
 /* ul.lists li:hover{
   background-color:#FFA;
 } */

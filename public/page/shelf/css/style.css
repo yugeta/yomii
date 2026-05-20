@@ -103,6 +103,10 @@ h2{
   opacity: 0.4;
   cursor: not-allowed;
 }
+.cache-toolbar .btn-cache-source{
+  color: #1565c0;
+  border-color: #90caf9;
+}
 .cache-toolbar .btn-cache-delete{
   color: #c62828;
   border-color: #e57373;
@@ -166,6 +170,10 @@ ul.lists[data-view="list"] li{
 }
 ul.lists[data-view="list"] li:last-child{
   border-bottom: none;
+}
+ul.lists[data-view="list"] li[data-status="active"]{
+  background-color: #e3f2fd;
+  border-bottom: 1px solid #90caf9;
 }
 ul.lists[data-view="list"] li .icon{
   width: 24px;
