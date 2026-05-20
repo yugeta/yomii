@@ -1,44 +1,182 @@
 import { PCloud } from "../../storage/js/pcloud.js"
+import { BookCache } from "../../storage/js/book_cache.js"
 
 export class Load{
   constructor(options){
     this.options = options || {}
-    this.source = this.options.source || "local"
+    this.source = this.options.source || "cache"
 
     switch(this.source){
       case "pcloud":
         this.load_pcloud()
         break
+      case "cache":
+        this.load_cache()
+        break
       case "local":
-      default:
         this.load_local()
+        break
+      case "sample":
+        this.load_sample()
+        break
+      default:
+        this.load_cache()
         break
     }
   }
 
-  // ローカルサーバーからファイル一覧を取得
-  load_local(){
+  // ============================================================
+  // ローカル（File System Access API）
+  // ============================================================
+  async load_local(){
+    // マイページで保存されたフォルダハンドルを取得
+    const handle = await Load.get_local_folder_handle()
+
+    if(!handle){
+      this.datas = []
+      this.finish()
+      return
+    }
+
+    try{
+      // 権限を再確認
+      const permission = await handle.queryPermission({ mode: "read" })
+      if(permission !== "granted"){
+        const request = await handle.requestPermission({ mode: "read" })
+        if(request !== "granted"){
+          this.datas = []
+          this.error_message = "フォルダへのアクセスが許可されていません。"
+          this.finish()
+          return
+        }
+      }
+
+      const files = []
+      for await(const entry of handle.values()){
+        if(entry.kind === "file" && entry.name.endsWith(".yomii")){
+          files.push({
+            type : "file",
+            name : entry.name,
+            handle : entry,
+          })
+        }else if(entry.kind === "directory"){
+          files.push({
+            type : "dir",
+            name : entry.name,
+            handle : entry,
+          })
+        }
+      }
+
+      files.sort((a, b) => {
+        if(a.type !== b.type) return a.type === "dir" ? -1 : 1
+        return a.name.localeCompare(b.name)
+      })
+
+      this.datas = files
+      this.finish()
+    }catch(e){
+      console.error("Local folder read error:", e)
+      this.datas = []
+      this.error_message = e.message
+      this.finish()
+    }
+  }
+
+  /**
+   * IndexedDB に保存されたフォルダハンドルを取得
+   */
+  static async get_local_folder_handle(){
+    try{
+      const db = await Load.open_handle_db()
+      return new Promise((resolve) => {
+        const tx = db.transaction("handles", "readonly")
+        const request = tx.objectStore("handles").get("local_folder")
+        request.onsuccess = () => resolve(request.result?.handle || null)
+        request.onerror = () => resolve(null)
+      })
+    }catch(e){
+      return null
+    }
+  }
+
+  /**
+   * フォルダハンドルを IndexedDB に保存
+   */
+  static async save_local_folder_handle(handle){
+    const db = await Load.open_handle_db()
+    return new Promise((resolve) => {
+      const tx = db.transaction("handles", "readwrite")
+      tx.objectStore("handles").put({ id: "local_folder", handle: handle })
+      tx.oncomplete = () => resolve()
+    })
+  }
+
+  /**
+   * フォルダハンドルを削除
+   */
+  static async remove_local_folder_handle(){
+    const db = await Load.open_handle_db()
+    return new Promise((resolve) => {
+      const tx = db.transaction("handles", "readwrite")
+      tx.objectStore("handles").delete("local_folder")
+      tx.oncomplete = () => resolve()
+    })
+  }
+
+  /**
+   * ハンドル保存用の IndexedDB を開く
+   */
+  static open_handle_db(){
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("yomii_handles", 1)
+      request.onupgradeneeded = (e) => {
+        e.target.result.createObjectStore("handles", { keyPath: "id" })
+      }
+      request.onsuccess = (e) => resolve(e.target.result)
+      request.onerror = (e) => reject(e.target.error)
+    })
+  }
+
+  // ============================================================
+  // サンプル（サーバーの data/shelf/）
+  // ============================================================
+  load_sample(){
     const query = {
       mode : 'lists',
-      dir  : this.options.dir,
+      dir  : this.options.dir || '',
     }
     const xhr = new XMLHttpRequest()
-    xhr.withCredentials = true;
+    xhr.withCredentials = true
     xhr.open('POST' , 'page/shelf/php/main.php' , true)
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onload = this.loaded_local.bind(this)
-    const query_string = Object.entries(query).map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`).join('&');
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+    xhr.onload = this.loaded_sample.bind(this)
+    xhr.onerror = () => {
+      this.datas = []
+      this.finish()
+    }
+    const query_string = Object.entries(query).map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`).join('&')
     xhr.send(query_string)
   }
 
-  loaded_local(e){
-    if(!e || !e.target || !e.target.response){return}
-    const res = JSON.parse(e.target.response)
-    this.datas = res.lists
+  loaded_sample(e){
+    if(!e || !e.target || !e.target.response){
+      this.datas = []
+      this.finish()
+      return
+    }
+    try{
+      const res = JSON.parse(e.target.response)
+      this.datas = res.lists || []
+    }catch(err){
+      this.datas = []
+    }
     this.finish()
   }
 
-  // pCloud からファイル一覧を取得
+  // ============================================================
+  // pCloud
+  // ============================================================
   async load_pcloud(){
     if(!PCloud.is_authenticated()){
       this.datas = []
@@ -48,11 +186,9 @@ export class Load{
     }
 
     try{
-      // URLSearchParams で正しくデコード
       const params = new URLSearchParams(location.search)
       const raw_dir = params.get("dir") || ""
       const dir = raw_dir ? `/yomii/${raw_dir}/` : "/yomii/"
-      console.log("pCloud list path:", dir)
       
       const files = await PCloud.list_files_path(dir)
       
@@ -71,6 +207,39 @@ export class Load{
     }
   }
 
+  // ============================================================
+  // キャッシュ（IndexedDB）
+  // ============================================================
+  async load_cache(){
+    try{
+      const all = await BookCache.list()
+
+      if(all.length === 0){
+        this.datas = []
+        this.finish()
+        return
+      }
+
+      all.sort((a, b) => (b.last_read || 0) - (a.last_read || 0))
+
+      this.datas = all.map(item => ({
+        type     : "file",
+        name     : item.name,
+        size     : item.size,
+        modified : item.last_read ? new Date(item.last_read).toLocaleString("ja-JP") : "",
+        source_path : item.source_path,
+        cache_id : item.id,
+      }))
+      this.finish()
+    }catch(e){
+      console.error("Cache list error:", e)
+      this.datas = []
+      this.error_message = e.message
+      this.finish()
+    }
+  }
+
+  // ============================================================
   finish(){
     if(this.options.callback){
       this.options.callback(this)

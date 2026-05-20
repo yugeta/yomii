@@ -438,3 +438,66 @@ h3{
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Connected detail rows */
+.connected-row{
+  display: flex;
+  gap: 8px;
+  font-size: 0.85em;
+  padding: 2px 0;
+}
+.connected-label{
+  color: #888;
+  min-width: 80px;
+}
+
+/* Local Folder Settings */
+.local-folder-settings{
+  margin-bottom: 25px;
+}
+.local-folder-card{
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px 20px;
+  background: #fff;
+}
+.local-folder-status{
+  margin-bottom: 10px;
+}
+.local-folder-path{
+  font-size: 0.9em;
+  color: #333;
+}
+.local-folder-actions{
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.local-folder-actions button{
+  padding: 6px 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #fff;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+.local-folder-actions button:hover{
+  opacity: 0.7;
+}
+.local-folder-actions button:disabled{
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.local-folder-actions .btn-select-folder{
+  background: #333;
+  color: #fff;
+  border-color: #333;
+}
+.local-folder-actions .btn-remove-folder{
+  color: #c62828;
+  border-color: #e57373;
+}
+.local-folder-note{
+  margin: 0;
+  color: #999;
+}

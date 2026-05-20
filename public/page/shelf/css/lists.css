@@ -27,7 +27,7 @@ ul.lists li[data-status="active"]{
 } */
 
 ul.lists li .icon{
-  width:64px;
+  width:48px;
   display:block;
   margin:0 auto;
 }

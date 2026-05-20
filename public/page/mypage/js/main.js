@@ -18,6 +18,7 @@ class MyPage{
     this.render_user_info()
     this.render_redirect_uris()
     this.render_saved_configs()
+    this.render_local_folder()
     this.update_status()
     this.bind_events()
   }
@@ -54,6 +55,65 @@ class MyPage{
         }
       })
     }
+  }
+
+  /**
+   * ローカルフォルダの状態を表示
+   */
+  async render_local_folder(){
+    const { Load } = await import("../../shelf/js/load.js")
+    const handle = await Load.get_local_folder_handle()
+    const path_el = document.querySelector(".local-folder-path")
+    const btn_select = document.querySelector(".btn-select-folder")
+    const btn_remove = document.querySelector(".btn-remove-folder")
+
+    // File System Access API 非対応チェック
+    if(!window.showDirectoryPicker){
+      if(path_el) path_el.textContent = "このブラウザでは利用できません"
+      if(btn_select) btn_select.disabled = true
+      return
+    }
+
+    if(handle){
+      if(path_el) path_el.textContent = `📁 ${handle.name}`
+      if(btn_select) btn_select.textContent = "変更"
+      if(btn_remove) btn_remove.style.display = ""
+    }else{
+      if(path_el) path_el.textContent = "未設定"
+      if(btn_select) btn_select.textContent = "フォルダを選択"
+      if(btn_remove) btn_remove.style.display = "none"
+    }
+  }
+
+  /**
+   * フォルダ選択
+   */
+  async on_select_folder(){
+    if(!window.showDirectoryPicker){
+      alert("このブラウザではフォルダ選択に対応していません。Chrome または Edge をご利用ください。")
+      return
+    }
+
+    try{
+      const handle = await window.showDirectoryPicker({ mode: "read" })
+      const { Load } = await import("../../shelf/js/load.js")
+      await Load.save_local_folder_handle(handle)
+      this.render_local_folder()
+    }catch(e){
+      if(e.name !== "AbortError"){
+        console.error("Folder select error:", e)
+      }
+    }
+  }
+
+  /**
+   * フォルダ解除
+   */
+  async on_remove_folder(){
+    if(!confirm("ローカルフォルダの設定を解除しますか？")) return
+    const { Load } = await import("../../shelf/js/load.js")
+    await Load.remove_local_folder_handle()
+    this.render_local_folder()
   }
 
   /**
@@ -129,8 +189,14 @@ class MyPage{
       btn_disconnect.style.display = ""
 
       const detail_el = connected_el.querySelector(".connected-detail")
-      if(detail_el && config.email){
-        detail_el.textContent = `アカウント: ${config.email}`
+      if(detail_el && config){
+        const mask_password = config.password ? "●".repeat(Math.min(config.password.length, 8)) : ""
+        const saved_date = config.saved_at ? new Date(config.saved_at).toLocaleString("ja-JP") : ""
+        detail_el.innerHTML = `
+          <div class="connected-row"><span class="connected-label">メール:</span> <span>${config.email || ""}</span></div>
+          <div class="connected-row"><span class="connected-label">パスワード:</span> <span>${mask_password}</span></div>
+          <div class="connected-row"><span class="connected-label">登録日時:</span> <span>${saved_date}</span></div>
+        `
       }
     }else{
       status_el.setAttribute("data-status", "disconnected")
@@ -203,6 +269,16 @@ class MyPage{
    * イベントバインド
    */
   bind_events(){
+    // ローカルフォルダ選択
+    const btn_select = document.querySelector(".btn-select-folder")
+    if(btn_select){
+      btn_select.addEventListener("click", this.on_select_folder.bind(this))
+    }
+    const btn_remove = document.querySelector(".btn-remove-folder")
+    if(btn_remove){
+      btn_remove.addEventListener("click", this.on_remove_folder.bind(this))
+    }
+
     // pCloud 保存ボタン
     const pcloud_save_btn = document.querySelector(".btn-pcloud-save")
     if(pcloud_save_btn){

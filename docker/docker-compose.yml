@@ -1,19 +1,9 @@
 version: '3'
 services:
-#  ubuntu:
-#   container_name : ubuntu
-#   # image : ubuntu:23.10
-#   build: ./ubuntu
-#   volumes:
-#     - ../public:/var/www/html
-#   command:
-#     bash /root/init.sh
-
   yomii-php:
     container_name : yomii-php
     build : ./php
     volumes:
-      # - ./php/php.ini:/etc/php81/php.ini
       - ./php/php.ini:/usr/local/etc/php/php.ini
       - ../public:/var/www/html
     working_dir: /var/www/html
@@ -28,3 +18,15 @@ services:
       - ../public:/var/www/html
     depends_on:
       - yomii-php
+
+  yomii-node:
+    container_name: yomii-node
+    build: ./node
+    volumes:
+      - ../batch:/app
+      - ../data:/data/input
+      - ../data/converted:/data/output
+    working_dir: /app
+    entrypoint: ["sh", "-c", "npm install --silent && node convert.js /data/input /data/output"]
+    profiles:
+      - batch

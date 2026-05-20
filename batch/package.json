@@ -1,0 +1,14 @@
+{
+  "name": "yomii-batch",
+  "version": "1.0.0",
+  "description": "ZIP/PDF を .yomii 形式に一括変換するバッチツール",
+  "type": "module",
+  "scripts": {
+    "convert": "node convert.js"
+  },
+  "dependencies": {
+    "sharp": "^0.33.0",
+    "archiver": "^7.0.0",
+    "adm-zip": "^0.5.0"
+  }
+}
