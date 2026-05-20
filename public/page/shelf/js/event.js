@@ -46,11 +46,10 @@ export class Event{
 
   click_dir(li){
     if(!li){return}
-    const current_dir = new Urlinfo().queries.dir || ''
-    const decoded_dir = current_dir ? decodeURIComponent(current_dir) : ''
-    const dir = decoded_dir ? decoded_dir + '/' : ''
+    const current_dir = new URLSearchParams(location.search).get("dir") || ''
+    const dir = current_dir ? current_dir + '/' : ''
     const name = li.getAttribute('data-name')
-    const source = new Urlinfo().queries.source || 'local'
+    const source = new URLSearchParams(location.search).get("source") || 'local'
     const params = new URLSearchParams()
     params.set("p", "shelf")
     params.set("source", source)
@@ -61,10 +60,28 @@ export class Event{
   click_file(li){
     if(!li){return}
     const name = li.getAttribute('data-name')
-    const dir = new Urlinfo().queries.dir ? new Urlinfo().queries.dir + '/' : ''
-    const urlinfo = new Urlinfo()
-    const url = `book.html?dir=${dir}&book=${name}`
-    location.href = url
+    const source = new URLSearchParams(location.search).get("source") || "local"
+
+    if(source === "pcloud"){
+      this.open_pcloud_book(name)
+    }else{
+      const dir = new Urlinfo().queries.dir ? new Urlinfo().queries.dir + '/' : ''
+      location.href = `book.html?dir=${dir}&book=${name}`
+    }
+  }
+
+  /**
+   * pCloud の書籍を開く
+   */
+  open_pcloud_book(name){
+    const dir = new URLSearchParams(location.search).get("dir") || ""
+    const pcloud_path = dir ? `/yomii/${dir}/${name}` : `/yomii/${name}`
+
+    const params = new URLSearchParams()
+    params.set("source", "pcloud")
+    params.set("path", pcloud_path)
+    params.set("book", name)
+    location.href = `book.html?${params.toString()}`
   }
 
   get_active(){
