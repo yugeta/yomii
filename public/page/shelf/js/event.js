@@ -46,12 +46,16 @@ export class Event{
 
   click_dir(li){
     if(!li){return}
-    const dir = new Urlinfo().queries.dir ? new Urlinfo().queries.dir + '/' : ''
+    const current_dir = new Urlinfo().queries.dir || ''
+    const decoded_dir = current_dir ? decodeURIComponent(current_dir) : ''
+    const dir = decoded_dir ? decoded_dir + '/' : ''
     const name = li.getAttribute('data-name')
-    new Urlinfo().add_query("dir",`${dir}${name}`)
-    new Main({
-      reload : true
-    })
+    const source = new Urlinfo().queries.source || 'local'
+    const params = new URLSearchParams()
+    params.set("p", "shelf")
+    params.set("source", source)
+    params.set("dir", `${dir}${name}`)
+    location.search = params.toString()
   }
 
   click_file(li){

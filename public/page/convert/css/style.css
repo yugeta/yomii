@@ -4,6 +4,7 @@
 @import "setting.css";
 @import "direction.css";
 @import "loading.css";
+@import "storage_selector.css";
 
 body{
   overflow:hidden;

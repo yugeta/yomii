@@ -1,0 +1,101 @@
+/* Storage Selector Modal */
+.storage-selector{
+  padding: 5px 0;
+}
+
+.storage-selector__description{
+  font-size: 0.85em;
+  color: #666;
+  margin: 0 0 10px 0;
+}
+
+.storage-selector__list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.storage-selector__item{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.storage-selector__item:hover{
+  background-color: #f5f5f5;
+  border-color: #999;
+}
+.storage-selector__item:active{
+  background-color: #eee;
+}
+
+.storage-selector__item--disabled{
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.storage-selector__item--disabled:hover{
+  background-color: transparent;
+  border-color: #ddd;
+}
+
+.storage-selector__icon{
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.storage-selector__icon svg{
+  width: 28px;
+  height: 28px;
+}
+
+.storage-selector__info{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.storage-selector__name{
+  font-size: 0.95em;
+  font-weight: bold;
+  color: #333;
+}
+
+.storage-selector__status{
+  font-size: 0.75em;
+  padding: 1px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  width: fit-content;
+}
+.storage-selector__status.authenticated{
+  color: #2e7d32;
+  background-color: #e8f5e9;
+}
+.storage-selector__status.unauthenticated{
+  color: #c62828;
+  background-color: #ffebee;
+}
+
+.storage-selector__hint{
+  font-size: 0.8em;
+  color: #666;
+  margin: 12px 0 0 0;
+  padding: 8px 12px;
+  background: #fff8e1;
+  border-radius: 5px;
+  border: 1px solid #ffe082;
+}
+.storage-selector__hint a{
+  color: #1565c0;
+  text-decoration: underline;
+}

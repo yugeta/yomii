@@ -3,6 +3,8 @@ Thumbs.db
 .vscode
 
 *.bak
+.env
+public/.env
 
 bak/
 data/

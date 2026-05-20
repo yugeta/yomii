@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pCloud 認証中...</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f5f5f5;
+    }
+    .message {
+      text-align: center;
+      padding: 40px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .message h2 { margin: 0 0 10px 0; font-size: 1.2em; }
+    .message p { margin: 0; color: #666; font-size: 0.9em; }
+    .error { color: #c62828; }
+  </style>
+</head>
+<body>
+  <div class="message">
+    <h2 id="title">認証処理中...</h2>
+    <p id="description">このウィンドウは自動的に閉じます。</p>
+  </div>
+  <script>
+    (function(){
+      const hash = window.location.hash.substring(1)
+      const params = new URLSearchParams(hash)
+      const query = new URLSearchParams(window.location.search)
+
+      if(query.get("error")){
+        const error_msg = query.get("error_description") || query.get("error") || "認証が拒否されました"
+        document.getElementById("title").textContent = "認証エラー"
+        document.getElementById("description").textContent = error_msg
+        document.getElementById("description").classList.add("error")
+        if(window.opener){
+          window.opener.postMessage({ type: "pcloud_auth_callback", error: error_msg }, "*")
+        }
+        setTimeout(() => window.close(), 3000)
+        return
+      }
+
+      const access_token = params.get("access_token")
+      if(access_token){
+        document.getElementById("title").textContent = "認証成功"
+        if(window.opener){
+          window.opener.postMessage({
+            type         : "pcloud_auth_callback",
+            access_token : access_token,
+            token_type   : params.get("token_type"),
+            uid          : params.get("uid"),
+            hostname     : params.get("hostname"),
+            locationid   : params.get("locationid"),
+            state        : params.get("state"),
+          }, "*")
+        }
+        setTimeout(() => window.close(), 1000)
+      }else{
+        document.getElementById("title").textContent = "認証エラー"
+        document.getElementById("description").textContent = "トークンを取得できませんでした。"
+        document.getElementById("description").classList.add("error")
+        if(window.opener){
+          window.opener.postMessage({ type: "pcloud_auth_callback", error: "トークンを取得できませんでした" }, "*")
+        }
+        setTimeout(() => window.close(), 3000)
+      }
+    })()
+  </script>
+</body>
+</html>

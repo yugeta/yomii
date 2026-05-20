@@ -9,6 +9,7 @@ export class Main{
   }
 
   static mime      = "image/webp"
+  static quality   = 0.3
   static page_name = new Urlinfo().queries.p || "index"
   
 }

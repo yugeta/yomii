@@ -110,7 +110,7 @@ export class Zip{
   }
 
   canvas2img(canvas){
-    const base64 = canvas.toDataURL(Main.mime)
+    const base64 = canvas.toDataURL(Main.mime, Main.quality)
     const tmp    = base64.split(",")
     const bin    = atob(tmp[1])
     const mime   = tmp[0].split(':')[1].split(';')[0]

@@ -1,0 +1,132 @@
+<link rel="stylesheet" href="page/{{page_name}}/css/style.css"/>
+<script type="module" src="page/{{page_name}}/js/main.js"></script>
+
+<h1>マイページ</h1>
+
+<section class="user-info"></section>
+
+<section class="storage-settings">
+  <h2>クラウドストレージ連携</h2>
+  <p class="description">書籍データの保存先として使用するクラウドストレージサービスを設定します。</p>
+
+  <div class="service-list">
+
+    <!-- pCloud -->
+    <div class="service-card" data-service="pcloud">
+      <div class="service-card__header">
+        <div class="service-icon service-icon--pcloud">
+          <svg viewBox="0 0 24 24" width="32" height="32">
+            <path d="M19.5 10.5c-.2-3.1-2.8-5.5-6-5.5-2.3 0-4.3 1.3-5.3 3.2C5.6 8.5 3.5 10.8 3.5 13.5 3.5 16.5 6 19 9 19h10c2.2 0 4-1.8 4-4 0-2-1.5-3.7-3.5-4z" fill="#20B6E8"/>
+          </svg>
+        </div>
+        <div class="service-card__title">
+          <h3>pCloud</h3>
+          <div class="service-status" data-status="unknown">
+            <span class="status-label">確認中...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-card__setup pcloud-setup-form" data-step="setup">
+        <p class="setup-guide">pCloud アカウントのメールアドレスとパスワードで連携します。</p>
+        <div class="setup-form pcloud-form">
+          <div class="form-row">
+            <label>メールアドレス:</label>
+            <input type="email" class="input-pcloud-email" placeholder="pCloud のメールアドレス"/>
+          </div>
+          <div class="form-row">
+            <label>パスワード:</label>
+            <input type="password" class="input-pcloud-password" placeholder="パスワード"/>
+          </div>
+          <div class="form-row form-row--note">
+            <small>※ 認証情報はブラウザの localStorage に保存され、サーバー経由で pCloud WebDAV に送信されます。</small>
+          </div>
+          <details class="setup-help">
+            <summary>Google/Facebook/Apple でログインしている方</summary>
+            <p class="social-login-note">ソーシャルログインで pCloud を利用している場合、パスワードの設定が必要です：</p>
+            <ol>
+              <li><a href="https://my.pcloud.com/#page=settings&settings=tab-security" target="_blank" rel="noopener">pCloud セキュリティ設定</a>を開く</li>
+              <li>「Change Password」からパスワードを設定する</li>
+            </ol>
+          </details>
+          <button class="btn-pcloud-save">連携する</button>
+        </div>
+      </div>
+
+      <div class="service-card__connected pcloud-connected" style="display:none;">
+        <div class="connected-info">
+          <span class="connected-detail"></span>
+        </div>
+      </div>
+
+      <div class="service-card__actions">
+        <button class="btn-disconnect" data-service="pcloud" style="display:none;">連携解除</button>
+      </div>
+    </div>
+
+    <!-- Google Drive -->
+    <div class="service-card" data-service="google_drive">
+      <div class="service-card__header">
+        <div class="service-icon service-icon--google">
+          <svg viewBox="0 0 24 24" width="32" height="32">
+            <path d="M4.433 22l-1.766-3.062 7.57-13.104h3.53L6.2 18.938z" fill="#0066DA"/>
+            <path d="M22 18.938H14.43l1.767 3.062h7.57L22 18.938z" fill="#00AC47"/>
+            <path d="M11.77 5.834L8.238 12l-3.805-6.166L8.2 2.772z" fill="#EA4335"/>
+            <path d="M15.467 5.834h-3.697L4.2 18.938l1.766 3.062z" fill="#00832D"/>
+            <path d="M22 18.938l-3.767-6.52-3.766 6.52H22z" fill="#2684FC"/>
+            <path d="M15.467 5.834L18.233 12 22 18.938l1.767-3.062z" fill="#FFBA00"/>
+          </svg>
+        </div>
+        <div class="service-card__title">
+          <h3>Google Drive</h3>
+          <div class="service-status" data-status="unknown">
+            <span class="status-label">確認中...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="service-card__setup" data-step="setup">
+        <p class="setup-guide">Google Cloud Console で OAuth クライアント ID を作成してください。</p>
+        <details class="setup-help">
+          <summary>セットアップ手順を見る</summary>
+          <ol>
+            <li><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a> にアクセス</li>
+            <li>プロジェクトを作成（または既存を選択）</li>
+            <li>「APIとサービス」→「ライブラリ」→「Google Drive API」を有効化</li>
+            <li>「APIとサービス」→「OAuth 同意画面」を設定</li>
+            <li>「APIとサービス」→「認証情報」→「OAuth クライアント ID」を作成</li>
+            <li>アプリケーションの種類: 「ウェブ アプリケーション」</li>
+            <li>承認済みの JavaScript 生成元に現在のオリジンを追加：</li>
+          </ol>
+          <div class="setup-redirect-uri">
+            <label>JavaScript 生成元（これをコピー）:</label>
+            <input type="text" class="input-origin" data-service="google_drive" readonly/>
+          </div>
+          <ol start="8">
+            <li>承認済みのリダイレクト URI に下記を追加：</li>
+          </ol>
+          <div class="setup-redirect-uri">
+            <label>Redirect URI（これをコピー）:</label>
+            <input type="text" class="input-redirect-uri" data-service="google_drive" readonly/>
+            <button class="btn-copy" data-target="google_drive">コピー</button>
+          </div>
+          <ol start="9">
+            <li>作成後に表示される「クライアント ID」を下の欄に入力</li>
+          </ol>
+        </details>
+
+        <div class="setup-form">
+          <label>Client ID:</label>
+          <input type="text" class="input-client-id" data-service="google_drive" placeholder="Google OAuth Client ID を入力"/>
+          <button class="btn-save-config" data-service="google_drive">保存</button>
+        </div>
+      </div>
+
+      <div class="service-card__actions">
+        <button class="btn-connect" data-service="google_drive" disabled>連携する</button>
+        <button class="btn-disconnect" data-service="google_drive" style="display:none;">連携解除</button>
+      </div>
+    </div>
+
+  </div>
+</section>

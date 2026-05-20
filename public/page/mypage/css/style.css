@@ -1,0 +1,440 @@
+main{
+  padding: 20px;
+  max-width: 700px;
+}
+
+h1{
+  font-size: 1.5em;
+  margin: 0 0 20px 0;
+}
+
+h2{
+  font-size: 1.1em;
+  margin: 0 0 5px 0;
+}
+
+h3{
+  margin: 0;
+  font-size: 1em;
+}
+
+.description{
+  font-size: 0.85em;
+  color: #666;
+  margin: 0 0 20px 0;
+}
+
+/* User Info */
+.user-info{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fafafa;
+  margin-bottom: 25px;
+}
+.user-info:empty{
+  display: none;
+}
+.user-avatar{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.user-detail{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.user-name{
+  font-size: 0.95em;
+  font-weight: bold;
+  color: #333;
+}
+.user-email{
+  font-size: 0.8em;
+  color: #888;
+}
+.btn-logout{
+  padding: 6px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.8em;
+  color: #666;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-logout:hover{
+  opacity: 0.7;
+}
+
+/* Service List */
+.service-list{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Service Card */
+.service-card{
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  background: #fff;
+}
+
+.service-card__header{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.service-icon{
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.service-card__title{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Status */
+.service-status{
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75em;
+}
+.service-status[data-status="connected"]{
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.service-status[data-status="configured"]{
+  background: #fff3e0;
+  color: #e65100;
+}
+.service-status[data-status="disconnected"]{
+  background: #f5f5f5;
+  color: #999;
+}
+.service-status[data-status="unknown"]{
+  background: #f5f5f5;
+  color: #999;
+}
+
+/* Setup Section */
+.service-card__setup{
+  margin-bottom: 15px;
+  padding: 12px 15px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.setup-guide{
+  font-size: 0.85em;
+  color: #555;
+  margin: 0 0 10px 0;
+}
+
+.setup-help{
+  margin-bottom: 12px;
+}
+.setup-help summary{
+  font-size: 0.8em;
+  color: #1565c0;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.setup-help ol{
+  font-size: 0.8em;
+  color: #555;
+  padding-left: 20px;
+  margin: 5px 0;
+  line-height: 1.8;
+}
+.setup-help a{
+  color: #1565c0;
+}
+
+.setup-redirect-uri{
+  margin: 8px 0;
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+}
+.setup-redirect-uri label{
+  display: block;
+  font-size: 0.75em;
+  color: #888;
+  margin-bottom: 4px;
+}
+.setup-redirect-uri input{
+  width: calc(100% - 70px);
+  padding: 4px 6px;
+  font-size: 0.8em;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  background: #f5f5f5;
+  color: #333;
+}
+.setup-redirect-uri .btn-copy{
+  padding: 4px 10px;
+  font-size: 0.75em;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  background: #fff;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.setup-redirect-uri .btn-copy:hover{
+  background: #f0f0f0;
+}
+
+/* Setup Form */
+.setup-form{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.setup-form label{
+  font-size: 0.8em;
+  color: #555;
+  white-space: nowrap;
+}
+.setup-form input{
+  flex: 1;
+  min-width: 200px;
+  padding: 6px 10px;
+  font-size: 0.85em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.setup-form input:focus{
+  outline: none;
+  border-color: #1565c0;
+}
+
+/* Buttons */
+.btn-save-config{
+  padding: 6px 14px;
+  border: none;
+  border-radius: 5px;
+  background: #1565c0;
+  color: #fff;
+  font-size: 0.8em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-save-config:hover{
+  opacity: 0.8;
+}
+
+.service-card__actions{
+  display: flex;
+  gap: 10px;
+}
+
+.btn-connect{
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #333;
+  color: #fff;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-connect:hover{
+  opacity: 0.7;
+}
+.btn-connect:disabled{
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-disconnect{
+  padding: 8px 20px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  color: #c62828;
+  font-size: 0.85em;
+  cursor: pointer;
+}
+.btn-disconnect:hover{
+  opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 600px){
+  .service-card__header{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .setup-form{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .setup-form input{
+    min-width: auto;
+  }
+  .setup-redirect-uri input{
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  .setup-redirect-uri .btn-copy{
+    margin-left: 0;
+  }
+}
+
+/* pCloud Login Form */
+.pcloud-form{
+  flex-direction: column;
+  align-items: stretch;
+}
+.pcloud-form .form-row{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.pcloud-form .form-row label{
+  font-size: 0.8em;
+  color: #555;
+}
+.pcloud-form .form-row input,
+.pcloud-form .form-row select{
+  padding: 8px 10px;
+  font-size: 0.9em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.pcloud-form .form-row input:focus,
+.pcloud-form .form-row select:focus{
+  outline: none;
+  border-color: #20B6E8;
+}
+.pcloud-form .form-row--note{
+  margin-bottom: 12px;
+}
+.pcloud-form .form-row--note small{
+  font-size: 0.75em;
+  color: #999;
+}
+
+.btn-pcloud-login{
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #20B6E8;
+  color: #fff;
+  font-size: 0.9em;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.2s;
+}
+.btn-pcloud-login:hover{
+  opacity: 0.8;
+}
+.btn-pcloud-login:disabled{
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Connected Info */
+.service-card__connected{
+  padding: 10px 0;
+}
+.connected-info{
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.connected-email{
+  font-size: 0.85em;
+  color: #333;
+}
+.connected-quota{
+  font-size: 0.8em;
+  color: #888;
+}
+
+/* Social login note */
+.pcloud-form .setup-help{
+  margin: 0 0 12px 0;
+  padding: 10px 12px;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 5px;
+}
+.pcloud-form .setup-help summary{
+  font-size: 0.8em;
+  color: #e65100;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+.pcloud-form .setup-help[open] summary{
+  margin-bottom: 8px;
+}
+.social-login-note{
+  font-size: 0.8em;
+  color: #555;
+  margin: 0 0 8px 0;
+  line-height: 1.6;
+}
+.pcloud-form .setup-help ol{
+  font-size: 0.8em;
+  color: #555;
+  padding-left: 20px;
+  margin: 5px 0;
+  line-height: 1.8;
+}
+.pcloud-form .setup-help a{
+  color: #1565c0;
+}
+
+/* pCloud TFA */
+.pcloud-tfa-section{
+  margin-top: 12px;
+  padding: 12px 15px;
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: 6px;
+}
+.tfa-message{
+  font-size: 0.8em;
+  color: #1565c0;
+  margin: 0 0 10px 0;
+}
+.btn-pcloud-tfa-submit{
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #1565c0;
+  color: #fff;
+  font-size: 0.85em;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+}
+.btn-pcloud-tfa-submit:hover{
+  opacity: 0.8;
+}
+.btn-pcloud-tfa-submit:disabled{
+  opacity: 0.5;
+  cursor: not-allowed;
+}

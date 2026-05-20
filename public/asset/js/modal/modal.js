@@ -78,7 +78,10 @@ export class Modal{
     div.appendChild(this.make_title())
     div.appendChild(this.make_caption())
     div.appendChild(this.make_content())
-    div.appendChild(this.make_buttons())
+    const buttons = this.make_buttons()
+    if(buttons){
+      div.appendChild(buttons)
+    }
     return div
   }
   make_title(){

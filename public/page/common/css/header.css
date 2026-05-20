@@ -69,3 +69,22 @@ header .menu a{
     left:0%;
   }
 }
+
+/* Auth menu */
+header .menu .menu-auth{
+  margin-left: 10px;
+}
+header .menu .auth-link{
+  padding: 5px 12px;
+  border: 1px solid var(--color-2);
+  border-radius: 5px;
+  font-size: 0.9em;
+  transition: opacity 0.2s;
+}
+header .menu .auth-link:hover{
+  opacity: 0.7;
+}
+header .menu .auth-link[data-auth="mypage"]{
+  background: var(--color-2);
+  color: var(--color-1);
+}

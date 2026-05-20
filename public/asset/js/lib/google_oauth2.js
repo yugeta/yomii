@@ -145,7 +145,9 @@ export class GoogleOAuth2{
   }
   
   finish(){
-    this.login_close()
+    if(this.login_close){
+      this.login_close()
+    }
     if(!this.callback){return}
     this.callback(this.data)
   }

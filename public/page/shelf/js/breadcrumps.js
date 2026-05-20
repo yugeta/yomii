@@ -2,10 +2,11 @@ import { Urlinfo } from "../../../asset/js/lib/urlinfo.js"
 
 export class Breadcrumps{
   constructor(){
-    const dir = new Urlinfo().queries.dir || ''
+    const params = new URLSearchParams(location.search)
+    const dir = params.get("dir") || ''
     if(!dir){return}
     this.clear()
-    this.dir = decodeURI(dir)
+    this.dir = dir
     this.create_links()
     this.view()
   }
@@ -20,33 +21,34 @@ export class Breadcrumps{
     const links = []
     for(let i=0; i<dirs.length; i++){
       const dir = dirs.slice(0,i+1).join('/')
-      // if(dir){continue}
       links.push({
         dir  : dir,
-        name : dirs[i],
+        name : decodeURIComponent(dirs[i].replace(/\+/g, ' ')),
       })
     }
-    // console.log(links)
     this.links =  links
     return links
   }
 
   view(){
-    // this.elm.textContent = this.dir
     const url = new Urlinfo().url
+    const source = new URLSearchParams(location.search).get("source") || "local"
     {
       const a = document.createElement('a')
       a.textContent = 'Top'
-      a.href = `${url}?p=shelf`
+      a.href = `${url}?p=shelf&source=${source}`
       this.elm.appendChild(a)
-      this.elm.innerHTML += "/"
+      this.elm.innerHTML += " / "
     }
-    for(const link of this.links){
+    for(let i = 0; i < this.links.length; i++){
+      const link = this.links[i]
       const a = document.createElement('a')
       a.textContent = link.name
-      a.href = `${url}?p=shelf&dir=${link.dir}`
+      a.href = `${url}?p=shelf&source=${source}&dir=${encodeURIComponent(link.dir)}`
       this.elm.appendChild(a)
-      this.elm.innerHTML += "/"
+      if(i < this.links.length - 1){
+        this.elm.innerHTML += " / "
+      }
     }
   }
 

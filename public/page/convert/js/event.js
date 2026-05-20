@@ -1,6 +1,6 @@
 import { Common }  from "./common.js"
 import { Upload }  from "./upload.js"
-import { Archive } from "./archive.js"
+import { StorageSelector } from "./storage_selector.js"
 
 export class Event{
   constructor(){
@@ -11,7 +11,7 @@ export class Event{
       Common.input_file.addEventListener("change" , (()=> new Upload()))
     }
     if(Common.button_save){
-      Common.button_save.addEventListener("click" , (()=> new Archive()))
+      Common.button_save.addEventListener("click" , (()=> new StorageSelector()))
     }
   }
 
