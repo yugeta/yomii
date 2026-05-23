@@ -3,6 +3,7 @@
   margin-bottom: 10px;
   font-size: 0.85em;
   color: #666;
+  flex-shrink: 0;
 }
 .breadcrumps:empty{
   display:none;

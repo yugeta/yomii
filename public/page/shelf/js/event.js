@@ -15,6 +15,7 @@ export class Event{
     this.elm_lists.addEventListener('mousedown' , this.click_lists.bind(this))
     this.elm_lists.addEventListener('dblclick' , this.dbl_click_icon.bind(this))
     this.bind_cache_toolbar()
+    this.bind_action_bar()
   }
 
   click_lists(e){
@@ -24,6 +25,7 @@ export class Event{
     li.setAttribute('data-status' , 'active')
     e.preventDefault()
     this.update_delete_button()
+    this.update_open_button()
   }
 
   clear_lists(){
@@ -66,6 +68,36 @@ export class Event{
     }
   }
 
+  bind_action_bar(){
+    const btn_open = document.querySelector(".btn-open")
+    if(btn_open){
+      btn_open.addEventListener("click", this.on_open.bind(this))
+    }
+  }
+
+  update_open_button(){
+    const btn = document.querySelector(".btn-open")
+    if(!btn) return
+    const selected = this.elm_lists.querySelector('li[data-status="active"]')
+    btn.disabled = !selected
+  }
+
+  /**
+   * 「開く」ボタン押下 — 選択中のアイテムを開く
+   */
+  on_open(){
+    const li = this.elm_lists.querySelector('li[data-status="active"]')
+    if(!li) return
+    switch(li.getAttribute('data-type')){
+      case 'dir':
+        this.click_dir(li)
+        break
+      case 'file':
+        this.click_file(li)
+        break
+    }
+  }
+
   async on_cache_delete(){
     const li = this.elm_lists.querySelector('li[data-status="active"]')
     if(!li) return
@@ -83,6 +115,7 @@ export class Event{
 
     li.remove()
     this.update_delete_button()
+    this.update_open_button()
 
     // 容量情報を更新
     const total = await BookCache.get_total_size()

@@ -1,11 +1,13 @@
 ul.lists{
   width:100%;
   display:block;
-  /* flex-direction:column; */
   margin:0 auto;
   padding:0;
   gap:2px;
   border:1px solid black;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 ul.lists li{
   display:inline-block;

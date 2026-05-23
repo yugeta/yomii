@@ -3,10 +3,16 @@
 
 main{
   padding:20px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--size-header));
+  overflow: hidden;
 }
 
 h2{
   font-size:2.0em;
+  margin: 0 0 10px 0;
+  flex-shrink: 0;
 }
 
 /* Tabs */
@@ -15,6 +21,7 @@ h2{
   gap: 0;
   margin-bottom: 15px;
   border-bottom: 2px solid #ddd;
+  flex-shrink: 0;
 }
 .shelf-tab{
   padding: 8px 20px;
@@ -42,6 +49,7 @@ h2{
   text-align: center;
   color: #666;
   font-size: 0.9em;
+  flex-shrink: 0;
 }
 .shelf-empty .empty-title{
   font-size: 1.1em;
@@ -86,6 +94,7 @@ h2{
   gap: 10px;
   padding: 8px 0;
   margin-bottom: 10px;
+  flex-shrink: 0;
 }
 .cache-toolbar button{
   padding: 6px 14px;
@@ -158,6 +167,9 @@ ul.lists[data-view="list"]{
   gap: 0;
   border: 1px solid #ddd;
   border-radius: 5px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 ul.lists[data-view="list"] li{
   display: flex;
@@ -194,4 +206,33 @@ ul.lists[data-view="list"] li .name{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Action Bar */
+.shelf-action-bar{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  flex-shrink: 0;
+  border-top: 1px solid #ddd;
+}
+.shelf-action-bar .btn-open{
+  padding: 8px 24px;
+  border: none;
+  border-radius: 5px;
+  background: #1565c0;
+  color: #fff;
+  font-size: 0.9em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.shelf-action-bar .btn-open:hover:not(:disabled){
+  opacity: 0.8;
+}
+.shelf-action-bar .btn-open:disabled{
+  background: #ccc;
+  color: #888;
+  cursor: not-allowed;
 }
