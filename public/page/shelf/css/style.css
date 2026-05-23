@@ -236,3 +236,58 @@ ul.lists[data-view="list"] li .name{
   color: #888;
   cursor: not-allowed;
 }
+
+/* Mobile Dropdown Tab */
+.shelf-tab-select{
+  display: none;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.9em;
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+  appearance: auto;
+}
+
+/* Responsive: Mobile */
+@media (max-width: 768px) {
+  main{
+    padding: 12px;
+  }
+  h2{
+    font-size: 1.4em;
+    margin: 0 0 8px 0;
+  }
+
+  .shelf-tabs{
+    align-items: center;
+    gap: 8px;
+    border-bottom: none;
+    margin-bottom: 10px;
+  }
+
+  /* タブボタンを非表示、プルダウンを表示 */
+  .shelf-tab{
+    display: none;
+  }
+  .shelf-tab-add{
+    display: flex;
+  }
+  .shelf-tab-select{
+    display: block;
+  }
+
+  /* 動的タブもPC版では非表示（selectに含まれる） */
+  .shelf-tab-dynamic{
+    display: none;
+  }
+
+  .shelf-view-toggle{
+    margin-left: 0;
+    flex-shrink: 0;
+  }
+}

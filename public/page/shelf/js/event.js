@@ -261,11 +261,12 @@ export class Event{
   open_pcloud_share_book(li){
     const name = li.getAttribute("data-name")
     const fileid = li.getAttribute("data-fileid")
-    let code = new URLSearchParams(location.search).get("code") || ""
+    const url_params = new URLSearchParams(location.search)
+    let code = url_params.get("code") || ""
+    const source_id = url_params.get("source_id") || ""
 
     // 動的ソースの場合、SourceRegistry からコードを取得
     if(!code){
-      const source_id = new URLSearchParams(location.search).get("source_id") || ""
       if(source_id){
         const source = SourceRegistry.get(source_id)
         if(source && source.code){
@@ -284,6 +285,17 @@ export class Event{
     params.set("code", code)
     params.set("fileid", fileid)
     params.set("book", name)
+    if(source_id){
+      params.set("source_id", source_id)
+    }
+    const dir = url_params.get("dir") || ""
+    if(dir){
+      params.set("dir", dir)
+    }
+    const folderid = url_params.get("folderid") || ""
+    if(folderid){
+      params.set("folderid", folderid)
+    }
     location.href = `book.html?${params.toString()}`
   }
 

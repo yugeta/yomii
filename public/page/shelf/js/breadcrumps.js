@@ -32,11 +32,26 @@ export class Breadcrumps{
 
   view(){
     const url = new Urlinfo().url
-    const source = new URLSearchParams(location.search).get("source") || "local"
+    const params = new URLSearchParams(location.search)
+    const source = params.get("source") || "local"
+    const source_id = params.get("source_id") || ""
+    const code = params.get("code") || ""
+
+    // 共通パラメータを構築するヘルパー
+    const build_params = (dir) => {
+      const p = new URLSearchParams()
+      p.set("p", "shelf")
+      p.set("source", source)
+      if(source_id) p.set("source_id", source_id)
+      if(code) p.set("code", code)
+      if(dir) p.set("dir", dir)
+      return p.toString()
+    }
+
     {
       const a = document.createElement('a')
       a.textContent = 'Top'
-      a.href = `${url}?p=shelf&source=${source}`
+      a.href = `${url}?${build_params("")}`
       this.elm.appendChild(a)
       this.elm.innerHTML += " / "
     }
@@ -51,7 +66,7 @@ export class Breadcrumps{
       }else{
         const a = document.createElement('a')
         a.textContent = link.name
-        a.href = `${url}?p=shelf&source=${source}&dir=${encodeURIComponent(link.dir)}`
+        a.href = `${url}?${build_params(link.dir)}`
         this.elm.appendChild(a)
         this.elm.innerHTML += " / "
       }

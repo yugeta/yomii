@@ -55,3 +55,32 @@ ul.lists li .name{
   font-size:0.8em;
   text-align:center;
 }
+
+/* キャッシュ済みマーク（アイコンに被せて斜め30度） */
+ul.lists li[data-cached="true"] .icon{
+  position:relative;
+  overflow:visible;
+}
+ul.lists li[data-cached="true"] .icon::after{
+  content:"cached";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%) rotate(-10deg);
+  font-size:9px;
+  font-weight:bold;
+  color:#fff;
+  background-color:rgba(76, 175, 80, 0.85);
+  padding:1px 5px;
+  border-radius:2px;
+  white-space:nowrap;
+  pointer-events:none;
+  line-height:1.3;
+  letter-spacing:0.5px;
+}
+
+/* リスト表示時のキャッシュマーク（アイコンが小さいので調整） */
+ul.lists[data-view="list"] li[data-cached="true"] .icon::after{
+  font-size:7px;
+  padding:1px 3px;
+}

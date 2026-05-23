@@ -60,7 +60,7 @@ export class Main{
   }
 
   /**
-   * pCloud 公開リンクから書籍を読み込む
+   * pCloud 公開リンクから書籍を読み込む（IndexedDB キャッシュ経由）
    */
   async load_from_pcloud_share(params){
     const code   = params.get("code")
@@ -74,7 +74,10 @@ export class Main{
     }
 
     try{
-      const blob = await PCloudShare.download_file(code, fileid)
+      const source_path = `pcloud_share://${code}/${fileid}`
+      const blob = await BookCache.get_or_download(source_path, name, async () => {
+        return await PCloudShare.download_file(code, fileid)
+      })
       const file = new File([blob], name, { type: "application/zip" })
       new Upload({ target: { files: [file] } })
       new Direction()
@@ -215,12 +218,33 @@ export class Main{
 
     const shelf_params = new URLSearchParams()
     shelf_params.set("p", "shelf")
-    shelf_params.set("source", source)
+
+    const source_id = params.get("source_id") || ""
+
+    // 動的タブから来た場合は動的ソースとして本棚に戻る
+    if(source_id){
+      shelf_params.set("source", `dynamic_pcloud_share`)
+      shelf_params.set("source_id", source_id)
+    }else{
+      shelf_params.set("source", source)
+    }
 
     // パスからディレクトリを抽出
     const path = params.get("path") || ""
     const dir = params.get("dir") || ""
     const book = params.get("book") || ""
+    const code = params.get("code") || ""
+
+    if(code && !source_id){
+      // 直接共有リンクの場合は code を引き継ぐ
+      shelf_params.set("code", code)
+    }
+
+    // pCloud 共有リンクのサブフォルダ位置を引き継ぐ
+    const folderid = params.get("folderid") || ""
+    if(folderid){
+      shelf_params.set("folderid", folderid)
+    }
 
     if(dir){
       // sample ソースの場合は dir パラメータがそのまま使える

@@ -77,6 +77,11 @@ export class Main{
     // 直前に読んでいた本をハイライト＆スクロール
     this.highlight_current_book()
 
+    // キャッシュ済みの本にマーキング（キャッシュタブ以外）
+    if(source !== "cache"){
+      this.mark_cached_books()
+    }
+
     // キャッシュタブの場合、容量情報を表示
     if(source === "cache" && toolbar){
       this.update_cache_info()
@@ -118,10 +123,39 @@ export class Main{
     }
   }
 
+  /**
+   * キャッシュ済みの本に「ダウンロード済み」マークを付ける
+   */
+  async mark_cached_books(){
+    const { BookCache } = await import("../../storage/js/book_cache.js")
+    const cached_list = await BookCache.list()
+    if(!cached_list || cached_list.length === 0) return
+
+    // キャッシュされた書籍名のセットを作成
+    const cached_names = new Set(cached_list.map(item => item.name))
+
+    const lists = document.querySelector("ul.lists")
+    if(!lists) return
+
+    const items = lists.querySelectorAll('li[data-type="file"]')
+    for(const li of items){
+      const name = li.getAttribute("data-name")
+      if(name && cached_names.has(name)){
+        li.setAttribute("data-cached", "true")
+      }
+    }
+  }
+
   bind_tabs(){
     const tabs = document.querySelectorAll(".shelf-tab")
     for(const tab of tabs){
       tab.addEventListener("click", this.on_tab_click.bind(this))
+    }
+
+    // モバイル用プルダウン
+    const select = document.querySelector(".shelf-tab-select")
+    if(select){
+      select.addEventListener("change", this.on_tab_select_change.bind(this))
     }
 
     // ビュー切り替え
@@ -145,6 +179,31 @@ export class Main{
     params.delete("source_id")
     params.delete("folderid")
     location.search = params.toString()
+  }
+
+  on_tab_select_change(e){
+    const value = e.target.value
+    // dynamic_ プレフィックスの場合は source_id を含む
+    // 形式: dynamic_{type}_{uuid}
+    if(value.startsWith("dynamic_")){
+      // dynamic_pcloud_share_c5f3d111-... のようなフォーマット
+      // type部分とid部分を分離
+      const parts = value.match(/^(dynamic_[^_]+(?:_[^_]+)?)_([0-9a-f]{8}-.+)$/)
+      if(parts){
+        const source_type = parts[1]
+        const source_id = parts[2]
+        const params = new URLSearchParams()
+        params.set("p", "shelf")
+        params.set("source", source_type)
+        params.set("source_id", source_id)
+        location.search = params.toString()
+      }
+    }else{
+      const params = new URLSearchParams()
+      params.set("p", "shelf")
+      params.set("source", value)
+      location.search = params.toString()
+    }
   }
 
   on_view_toggle(e){
@@ -176,6 +235,16 @@ export class Main{
         tab.classList.add("active")
       }else{
         tab.classList.remove("active")
+      }
+    }
+
+    // モバイル用プルダウンも同期
+    const select = document.querySelector(".shelf-tab-select")
+    if(select){
+      // 固定タブの場合
+      const option = select.querySelector(`option[value="${source}"]`)
+      if(option){
+        select.value = source
       }
     }
   }
@@ -262,6 +331,23 @@ export class Main{
       add_btn.parentNode.insertBefore(tab, add_btn)
     }
 
+    // モバイル用プルダウンに動的タブのオプションを追加
+    const select = document.querySelector(".shelf-tab-select")
+    if(select){
+      // 既存の動的オプションを削除
+      const dynamic_options = select.querySelectorAll("option[data-dynamic]")
+      for(const opt of dynamic_options) opt.remove()
+
+      // 動的ソースをオプションとして追加
+      for(const source of sources){
+        const option = document.createElement("option")
+        option.value = `dynamic_${source.type}_${source.id}`
+        option.textContent = source.name
+        option.setAttribute("data-dynamic", "true")
+        select.appendChild(option)
+      }
+    }
+
     // アクティブ状態の設定（sourceがdynamic_で始まる場合のみ）
     const current_source = new Urlinfo().queries.source || "cache"
     const current_source_id = new Urlinfo().queries.source_id
@@ -272,6 +358,11 @@ export class Main{
         const tabs = document.querySelectorAll(".shelf-tab")
         for(const t of tabs) t.classList.remove("active")
         active_tab.classList.add("active")
+      }
+
+      // モバイル用プルダウンも同期
+      if(select){
+        select.value = `dynamic_${current_source.replace("dynamic_", "")}_${current_source_id}`
       }
     }
   }
