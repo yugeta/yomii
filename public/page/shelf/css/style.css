@@ -5,7 +5,8 @@ main{
   padding:20px;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - var(--size-header));
+  height: calc(100vh - var(--size-header) - var(--size-footer));
+  height: calc(100dvh - var(--size-header) - var(--size-footer));
   overflow: hidden;
 }
 
