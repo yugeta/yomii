@@ -16,6 +16,11 @@ export class Main{
     const source = new Urlinfo().queries.source || "cache"
     this.set_active_tab(source)
 
+    // 共有リンクモードの場合、タブを非表示にして共有ヘッダーを表示
+    if(source === "pcloud_share"){
+      this.show_share_header()
+    }
+
     new Load({
       source   : source,
       dir      : new Urlinfo().queries.dir || '',
@@ -163,6 +168,21 @@ export class Main{
     }
   }
 
+  /**
+   * 共有リンクモード時のUI表示
+   */
+  show_share_header(){
+    const tabs = document.querySelector(".shelf-tabs")
+    if(tabs){
+      tabs.style.display = "none"
+    }
+
+    const h2 = document.querySelector("h2")
+    if(h2){
+      h2.textContent = "共有本棚"
+    }
+  }
+
   get_empty_message(source){
     switch(source){
       case "cache":
@@ -184,6 +204,11 @@ export class Main{
             <li>または、pCloud の <code>/yomii/</code> フォルダに .yomii ファイルを直接配置する</li>
           </ol>
           <p class="empty-note">※ <a href="./?p=mypage">マイページ</a>で pCloud 連携が完了している必要があります</p>
+        `
+      case "pcloud_share":
+        return `
+          <p class="empty-title">共有本棚に書籍がありません</p>
+          <p class="empty-help">この公開リンクには .yomii ファイルが含まれていません。</p>
         `
       case "local":
         return `

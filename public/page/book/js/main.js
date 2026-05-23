@@ -4,6 +4,7 @@ import { Event }     from "./event.js"
 import { Urlinfo }   from "../../../asset/js/lib/urlinfo.js"
 import { BookCache } from "../../storage/js/book_cache.js"
 import { PCloud }    from "../../storage/js/pcloud.js"
+import { PCloudShare } from "../../storage/js/pcloud_share.js"
 
 export class Main{
   constructor(){
@@ -16,6 +17,8 @@ export class Main{
 
     if(source === "pcloud"){
       this.load_from_pcloud(params)
+    }else if(source === "pcloud_share"){
+      this.load_from_pcloud_share(params)
     }else if(source === "cache"){
       this.load_from_cache(params)
     }else if(source === "local"){
@@ -52,6 +55,31 @@ export class Main{
       new Direction()
     }catch(e){
       console.error("pCloud book load error:", e)
+      alert(`書籍の読み込みに失敗しました: ${e.message}`)
+    }
+  }
+
+  /**
+   * pCloud 公開リンクから書籍を読み込む
+   */
+  async load_from_pcloud_share(params){
+    const code   = params.get("code")
+    const fileid = params.get("fileid")
+    const name   = params.get("book") || "book"
+
+    if(!code || !fileid){
+      console.error("pCloud share: code または fileid が指定されていません")
+      alert("共有リンクの情報が不足しています。")
+      return
+    }
+
+    try{
+      const blob = await PCloudShare.download_file(code, fileid)
+      const file = new File([blob], name, { type: "application/zip" })
+      new Upload({ target: { files: [file] } })
+      new Direction()
+    }catch(e){
+      console.error("pCloud share book load error:", e)
       alert(`書籍の読み込みに失敗しました: ${e.message}`)
     }
   }

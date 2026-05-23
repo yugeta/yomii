@@ -1,4 +1,5 @@
 import { PCloud } from "../../storage/js/pcloud.js"
+import { PCloudShare } from "../../storage/js/pcloud_share.js"
 import { BookCache } from "../../storage/js/book_cache.js"
 import { Loading } from "../../../asset/js/loading/loading.js"
 
@@ -17,6 +18,9 @@ export class Load{
     switch(this.source){
       case "pcloud":
         this.load_pcloud()
+        break
+      case "pcloud_share":
+        this.load_pcloud_share()
         break
       case "cache":
         this.load_cache()
@@ -239,6 +243,48 @@ export class Load{
       this.finish()
     }catch(e){
       console.error("pCloud list error:", e)
+      this.datas = []
+      this.error_message = e.message
+      this.finish()
+    }
+  }
+
+  // ============================================================
+  // pCloud 公開リンク共有
+  // ============================================================
+  async load_pcloud_share(){
+    const params = new URLSearchParams(location.search)
+    const code = params.get("code") || ""
+
+    if(!code){
+      this.datas = []
+      this.error_message = "公開リンクコードが指定されていません。URLに code パラメータを追加してください。"
+      this.finish()
+      return
+    }
+
+    try{
+      const result = await PCloudShare.list_files(code)
+      
+      this.datas = (result.files || [])
+        .filter(file => {
+          if(file.name.startsWith('.')) return false
+          if(file.is_folder) return true
+          return file.name.endsWith('.yomii')
+        })
+        .map(file => ({
+          type     : file.is_folder ? "dir" : "file",
+          name     : file.name,
+          size     : file.size,
+          modified : file.modified,
+          fileid   : file.fileid,
+          folderid : file.folderid,
+        }))
+      
+      this.share_code = code
+      this.finish()
+    }catch(e){
+      console.error("pCloud share list error:", e)
       this.datas = []
       this.error_message = e.message
       this.finish()

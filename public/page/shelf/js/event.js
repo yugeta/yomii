@@ -1,6 +1,7 @@
 import { Main } from "./main.js"
 import { Urlinfo } from "../../../asset/js/lib/urlinfo.js"
 import { BookCache } from "../../storage/js/book_cache.js"
+import { PCloudShare } from "../../storage/js/pcloud_share.js"
 
 export class Event{
   constructor(options){
@@ -155,6 +156,11 @@ export class Event{
     params.set("p", "shelf")
     params.set("source", source)
     params.set("dir", `${dir}${name}`)
+    // 共有リンクの場合は code を引き継ぐ
+    const code = new URLSearchParams(location.search).get("code")
+    if(code){
+      params.set("code", code)
+    }
     location.search = params.toString()
   }
 
@@ -166,6 +172,9 @@ export class Event{
     switch(source){
       case "pcloud":
         this.open_pcloud_book(name)
+        break
+      case "pcloud_share":
+        this.open_pcloud_share_book(li)
         break
       case "cache":
         this.open_cached_book(li)
@@ -191,6 +200,27 @@ export class Event{
     const params = new URLSearchParams()
     params.set("source", "pcloud")
     params.set("path", pcloud_path)
+    params.set("book", name)
+    location.href = `book.html?${params.toString()}`
+  }
+
+  /**
+   * pCloud 公開リンク共有の書籍を開く
+   */
+  open_pcloud_share_book(li){
+    const name = li.getAttribute("data-name")
+    const fileid = li.getAttribute("data-fileid")
+    const code = new URLSearchParams(location.search).get("code") || ""
+
+    if(!fileid || !code){
+      alert("ファイル情報が不足しています。")
+      return
+    }
+
+    const params = new URLSearchParams()
+    params.set("source", "pcloud_share")
+    params.set("code", code)
+    params.set("fileid", fileid)
     params.set("book", name)
     location.href = `book.html?${params.toString()}`
   }

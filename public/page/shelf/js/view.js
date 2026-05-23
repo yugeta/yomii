@@ -36,6 +36,9 @@ export class View{
       if(data.source_path){
         li.setAttribute("data-source-path", data.source_path)
       }
+      if(data.fileid){
+        li.setAttribute("data-fileid", data.fileid)
+      }
       this.set_icon(li, data.type)
       this.set_name(li, data.name)
       this.elm_root.appendChild(li)
