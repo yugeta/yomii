@@ -74,13 +74,37 @@ export class Event{
     if(btn_open){
       btn_open.addEventListener("click", this.on_open.bind(this))
     }
+    const btn_cache_add = document.querySelector(".btn-cache-add")
+    if(btn_cache_add){
+      btn_cache_add.addEventListener("click", this.on_cache_add.bind(this))
+    }
+
+    // キャッシュタブ以外で「キャッシュに入れる」ボタンを表示
+    const source = new URLSearchParams(location.search).get("source") || "cache"
+    if(source !== "cache" && btn_cache_add){
+      btn_cache_add.style.display = ""
+    }
   }
 
   update_open_button(){
     const btn = document.querySelector(".btn-open")
-    if(!btn) return
+    const btn_cache_add = document.querySelector(".btn-cache-add")
     const selected = this.elm_lists.querySelector('li[data-status="active"]')
-    btn.disabled = !selected
+    const is_file = selected && selected.getAttribute("data-type") === "file"
+
+    if(btn){
+      btn.disabled = !selected
+    }
+    if(btn_cache_add){
+      // ファイル選択時のみ有効、既にキャッシュ済みなら無効
+      const is_cached = selected && selected.getAttribute("data-cached") === "true"
+      btn_cache_add.disabled = !is_file || is_cached
+      if(is_cached){
+        btn_cache_add.textContent = "キャッシュ済み"
+      }else{
+        btn_cache_add.textContent = "キャッシュに入れる"
+      }
+    }
   }
 
   /**
@@ -96,6 +120,85 @@ export class Event{
       case 'file':
         this.click_file(li)
         break
+    }
+  }
+
+  /**
+   * 「キャッシュに入れる」ボタン押下 — 本を開かずにキャッシュに保存
+   */
+  async on_cache_add(){
+    const li = this.elm_lists.querySelector('li[data-status="active"]')
+    if(!li || li.getAttribute("data-type") !== "file") return
+
+    const name = li.getAttribute("data-name")
+    const btn = document.querySelector(".btn-cache-add")
+    const source = new URLSearchParams(location.search).get("source") || ""
+
+    // ボタンをローディング状態に
+    if(btn){
+      btn.disabled = true
+      btn.textContent = "ダウンロード中..."
+    }
+
+    try{
+      let source_path = ""
+      let blob = null
+
+      if(source === "pcloud"){
+        const dir = new URLSearchParams(location.search).get("dir") || ""
+        const pcloud_path = dir ? `/yomii/${dir}/${name}` : `/yomii/${name}`
+        source_path = pcloud_path
+        blob = await BookCache.get_or_download(source_path, name, async () => {
+          const { PCloud } = await import("../../storage/js/pcloud.js")
+          return await PCloud.download_file(pcloud_path)
+        })
+      }else if(source === "pcloud_share" || source.startsWith("dynamic_pcloud_share")){
+        const url_params = new URLSearchParams(location.search)
+        let code = url_params.get("code") || ""
+        const source_id = url_params.get("source_id") || ""
+        const fileid = li.getAttribute("data-fileid")
+
+        if(!code && source_id){
+          const src = SourceRegistry.get(source_id)
+          if(src && src.code) code = src.code
+        }
+
+        if(!code || !fileid){
+          alert("ファイル情報が不足しています。")
+          return
+        }
+
+        source_path = `pcloud_share://${code}/${fileid}`
+        blob = await BookCache.get_or_download(source_path, name, async () => {
+          return await PCloudShare.download_file(code, fileid)
+        })
+      }else if(source === "sample"){
+        const dir = new URLSearchParams(location.search).get("dir") || ""
+        const path = dir ? `data/shelf/${dir}/${name}` : `data/shelf/${name}`
+        source_path = path
+        blob = await BookCache.get_or_download(source_path, name, async () => {
+          const response = await fetch(path)
+          if(!response.ok) throw new Error(`HTTP ${response.status}`)
+          return await response.blob()
+        })
+      }else{
+        alert("このソースではキャッシュ保存に対応していません。")
+        return
+      }
+
+      // キャッシュ済みマークを付ける
+      li.setAttribute("data-cached", "true")
+      if(btn){
+        btn.disabled = true
+        btn.textContent = "キャッシュ済み"
+      }
+    }catch(e){
+      console.error("Cache add error:", e)
+      alert(`キャッシュ保存に失敗しました: ${e.message}`)
+      if(btn){
+        btn.disabled = false
+        btn.textContent = "キャッシュに入れる"
+      }
     }
   }
 

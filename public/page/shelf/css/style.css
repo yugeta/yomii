@@ -236,6 +236,25 @@ ul.lists[data-view="list"] li .name{
   color: #888;
   cursor: not-allowed;
 }
+.shelf-action-bar .btn-cache-add{
+  padding: 8px 16px;
+  border: 1px solid #4caf50;
+  border-radius: 5px;
+  background: #fff;
+  color: #4caf50;
+  font-size: 0.85em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+.shelf-action-bar .btn-cache-add:hover:not(:disabled){
+  background: #e8f5e9;
+}
+.shelf-action-bar .btn-cache-add:disabled{
+  border-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
+}
 
 /* Mobile Dropdown Tab */
 .shelf-tab-select{
