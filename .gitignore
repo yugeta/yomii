@@ -13,3 +13,4 @@ public/data/
 public/plugin/
 public/vendor/
 books/*
+node_modules/
