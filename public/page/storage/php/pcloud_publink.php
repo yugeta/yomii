@@ -9,6 +9,7 @@
  * エンドポイント:
  *   POST   ?action=list      公開フォルダのファイル一覧取得
  *   POST   ?action=download  公開リンクからファイルダウンロード
+ *   POST   ?action=debug     デバッグ用: pCloud API の生レスポンスを返す
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -36,6 +37,9 @@ switch ($action) {
         break;
     case 'download':
         handle_download();
+        break;
+    case 'debug':
+        handle_debug();
         break;
     default:
         echo json_encode(['result' => 'error', 'message' => 'Invalid action']);
@@ -195,6 +199,42 @@ function handle_download() {
     header('Content-Disposition: attachment; filename="' . $filename . '"');
     header('Content-Length: ' . strlen($file_data));
     echo $file_data;
+}
+
+// ============================================================
+// デバッグ: pCloud API の生レスポンスを返す
+// ============================================================
+function handle_debug() {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $code = $input['code'] ?? '';
+
+    if (!$code) {
+        echo json_encode(['result' => 'error', 'message' => 'code が必要です']);
+        return;
+    }
+
+    $url = 'https://api.pcloud.com/showpublink?code=' . urlencode($code);
+
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL            => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_TIMEOUT        => 30,
+    ]);
+
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    echo json_encode([
+        'debug'     => true,
+        'api_url'   => $url,
+        'http_code' => $http_code,
+        'curl_error'=> $error,
+        'raw_response' => json_decode($response, true),
+    ]);
 }
 
 // ============================================================
