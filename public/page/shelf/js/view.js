@@ -61,7 +61,7 @@ export class View{
     const div = document.createElement('div')
     div.className = "name"
     li.appendChild(div)
-    div.textContent = name
+    div.textContent = name.replace(/\.yomii$/, '')
   }
 
   load(data){
