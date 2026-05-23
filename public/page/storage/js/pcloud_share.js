@@ -15,16 +15,23 @@ export class PCloudShare{
 
   /**
    * 公開リンクコードからファイル一覧を取得
+   * @param {string} code - 公開リンクコード
+   * @param {string|number} [folderid] - サブフォルダID（省略時はルート）
    */
-  static async list_files(code){
+  static async list_files(code, folderid){
     if(!code){
       throw new Error("公開リンクコードが指定されていません。")
+    }
+
+    const body = { code }
+    if(folderid){
+      body.folderid = folderid
     }
 
     const response = await fetch(PCloudShare.PROXY_URL + "?action=list", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify(body),
     })
 
     const data = await response.json()

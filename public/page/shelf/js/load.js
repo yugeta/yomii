@@ -2,6 +2,7 @@ import { PCloud } from "../../storage/js/pcloud.js"
 import { PCloudShare } from "../../storage/js/pcloud_share.js"
 import { BookCache } from "../../storage/js/book_cache.js"
 import { Loading } from "../../../asset/js/loading/loading.js"
+import { SourceRegistry } from "./source_registry.js"
 
 export class Load{
   constructor(options){
@@ -32,7 +33,12 @@ export class Load{
         this.load_sample()
         break
       default:
-        this.load_cache()
+        // 動的ソースの処理
+        if(this.source.startsWith("dynamic_")){
+          this.load_dynamic()
+        }else{
+          this.load_cache()
+        }
         break
     }
   }
@@ -264,7 +270,10 @@ export class Load{
     }
 
     try{
-      const result = await PCloudShare.list_files(code)
+      // サブフォルダナビゲーション: folderid が URL にあればそれを使う
+      const folderid = params.get("folderid") || ""
+
+      const result = await PCloudShare.list_files(code, folderid || undefined)
       
       this.datas = (result.files || [])
         .filter(file => {
@@ -319,6 +328,149 @@ export class Load{
       console.error("Cache list error:", e)
       this.datas = []
       this.error_message = e.message
+      this.finish()
+    }
+  }
+
+  // ============================================================
+  // 動的ソース
+  // ============================================================
+  async load_dynamic(){
+    const source_id = this.options.source_id || new URLSearchParams(location.search).get("source_id") || ""
+    if(!source_id){
+      this.datas = []
+      this.error_message = "ソース情報が見つかりません。"
+      this.finish()
+      return
+    }
+
+    const source = SourceRegistry.get(source_id)
+    if(!source){
+      this.datas = []
+      this.error_message = "登録されたソースが見つかりません。削除された可能性があります。"
+      this.finish()
+      return
+    }
+
+    switch(source.type){
+      case "pcloud_share":
+        await this.load_dynamic_pcloud_share(source)
+        break
+      case "local_folder":
+        await this.load_dynamic_local_folder(source)
+        break
+      default:
+        this.datas = []
+        this.error_message = "未対応のソース種別です。"
+        this.finish()
+    }
+  }
+
+  /**
+   * 動的 pCloud 公開リンクの読み込み
+   */
+  async load_dynamic_pcloud_share(source){
+    const code = source.code
+    if(!code){
+      this.datas = []
+      this.error_message = "pCloud リンクコードが見つかりません。"
+      this.finish()
+      return
+    }
+
+    try{
+      // サブフォルダナビゲーション: folderid が URL にあればそれを使う
+      const params = new URLSearchParams(location.search)
+      const folderid = params.get("folderid") || ""
+
+      const result = await PCloudShare.list_files(code, folderid || undefined)
+      
+      this.datas = (result.files || [])
+        .filter(file => {
+          if(file.name.startsWith('.')) return false
+          if(file.is_folder) return true
+          return file.name.endsWith('.yomii')
+        })
+        .map(file => ({
+          type     : file.is_folder ? "dir" : "file",
+          name     : file.name,
+          size     : file.size,
+          modified : file.modified,
+          fileid   : file.fileid,
+          folderid : file.folderid,
+        }))
+      
+      this.share_code = code
+      this.finish()
+    }catch(e){
+      console.error("Dynamic pCloud share list error:", e)
+      this.datas = []
+      this.error_message = `接続に失敗しました: ${e.message}`
+      this.finish()
+    }
+  }
+
+  /**
+   * 動的ローカルフォルダの読み込み
+   */
+  async load_dynamic_local_folder(source){
+    const handle_key = source.handle_key
+    if(!handle_key){
+      this.datas = []
+      this.error_message = "フォルダ情報が見つかりません。"
+      this.finish()
+      return
+    }
+
+    const handle = await SourceRegistry.get_handle(handle_key)
+    if(!handle){
+      this.datas = []
+      this.error_message = "フォルダハンドルが見つかりません。再度追加してください。"
+      this.finish()
+      return
+    }
+
+    try{
+      // 権限を再確認
+      const permission = await handle.queryPermission({ mode: "read" })
+      if(permission !== "granted"){
+        const request = await handle.requestPermission({ mode: "read" })
+        if(request !== "granted"){
+          this.datas = []
+          this.error_message = "フォルダへのアクセスが許可されていません。"
+          this.finish()
+          return
+        }
+      }
+
+      const files = []
+      for await(const entry of handle.values()){
+        if(entry.kind === "file" && entry.name.endsWith(".yomii")){
+          files.push({
+            type : "file",
+            name : entry.name,
+            handle : entry,
+          })
+        }else if(entry.kind === "directory"){
+          files.push({
+            type : "dir",
+            name : entry.name,
+            handle : entry,
+          })
+        }
+      }
+
+      files.sort((a, b) => {
+        if(a.type !== b.type) return a.type === "dir" ? -1 : 1
+        return a.name.localeCompare(b.name)
+      })
+
+      this.datas = files
+      this.finish()
+    }catch(e){
+      console.error("Dynamic local folder read error:", e)
+      this.datas = []
+      this.error_message = `フォルダの読み込みに失敗しました: ${e.message}`
       this.finish()
     }
   }

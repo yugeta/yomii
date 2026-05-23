@@ -39,6 +39,9 @@ export class View{
       if(data.fileid){
         li.setAttribute("data-fileid", data.fileid)
       }
+      if(data.folderid){
+        li.setAttribute("data-folderid", data.folderid)
+      }
       this.set_icon(li, data.type)
       this.set_name(li, data.name)
       this.elm_root.appendChild(li)

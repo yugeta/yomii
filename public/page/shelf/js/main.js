@@ -3,6 +3,9 @@ import { View }  from './view.js'
 import { Event } from './event.js'
 import { Breadcrumps } from './breadcrumps.js'
 import { Urlinfo } from "../../../asset/js/lib/urlinfo.js"
+import { SourceRegistry } from './source_registry.js'
+import { AddDialog } from './add_dialog.js'
+import { TabInfoDialog } from './tab_info_dialog.js'
 
 export class Main{
   constructor(options){
@@ -16,14 +19,21 @@ export class Main{
     const source = new Urlinfo().queries.source || "cache"
     this.set_active_tab(source)
 
+    // 動的タブを生成
+    this.render_dynamic_tabs()
+
     // 共有リンクモードの場合、タブを非表示にして共有ヘッダーを表示
     if(source === "pcloud_share"){
       this.show_share_header()
     }
 
+    // 「+」ボタンのバインド
+    this.bind_add_button()
+
     new Load({
       source   : source,
       dir      : new Urlinfo().queries.dir || '',
+      source_id: new Urlinfo().queries.source_id || '',
       callback : this.view.bind(this),
     })
   }
@@ -132,6 +142,8 @@ export class Main{
     params.set("p", "shelf")
     params.set("source", source)
     params.delete("dir")
+    params.delete("source_id")
+    params.delete("folderid")
     location.search = params.toString()
   }
 
@@ -224,6 +236,157 @@ export class Main{
       default:
         return `<p class="empty-title">書籍がありません</p>`
     }
+  }
+
+  // ============================================================
+  // 動的タブ管理
+  // ============================================================
+
+  /**
+   * SourceRegistry から動的タブを生成して DOM に追加
+   */
+  render_dynamic_tabs(){
+    const sources = SourceRegistry.list()
+    const add_btn = document.querySelector(".shelf-tab-add")
+    if(!add_btn) return
+
+    // 既存の動的タブを削除
+    const existing = document.querySelectorAll(".shelf-tab-dynamic")
+    for(const el of existing){
+      el.remove()
+    }
+
+    // 動的タブを「+」ボタンの前に挿入
+    for(const source of sources){
+      const tab = this.create_dynamic_tab(source)
+      add_btn.parentNode.insertBefore(tab, add_btn)
+    }
+
+    // アクティブ状態の設定（sourceがdynamic_で始まる場合のみ）
+    const current_source = new Urlinfo().queries.source || "cache"
+    const current_source_id = new Urlinfo().queries.source_id
+    if(current_source_id && current_source.startsWith("dynamic_")){
+      const active_tab = document.querySelector(`.shelf-tab-dynamic[data-source-id="${current_source_id}"]`)
+      if(active_tab){
+        // 固定タブのアクティブを解除
+        const tabs = document.querySelectorAll(".shelf-tab")
+        for(const t of tabs) t.classList.remove("active")
+        active_tab.classList.add("active")
+      }
+    }
+  }
+
+  /**
+   * 動的タブの DOM 要素を生成
+   */
+  create_dynamic_tab(source){
+    const tab = document.createElement("button")
+    tab.className = "shelf-tab shelf-tab-dynamic"
+    tab.setAttribute("data-source", `dynamic_${source.type}`)
+    tab.setAttribute("data-source-id", source.id)
+
+    // 表示名（20文字で切り詰め）
+    const display_name = source.name.length > 20
+      ? source.name.substring(0, 20) + "…"
+      : source.name
+
+    tab.innerHTML = `
+      <span class="tab-label">${this.escape_html(display_name)}</span>
+      <span class="tab-info-btn" title="タブ情報">ⓘ</span>
+    `
+
+    // タブクリック
+    tab.addEventListener("click", (e) => {
+      // 情報ボタンのクリックは除外
+      if(e.target.classList.contains("tab-info-btn")) return
+      this.on_dynamic_tab_click(source)
+    })
+
+    // 情報ボタン
+    tab.querySelector(".tab-info-btn").addEventListener("click", (e) => {
+      e.stopPropagation()
+      this.on_dynamic_tab_info(source, tab)
+    })
+
+    return tab
+  }
+
+  /**
+   * 動的タブクリック時の処理
+   */
+  on_dynamic_tab_click(source){
+    const params = new URLSearchParams()
+    params.set("p", "shelf")
+    params.set("source", `dynamic_${source.type}`)
+    params.set("source_id", source.id)
+    location.search = params.toString()
+  }
+
+  /**
+   * 動的タブ情報ダイアログ表示
+   */
+  on_dynamic_tab_info(source, tab_el){
+    const dialog = new TabInfoDialog({
+      source: source,
+      on_updated: (updated_source) => {
+        // タブ名を更新
+        const label = tab_el.querySelector(".tab-label")
+        if(label){
+          const display_name = updated_source.name.length > 20
+            ? updated_source.name.substring(0, 20) + "…"
+            : updated_source.name
+          label.textContent = display_name
+        }
+      },
+      on_deleted: (deleted_source) => {
+        // DOM から削除
+        tab_el.remove()
+
+        // 削除したタブがアクティブだった場合、キャッシュタブに戻る
+        const current_source_id = new URLSearchParams(location.search).get("source_id")
+        if(current_source_id === deleted_source.id){
+          const params = new URLSearchParams()
+          params.set("p", "shelf")
+          params.set("source", "cache")
+          location.search = params.toString()
+        }
+      }
+    })
+    dialog.show()
+  }
+
+  /**
+   * 「+」ボタンのバインド
+   */
+  bind_add_button(){
+    const btn = document.querySelector(".shelf-tab-add")
+    if(!btn) return
+
+    // 共有リンクモードでは非表示
+    const source = new Urlinfo().queries.source || "cache"
+    if(source === "pcloud_share"){
+      btn.style.display = "none"
+      return
+    }
+
+    btn.addEventListener("click", () => {
+      const dialog = new AddDialog({
+        on_added: (entry) => {
+          // 追加成功 → そのタブに遷移
+          this.on_dynamic_tab_click(entry)
+        }
+      })
+      dialog.show()
+    })
+  }
+
+  /**
+   * HTML エスケープ
+   */
+  escape_html(str){
+    const div = document.createElement("div")
+    div.textContent = str
+    return div.innerHTML
   }
 }
 

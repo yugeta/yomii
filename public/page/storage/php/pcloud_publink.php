@@ -52,13 +52,14 @@ switch ($action) {
 function handle_list() {
     $input = json_decode(file_get_contents('php://input'), true);
     $code = $input['code'] ?? '';
+    $folderid = $input['folderid'] ?? '';
 
     if (!$code) {
         echo json_encode(['result' => 'error', 'message' => '公開リンクコードが必要です']);
         return;
     }
 
-    // pCloud API: showpublink（認証不要）
+    // showpublink API で全ツリーを取得（認証不要）
     $url = 'https://api.pcloud.com/showpublink?code=' . urlencode($code);
 
     $ch = curl_init();
@@ -94,10 +95,22 @@ function handle_list() {
 
     // メタデータからファイル一覧を構築
     $metadata = $data['metadata'] ?? [];
-    $files = [];
 
-    if (isset($metadata['contents']) && is_array($metadata['contents'])) {
-        foreach ($metadata['contents'] as $item) {
+    // folderid が指定されている場合、ツリーを再帰的に探索して該当フォルダを見つける
+    $target = $metadata;
+    if ($folderid) {
+        $found = find_folder_by_id($metadata, (int)$folderid);
+        if ($found) {
+            $target = $found;
+        } else {
+            echo json_encode(['result' => 'error', 'message' => '指定されたフォルダが見つかりません。']);
+            return;
+        }
+    }
+
+    $files = [];
+    if (isset($target['contents']) && is_array($target['contents'])) {
+        foreach ($target['contents'] as $item) {
             $files[] = [
                 'name'      => $item['name'] ?? '',
                 'is_folder' => !empty($item['isfolder']),
@@ -111,7 +124,7 @@ function handle_list() {
 
     echo json_encode([
         'result'      => 'success',
-        'folder_name' => $metadata['name'] ?? '',
+        'folder_name' => $target['name'] ?? '',
         'files'       => $files,
     ]);
 }
@@ -240,6 +253,30 @@ function handle_debug() {
 // ============================================================
 // ユーティリティ
 // ============================================================
+
+/**
+ * ツリー構造から folderid に一致するフォルダを再帰的に探索
+ */
+function find_folder_by_id($node, $target_folderid) {
+    // 現在のノードが対象か
+    if (isset($node['folderid']) && (int)$node['folderid'] === $target_folderid) {
+        return $node;
+    }
+
+    // contents を再帰探索
+    if (isset($node['contents']) && is_array($node['contents'])) {
+        foreach ($node['contents'] as $child) {
+            if (!empty($child['isfolder'])) {
+                $found = find_folder_by_id($child, $target_folderid);
+                if ($found) {
+                    return $found;
+                }
+            }
+        }
+    }
+
+    return null;
+}
 
 /**
  * pCloud エラーコードからメッセージを返す

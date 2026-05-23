@@ -2,6 +2,7 @@ import { Main } from "./main.js"
 import { Urlinfo } from "../../../asset/js/lib/urlinfo.js"
 import { BookCache } from "../../storage/js/book_cache.js"
 import { PCloudShare } from "../../storage/js/pcloud_share.js"
+import { SourceRegistry } from "./source_registry.js"
 
 export class Event{
   constructor(options){
@@ -194,6 +195,16 @@ export class Event{
     if(code){
       params.set("code", code)
     }
+    // 動的ソースの場合は source_id を引き継ぐ
+    const source_id = new URLSearchParams(location.search).get("source_id")
+    if(source_id){
+      params.set("source_id", source_id)
+    }
+    // pCloud 共有リンクの場合は folderid を渡す（サブフォルダナビゲーション用）
+    const folderid = li.getAttribute("data-folderid")
+    if(folderid && (source === "pcloud_share" || source.startsWith("dynamic_pcloud_share"))){
+      params.set("folderid", folderid)
+    }
     location.search = params.toString()
   }
 
@@ -219,7 +230,14 @@ export class Event{
         this.open_sample_book(name)
         break
       default:
-        this.open_cached_book(li)
+        // 動的ソース
+        if(source.startsWith("dynamic_pcloud_share")){
+          this.open_pcloud_share_book(li)
+        }else if(source.startsWith("dynamic_local_folder")){
+          this.open_local_book(li)
+        }else{
+          this.open_cached_book(li)
+        }
     }
   }
 
@@ -243,7 +261,18 @@ export class Event{
   open_pcloud_share_book(li){
     const name = li.getAttribute("data-name")
     const fileid = li.getAttribute("data-fileid")
-    const code = new URLSearchParams(location.search).get("code") || ""
+    let code = new URLSearchParams(location.search).get("code") || ""
+
+    // 動的ソースの場合、SourceRegistry からコードを取得
+    if(!code){
+      const source_id = new URLSearchParams(location.search).get("source_id") || ""
+      if(source_id){
+        const source = SourceRegistry.get(source_id)
+        if(source && source.code){
+          code = source.code
+        }
+      }
+    }
 
     if(!fileid || !code){
       alert("ファイル情報が不足しています。")
