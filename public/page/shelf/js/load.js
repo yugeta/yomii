@@ -1,10 +1,18 @@
 import { PCloud } from "../../storage/js/pcloud.js"
 import { BookCache } from "../../storage/js/book_cache.js"
+import { Loading } from "../../../asset/js/loading/loading.js"
 
 export class Load{
   constructor(options){
     this.options = options || {}
     this.source = this.options.source || "cache"
+
+    // プログレス表示開始
+    new Loading({ type: "plane" })
+    Loading.set_status('active')
+    Loading.set_rate(5)
+    this.progress_value = 5
+    this.start_progress_timer()
 
     switch(this.source){
       case "pcloud":
@@ -22,6 +30,27 @@ export class Load{
       default:
         this.load_cache()
         break
+    }
+  }
+
+  /**
+   * 通信中にバーを少しずつ進めるタイマー
+   * 90%を上限として徐々に減速しながら進む
+   */
+  start_progress_timer(){
+    this.progress_timer = setInterval(() => {
+      if(this.progress_value >= 90) return
+      // 残りの距離の10%ずつ進む（減速）
+      const remaining = 90 - this.progress_value
+      this.progress_value += remaining * 0.08
+      Loading.set_rate(this.progress_value)
+    }, 100)
+  }
+
+  stop_progress_timer(){
+    if(this.progress_timer){
+      clearInterval(this.progress_timer)
+      this.progress_timer = null
     }
   }
 
@@ -192,12 +221,21 @@ export class Load{
       
       const files = await PCloud.list_files_path(dir)
       
-      this.datas = files.map(file => ({
-        type : file.is_folder ? "dir" : "file",
-        name : file.name,
-        size : file.size,
-        modified : file.modified,
-      }))
+      this.datas = files
+        .filter(file => {
+          // 隠しファイル・隠しフォルダを除外
+          if(file.name.startsWith('.')) return false
+          // ディレクトリは表示
+          if(file.is_folder) return true
+          // ファイルは .yomii のみ表示
+          return file.name.endsWith('.yomii')
+        })
+        .map(file => ({
+          type : file.is_folder ? "dir" : "file",
+          name : file.name,
+          size : file.size,
+          modified : file.modified,
+        }))
       this.finish()
     }catch(e){
       console.error("pCloud list error:", e)
@@ -241,8 +279,17 @@ export class Load{
 
   // ============================================================
   finish(){
+    this.stop_progress_timer()
+    Loading.set_rate(100)
+
+    // callback（View描画）を先に実行し、描画完了後にプログレスを消す
     if(this.options.callback){
       this.options.callback(this)
     }
+
+    // 描画が反映された後にプログレスを非表示
+    requestAnimationFrame(() => {
+      Loading.set_status('passive')
+    })
   }
 }

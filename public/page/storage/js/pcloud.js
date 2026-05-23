@@ -4,6 +4,8 @@
  * PHP プロキシ（pcloud_webdav.php）を経由して pCloud WebDAV にアクセスする。
  * 認証情報（email/password）は localStorage に保存し、リクエスト時に送信する。
  */
+import { Loading } from "../../../asset/js/loading/loading.js"
+
 export class PCloud{
 
   // ============================================================
@@ -75,6 +77,7 @@ export class PCloud{
    * 認証情報が正しいかテスト（一覧取得で確認）
    */
   static async test_auth(email, password){
+    console.log("[pCloud] test_auth: sending request...", { email, path: "/" })
     const response = await fetch(PCloud.PROXY_URL + "?action=list", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -84,8 +87,13 @@ export class PCloud{
         path     : "/",
       }),
     })
+    console.log("[pCloud] test_auth: HTTP status =", response.status)
     const data = await response.json()
+    console.log("[pCloud] test_auth: response data =", JSON.stringify(data, null, 2))
     if(data.result === "error"){
+      if(data.debug){
+        console.error("[pCloud] test_auth: debug info =", data.debug)
+      }
       throw new Error(data.message)
     }
     return data
@@ -200,24 +208,39 @@ export class PCloud{
       throw new Error("pCloud: 認証情報が設定されていません。")
     }
 
-    const response = await fetch(PCloud.PROXY_URL + "?action=download", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email    : config.email,
-        password : config.password,
-        filepath : filepath,
-      }),
-    })
+    new Loading({ type: "plane" })
+    Loading.set_status('active')
+    Loading.set_rate(10)
 
-    // エラーチェック（JSON が返ってきた場合はエラー）
-    const content_type = response.headers.get("content-type") || ""
-    if(content_type.includes("application/json")){
-      const data = await response.json()
-      throw new Error(data.message || "ダウンロードに失敗しました")
+    try{
+      const response = await fetch(PCloud.PROXY_URL + "?action=download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email    : config.email,
+          password : config.password,
+          filepath : filepath,
+        }),
+      })
+
+      Loading.set_rate(50)
+
+      // エラーチェック（JSON が返ってきた場合はエラー）
+      const content_type = response.headers.get("content-type") || ""
+      if(content_type.includes("application/json")){
+        const data = await response.json()
+        Loading.set_status('passive')
+        throw new Error(data.message || "ダウンロードに失敗しました")
+      }
+
+      const blob = await response.blob()
+      Loading.set_rate(100)
+      setTimeout(() => Loading.set_status('passive'), 300)
+      return blob
+    }catch(e){
+      Loading.set_status('passive')
+      throw e
     }
-
-    return await response.blob()
   }
 
   // ============================================================

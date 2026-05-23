@@ -42,11 +42,17 @@ export class Breadcrumps{
     }
     for(let i = 0; i < this.links.length; i++){
       const link = this.links[i]
-      const a = document.createElement('a')
-      a.textContent = link.name
-      a.href = `${url}?p=shelf&source=${source}&dir=${encodeURIComponent(link.dir)}`
-      this.elm.appendChild(a)
-      if(i < this.links.length - 1){
+      const is_current = (i === this.links.length - 1)
+      if(is_current){
+        const span = document.createElement('span')
+        span.textContent = link.name
+        span.className = 'breadcrumps-current'
+        this.elm.appendChild(span)
+      }else{
+        const a = document.createElement('a')
+        a.textContent = link.name
+        a.href = `${url}?p=shelf&source=${source}&dir=${encodeURIComponent(link.dir)}`
+        this.elm.appendChild(a)
         this.elm.innerHTML += " / "
       }
     }

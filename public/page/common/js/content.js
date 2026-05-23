@@ -29,23 +29,15 @@ export class Content{
     const xhr = new XMLHttpRequest()
     xhr.open('get' , `page/${this.page_name}/${this.file_name}.html` , true)
     xhr.setRequestHeader('Content-Type', 'text/html');
+    xhr.onerror = () => {}
     xhr.onload = this.loaded.bind(this)
     xhr.send()
   }
 
   loaded(e){
     const html = this.convert_html(e.target.response)
-    // this.check_load_modules(main)
     this.elm_root.innerHTML = html
-    // this.elm_root.parentNode.replaceChild(main, this.elm_root)
-    // this.menu_load()
-    // if(Asset.page_name === 'index'){
-    //   // Asset.top_menu.innerHTML = Asset.aside_menu.querySelector(':scope > ul').innerHTML
-    //   // Asset.aside_menu.style.display = 'none'
-    // }
-
     this.set_scripts()
-    // this.module_loaded(e)
   }
 
   convert_html(html){

@@ -13,11 +13,17 @@ ul.lists li{
   margin:0;
   padding:10px 0;
   
-  /* cursor:pointer; */
+  cursor:pointer;
   width:120px;
   margin:5px;
   border:1px solid transparent;
   vertical-align:top;
+  border-radius:4px;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+ul.lists li:hover{
+  background-color:rgba(0,0,0,0.04);
+  border-color:rgba(0,0,0,0.12);
 }
 ul.lists li[data-status="active"]{
   border:1px dashed #666;

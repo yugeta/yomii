@@ -325,10 +325,12 @@ class MyPage{
 
     btn.disabled = true
     btn.textContent = "認証テスト中..."
+    console.log("[pCloud] on_pcloud_save: starting auth test...")
 
     try{
       // 認証テスト
-      await PCloud.test_auth(email, password)
+      const result = await PCloud.test_auth(email, password)
+      console.log("[pCloud] on_pcloud_save: auth test succeeded", result)
 
       // 成功 → 保存
       PCloud.save_config({
@@ -344,7 +346,8 @@ class MyPage{
       document.querySelector(".input-pcloud-password").value = ""
       this.update_status()
     }catch(err){
-      console.error("pCloud auth error:", err)
+      console.error("[pCloud] on_pcloud_save: auth failed", err)
+      console.error("[pCloud] on_pcloud_save: error message =", err.message)
       alert(`pCloud 連携エラー: ${err.message}`)
     }finally{
       btn.disabled = false

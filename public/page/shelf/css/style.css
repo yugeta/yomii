@@ -171,6 +171,9 @@ ul.lists[data-view="list"] li{
 ul.lists[data-view="list"] li:last-child{
   border-bottom: none;
 }
+ul.lists[data-view="list"] li:hover{
+  background-color: rgba(0,0,0,0.04);
+}
 ul.lists[data-view="list"] li[data-status="active"]{
   background-color: #e3f2fd;
   border-bottom: 1px solid #90caf9;

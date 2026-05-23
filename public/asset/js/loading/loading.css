@@ -83,9 +83,10 @@ div.loading .loading-progress .loading-bar{
   mix-blend-mode:difference;
 
   transition-property: width;
-  transition-duration:1.5s;
+  transition-duration:0.4s;
+  transition-timing-function: ease-out;
 }
 div.loading[data-type="plane"] .loading-progress .loading-bar{
-  transition-duration:0.1s;
+  transition-duration:0.15s;
 }
 

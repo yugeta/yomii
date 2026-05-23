@@ -167,34 +167,61 @@ function handle_list() {
             'Depth: 1',
         ],
         CURLOPT_USERPWD        => $email . ':' . $password,
-        CURLOPT_HTTPAUTH       => CURLAUTH_BASIC,
+        CURLOPT_HTTPAUTH       => CURLAUTH_ANY,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_TIMEOUT        => 30,
+        CURLOPT_HEADER         => true,
     ]);
 
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+    $curl_debug = [
+        'total_time'       => curl_getinfo($ch, CURLINFO_TOTAL_TIME),
+        'primary_ip'       => curl_getinfo($ch, CURLINFO_PRIMARY_IP),
+        'redirect_count'   => curl_getinfo($ch, CURLINFO_REDIRECT_COUNT),
+        'effective_url'    => curl_getinfo($ch, CURLINFO_EFFECTIVE_URL),
+        'ssl_verify_result'=> curl_getinfo($ch, CURLINFO_SSL_VERIFYRESULT),
+        'response_headers' => substr($response ?: '', 0, $header_size),
+    ];
+    $response_body = substr($response ?: '', $header_size);
     $error = curl_error($ch);
     curl_close($ch);
 
     if ($error) {
-        echo json_encode(['result' => 'error', 'message' => 'cURL error: ' . $error]);
+        echo json_encode(['result' => 'error', 'message' => 'cURL error: ' . $error, 'debug' => $curl_debug]);
         return;
     }
 
     if ($http_code === 401) {
-        echo json_encode(['result' => 'error', 'message' => '認証に失敗しました。']);
+        echo json_encode([
+            'result'    => 'error',
+            'message'   => '認証に失敗しました。',
+            'debug'     => array_merge($curl_debug, [
+                'http_code' => $http_code,
+                'url'       => $url,
+                'response'  => mb_substr($response_body ?: '', 0, 1000),
+            ]),
+        ]);
         return;
     }
 
     if ($http_code !== 207) {
-        echo json_encode(['result' => 'error', 'message' => "一覧取得失敗 (HTTP $http_code)"]);
+        echo json_encode([
+            'result'  => 'error',
+            'message' => "一覧取得失敗 (HTTP $http_code)",
+            'debug'   => array_merge($curl_debug, [
+                'http_code' => $http_code,
+                'url'       => $url,
+                'response'  => mb_substr($response_body ?: '', 0, 1000),
+            ]),
+        ]);
         return;
     }
 
-    // XML パース
-    $files = parse_propfind_response($response, $path);
+    // XML パース（ヘッダー部分を除いたボディのみ渡す）
+    $files = parse_propfind_response($response_body, $path);
     echo json_encode(['result' => 'success', 'files' => $files]);
 }
 
