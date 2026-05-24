@@ -6,6 +6,7 @@
  */
 import { SourceRegistry } from "./source_registry.js"
 import { PCloudShare } from "../../storage/js/pcloud_share.js"
+import { GoogleDriveShare } from "../../storage/js/google_drive_share.js"
 
 export class AddDialog {
 
@@ -88,13 +89,12 @@ export class AddDialog {
             <span class="source-desc">公開フォルダのURLを入力</span>
           </span>
         </button>
-        <button class="add-source-option" data-type="google_drive" disabled>
+        <button class="add-source-option" data-type="google_drive_share">
           <span class="source-icon">📄</span>
           <span class="source-info">
-            <span class="source-name">Google Drive</span>
-            <span class="source-desc">Google DriveのフォルダURL</span>
+            <span class="source-name">Google Drive 共有フォルダ</span>
+            <span class="source-desc">共有フォルダのURLを入力</span>
           </span>
-          <span class="source-badge">準備中</span>
         </button>
       </div>
 
@@ -111,6 +111,23 @@ export class AddDialog {
         <div class="add-dialog-error"></div>
         <div class="form-actions">
           <button class="btn-connect">接続</button>
+        </div>
+      </div>
+
+      <div class="add-dialog-form" data-form="google_drive_share">
+        <button class="form-back">← 戻る</button>
+        <label for="gdrive-name">タブ名（任意）</label>
+        <input type="text" id="gdrive-name" placeholder="例: マンガ共有" maxlength="50">
+        <label for="gdrive-url" style="margin-top:12px;">Google Drive 共有フォルダ URL</label>
+        <input type="url" id="gdrive-url" placeholder="https://drive.google.com/drive/folders/XXXXX">
+        <p class="form-hint">※ フォルダの共有設定で「リンクを知っている全員」に設定してください</p>
+        <div class="add-dialog-loading">
+          <span class="spinner"></span>
+          <span>接続を確認中...</span>
+        </div>
+        <div class="add-dialog-error"></div>
+        <div class="form-actions">
+          <button class="btn-connect-gdrive">接続</button>
         </div>
       </div>
     `
@@ -144,6 +161,17 @@ export class AddDialog {
     pcloud_form.querySelector("#pcloud-url").addEventListener("keydown", (e) => {
       if (e.key === "Enter") this.connect_pcloud(dialog)
     })
+
+    const gdrive_form = dialog.querySelector('.add-dialog-form[data-form="google_drive_share"]')
+    gdrive_form.querySelector(".form-back").addEventListener("click", () => {
+      this.show_source_list(dialog)
+    })
+    gdrive_form.querySelector(".btn-connect-gdrive").addEventListener("click", () => {
+      this.connect_google_drive(dialog)
+    })
+    gdrive_form.querySelector("#gdrive-url").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") this.connect_google_drive(dialog)
+    })
   }
 
   // ============================================================
@@ -157,6 +185,9 @@ export class AddDialog {
         break
       case "pcloud_share":
         this.show_pcloud_form(dialog)
+        break
+      case "google_drive_share":
+        this.show_google_drive_form(dialog)
         break
     }
   }
@@ -317,6 +348,74 @@ export class AddDialog {
       return url
     }
     return null
+  }
+
+  // ============================================================
+  // Google Drive 共有フォルダ
+  // ============================================================
+
+  show_google_drive_form(dialog) {
+    dialog.querySelector(".add-dialog-sources").style.display = "none"
+    const form = dialog.querySelector('.add-dialog-form[data-form="google_drive_share"]')
+    form.classList.add("active")
+    this.clear_error(dialog)
+    form.querySelector("#gdrive-url").focus()
+  }
+
+  async connect_google_drive(dialog) {
+    const form = dialog.querySelector('.add-dialog-form[data-form="google_drive_share"]')
+    const url_input = form.querySelector("#gdrive-url")
+    const name_input = form.querySelector("#gdrive-name")
+    const url = url_input.value.trim()
+    const custom_name = name_input.value.trim()
+
+    const folder_id = GoogleDriveShare.extract_folder_id(url)
+    if (!folder_id) {
+      this.show_error(dialog, "有効な Google Drive 共有フォルダ URL を入力してください。\n例: https://drive.google.com/drive/folders/XXXXX")
+      return
+    }
+
+    // 重複チェック
+    const sources = SourceRegistry.list()
+    const duplicate = sources.find(s => s.type === "google_drive_share" && s.folder_id === folder_id)
+    if (duplicate) {
+      this.show_error(dialog, "このフォルダは既に追加されています。")
+      return
+    }
+
+    this.show_loading(dialog)
+    const btn = form.querySelector(".btn-connect-gdrive")
+    if (btn) btn.disabled = true
+
+    try {
+      const result = await GoogleDriveShare.list_files(folder_id)
+
+      const file_count = (result.files || []).filter(f => f.name.endsWith(".yomii")).length
+      const display_name = custom_name || `Google Drive (${file_count}冊)`
+
+      const entry = SourceRegistry.add({
+        type: "google_drive_share",
+        name: display_name,
+        connection: { folder_id, url },
+      })
+
+      this.hide_loading(dialog)
+      this.close()
+
+      if (this.on_added) {
+        this.on_added(entry)
+      }
+    } catch (e) {
+      this.hide_loading(dialog)
+      if (btn) btn.disabled = false
+
+      const msg = e.message || ""
+      if (msg.includes("404") || msg.includes("notFound")) {
+        this.show_error(dialog, "フォルダが見つかりません。共有設定で「リンクを知っている全員」に設定されているか確認してください。")
+      } else {
+        this.show_error(dialog, `接続に失敗しました: ${msg || "ネットワーク接続を確認してください。"}`)
+      }
+    }
   }
 
   // ============================================================

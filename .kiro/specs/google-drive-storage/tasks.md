@@ -6,8 +6,8 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
 
 ## Tasks
 
-- [ ] 1. GoogleDrive クラスの API 基盤強化
-  - [ ] 1.1 `api_get` メソッドをエラーハンドリング強化版に改修する
+- [x] 1. GoogleDrive クラスの API 基盤強化
+  - [x] 1.1 `api_get` メソッドをエラーハンドリング強化版に改修する
     - 401: localStorage からトークン削除 + 再認証エラー throw
     - 403: レートリミットエラー throw
     - 404: リソース不在エラー throw
@@ -18,7 +18,7 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - ファイル: `public/page/storage/js/google_drive.js`
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8_
 
-  - [ ] 1.2 `api_delete` メソッドを追加する
+  - [x] 1.2 `api_delete` メソッドを追加する
     - DELETE リクエスト用メソッド（`api_get` と同じエラーハンドリングパターン）
     - AbortController による60秒タイムアウト
     - ファイル: `public/page/storage/js/google_drive.js`
@@ -42,19 +42,19 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - 401 レスポンス時に localStorage からトークン削除 + エラー throw を検証
     - テストファイル: `tests/google-drive-storage/properties/token-cleanup.test.js`
 
-- [ ] 2. GoogleDrive クラスのファイル操作メソッド追加
-  - [ ] 2.1 `resolve_folder_path` メソッドを追加する
+- [x] 2. GoogleDrive クラスのファイル操作メソッド追加
+  - [x] 2.1 `resolve_folder_path` メソッドを追加する
     - スラッシュ区切りパス文字列を受け取り、各セグメントを順に親フォルダ ID で検索してフォルダ ID を解決
     - 中間セグメントが見つからない場合はエラー throw
     - ファイル: `public/page/storage/js/google_drive.js`
     - _Requirements: 3.1, 3.2, 3.4, 3.5_
 
-  - [ ] 2.2 `find_file_by_name` メソッドを追加する
+  - [x] 2.2 `find_file_by_name` メソッドを追加する
     - 指定フォルダ内の同名ファイルを検索し、ファイル ID or null を返す
     - ファイル: `public/page/storage/js/google_drive.js`
     - _Requirements: 6.5_
 
-  - [ ] 2.3 `list_files` メソッドを追加する
+  - [x] 2.3 `list_files` メソッドを追加する
     - `ensure_folder` で Yomii フォルダ ID を取得
     - Google Drive API v3 files.list で parent=folder_id のファイル一覧取得
     - pageToken によるページネーション（全件取得まで繰り返し）
@@ -63,13 +63,13 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - ファイル: `public/page/storage/js/google_drive.js`
     - _Requirements: 2.1, 2.2, 2.5, 2.6, 2.10, 2.11_
 
-  - [ ] 2.4 `list_files_path` メソッドを追加する
+  - [x] 2.4 `list_files_path` メソッドを追加する
     - `dir` パラメータのパス文字列を受け取り、`resolve_folder_path` でフォルダ ID を解決
     - 解決したフォルダ ID 配下のファイル一覧を取得（最大1000件）
     - ファイル: `public/page/storage/js/google_drive.js`
     - _Requirements: 3.1, 3.2_
 
-  - [ ] 2.5 `download_file` メソッドを追加する
+  - [x] 2.5 `download_file` メソッドを追加する
     - files.get (alt=media) で Blob をダウンロード
     - Loading パターン: set_status('active') → set_rate(10) → set_rate(50) → set_rate(100) → set_status('passive')
     - 120秒タイムアウト
@@ -77,12 +77,12 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - ファイル: `public/page/storage/js/google_drive.js`
     - _Requirements: 4.1, 4.2, 4.6, 4.7, 4.8_
 
-  - [ ] 2.6 `delete_file` メソッドを追加する
+  - [x] 2.6 `delete_file` メソッドを追加する
     - `api_delete` を使用して files.delete を実行
     - ファイル: `public/page/storage/js/google_drive.js`
     - _Requirements: 5.3, 5.6_
 
-  - [ ] 2.7 `get_storage_quota` メソッドを追加する
+  - [x] 2.7 `get_storage_quota` メソッドを追加する
     - about.get (fields: storageQuota) でストレージ使用量・上限を取得
     - `{ usage, limit, remaining }` 形式（数値、バイト単位）で返す
     - ファイル: `public/page/storage/js/google_drive.js`
@@ -103,8 +103,8 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
 - [ ] 3. Checkpoint - API 基盤とファイル操作メソッドの確認
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. 純粋関数の抽出とテスト
-  - [ ] 4.1 純粋関数モジュール `google_drive_utils.js` を作成する
+- [x] 4. 純粋関数の抽出とテスト
+  - [x] 4.1 純粋関数モジュール `google_drive_utils.js` を作成する
     - `transform_file_entry(api_file)` — API レスポンスを内部形式に変換
     - `filter_file_list(files)` — 隠しファイル除外 + .yomii / ディレクトリのみフィルタ
     - `sort_file_list(files)` — ディレクトリ優先 + 名前順ソート
@@ -140,8 +140,8 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - **Validates: Requirements 7.3**
     - テストファイル: `tests/google-drive-storage/properties/aggregate-file-stats.test.js`
 
-- [ ] 5. Load モジュールへの Google Drive ソース統合
-  - [ ] 5.1 `load_google_drive` メソッドを Load クラスに追加する
+- [x] 5. Load モジュールへの Google Drive ソース統合
+  - [x] 5.1 `load_google_drive` メソッドを Load クラスに追加する
     - `GoogleDrive.is_authenticated()` で認証チェック → 未認証時は error_message 設定 + finish()
     - URL パラメータ `dir` がある場合は `list_files_path(dir)` を呼び出し
     - `dir` がない場合は `list_files()` を呼び出し
@@ -151,13 +151,13 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - ファイル: `public/page/shelf/js/load.js`
     - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
-  - [ ] 5.2 Load コンストラクタの switch 文に `case "google_drive"` を追加する
+  - [x] 5.2 Load コンストラクタの switch 文に `case "google_drive"` を追加する
     - `this.load_google_drive()` を呼び出す
     - ファイル: `public/page/shelf/js/load.js`
     - _Requirements: 11.1_
 
-- [ ] 6. Event モジュールへの Google Drive 操作追加
-  - [ ] 6.1 `open_google_drive_book` メソッドを Event クラスに追加する
+- [x] 6. Event モジュールへの Google Drive 操作追加
+  - [x] 6.1 `open_google_drive_book` メソッドを Event クラスに追加する
     - source_path を `google_drive://{fileId}` 形式で構築
     - `BookCache.get_or_download(source_path, name, download_fn)` を呼び出し
     - download_fn は `GoogleDrive.download_file(fileId)` を使用
@@ -165,7 +165,7 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - ファイル: `public/page/shelf/js/event.js`
     - _Requirements: 4.1, 4.3, 4.4, 4.5_
 
-  - [ ] 6.2 `delete_google_drive_book` メソッドを Event クラスに追加する
+  - [x] 6.2 `delete_google_drive_book` メソッドを Event クラスに追加する
     - 確認ダイアログ表示（「この書籍を Google Drive から削除しますか？」）
     - 削除ボタン無効化 + ローディング表示
     - `GoogleDrive.delete_file(fileId)` を呼び出し
@@ -174,19 +174,19 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - ファイル: `public/page/shelf/js/event.js`
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9_
 
-  - [ ] 6.3 `click_file` メソッドの switch 文に `case "google_drive"` を追加する
+  - [x] 6.3 `click_file` メソッドの switch 文に `case "google_drive"` を追加する
     - `this.open_google_drive_book(li)` を呼び出す
     - ファイル: `public/page/shelf/js/event.js`
     - _Requirements: 4.1_
 
-  - [ ] 6.4 `on_cache_add` メソッドに Google Drive ソースの処理を追加する
+  - [x] 6.4 `on_cache_add` メソッドに Google Drive ソースの処理を追加する
     - source === "google_drive" の場合、source_path を `google_drive://{fileId}` で構築
     - `BookCache.get_or_download` で GoogleDrive.download_file を使用
     - ファイル: `public/page/shelf/js/event.js`
     - _Requirements: 4.1, 4.3_
 
-- [ ] 7. HTML と UI の変更
-  - [ ] 7.1 本棚ページの HTML に Google Drive タブを追加する
+- [x] 7. HTML と UI の変更
+  - [x] 7.1 本棚ページの HTML に Google Drive タブを追加する
     - `<option value="google_drive">Google Drive</option>` をプルダウンに追加
     - `<button class="shelf-tab" data-source="google_drive">Google Drive</button>` をタブ列に追加
     - ストレージ容量表示エリア `<div class="google-drive-quota">` を追加
@@ -194,13 +194,13 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - ファイル: `public/page/shelf/index.html`
     - _Requirements: 1.1, 8.1, 9.2_
 
-  - [ ] 7.2 Main モジュールの `get_empty_message` に `case "google_drive"` を追加する
+  - [x] 7.2 Main モジュールの `get_empty_message` に `case "google_drive"` を追加する
     - 未認証時: 認証促進メッセージ + 「Google Drive に接続」ボタン
     - フォルダ空時: 「書籍がありません。変換ページからアップロードしてください。」
     - ファイル: `public/page/shelf/js/main.js`
     - _Requirements: 1.2, 2.7_
 
-  - [ ] 7.3 Main モジュールの `view` メソッドにストレージ容量表示を追加する
+  - [x] 7.3 Main モジュールの `view` メソッドにストレージ容量表示を追加する
     - source === "google_drive" かつ認証済みの場合、`GoogleDrive.get_storage_quota()` を呼び出し
     - `format_storage_size` で使用量・上限・残り容量をフォーマット
     - `check_low_storage` で警告判定
@@ -208,21 +208,21 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - ファイル: `public/page/shelf/js/main.js`
     - _Requirements: 9.1, 9.2, 9.3, 9.4_
 
-  - [ ] 7.4 Main モジュールにキャッシュ状態アイコン表示を追加する
+  - [x] 7.4 Main モジュールにキャッシュ状態アイコン表示を追加する
     - source === "google_drive" の場合、各書籍の `source_path` で BookCache.get_meta を確認
     - キャッシュ済み: 端末アイコン、クラウドのみ: クラウドアイコンを書籍名横に表示
     - 3秒以内に全書籍のキャッシュ状態判定を完了
     - ファイル: `public/page/shelf/js/main.js`
     - _Requirements: 7.1, 7.2, 7.5, 7.6_
 
-  - [ ] 7.5 Main モジュールに接続解除ボタンのバインドを追加する
+  - [x] 7.5 Main モジュールに接続解除ボタンのバインドを追加する
     - 確認ダイアログ表示（「Google Drive との接続を解除しますか？ローカルキャッシュは保持されます。」）
     - `GoogleDrive.logout()` でトークン削除
     - UI を未認証状態に更新
     - ファイル: `public/page/shelf/js/main.js`
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7_
 
-  - [ ] 7.6 Main モジュールに「Google Drive に接続」ボタンのバインドを追加する
+  - [x] 7.6 Main モジュールに「Google Drive に接続」ボタンのバインドを追加する
     - `GoogleDrive.start_auth()` を呼び出し
     - 認証成功後にページリロードで書籍一覧を表示
     - キャンセル時・エラー時のメッセージ表示
@@ -232,8 +232,8 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
 - [ ] 8. Checkpoint - UI 統合の確認
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. パンくずナビゲーションの Google Drive 対応
-  - [ ] 9.1 Breadcrumps クラスを Google Drive ソースに対応させる
+- [x] 9. パンくずナビゲーションの Google Drive 対応
+  - [x] 9.1 Breadcrumps クラスを Google Drive ソースに対応させる
     - source === "google_drive" の場合、ルートリンクのテキストを「Yomii」に変更
     - `generate_breadcrumbs` ユーティリティ関数を使用してリンク配列を生成
     - 各リンクの href に `dir` パラメータとして部分パスを設定
@@ -241,8 +241,8 @@ Google Drive を Yomii 本棚ページのストレージバックエンドとし
     - ファイル: `public/page/shelf/js/breadcrumps.js`
     - _Requirements: 3.3_
 
-- [ ] 10. アップロード機能の拡張
-  - [ ] 10.1 Event モジュールにキャッシュタブからの Google Drive アップロード機能を追加する
+- [x] 10. アップロード機能の拡張
+  - [x] 10.1 Event モジュールにキャッシュタブからの Google Drive アップロード機能を追加する
     - ローカルキャッシュタブの書籍に「Google Drive にアップロード」導線を追加
     - 未認証時は OAuth 認証フローを開始し、認証完了後にアップロード実行
     - `ensure_folder` → `find_file_by_name` で同名ファイル確認 → 確認ダイアログ → `upload_file`

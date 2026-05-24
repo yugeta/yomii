@@ -6,6 +6,9 @@ import { Urlinfo } from "../../../asset/js/lib/urlinfo.js"
 import { SourceRegistry } from './source_registry.js'
 import { AddDialog } from './add_dialog.js'
 import { TabInfoDialog } from './tab_info_dialog.js'
+import { GoogleDrive } from "../../storage/js/google_drive.js"
+import { BookCache } from "../../storage/js/book_cache.js"
+import { format_storage_size, check_low_storage, aggregate_file_stats } from "../../storage/js/google_drive_utils.js"
 
 export class Main{
   constructor(options){
@@ -48,11 +51,29 @@ export class Main{
       toolbar.style.display = (source === "cache") ? "" : "none"
     }
 
+    // Google Drive ヘッダーの表示制御
+    const gd_header = document.querySelector(".google-drive-header")
+    if(gd_header){
+      gd_header.style.display = (source === "google_drive") ? "" : "none"
+    }
+
     if(load_cls.error_message){
       document.querySelector("ul.lists").innerHTML = ""
       if(empty_el){
         empty_el.style.display = ""
-        empty_el.textContent = load_cls.error_message
+        // Google Drive 未認証時は接続ボタンを表示
+        if(source === "google_drive" && !GoogleDrive.is_authenticated()){
+          empty_el.innerHTML = `
+            <p class="empty-title">${load_cls.error_message}</p>
+            <p><button class="btn-google-drive-connect">Google Drive に接続</button></p>
+          `
+          const btn = empty_el.querySelector(".btn-google-drive-connect")
+          if(btn){
+            btn.addEventListener("click", () => this.on_google_drive_connect())
+          }
+        }else{
+          empty_el.textContent = load_cls.error_message
+        }
       }
       return
     }
@@ -85,6 +106,11 @@ export class Main{
     // キャッシュタブの場合、容量情報を表示
     if(source === "cache" && toolbar){
       this.update_cache_info()
+    }
+
+    // Google Drive タブの場合、ヘッダー表示
+    if(source === "google_drive"){
+      this.show_google_drive_header(load_cls.datas)
     }
   }
 
@@ -286,6 +312,15 @@ export class Main{
           </ol>
           <p class="empty-note">※ <a href="./?p=mypage">マイページ</a>で pCloud 連携が完了している必要があります</p>
         `
+      case "google_drive":
+        return `
+          <p class="empty-title">Google Drive に書籍がありません</p>
+          <p class="empty-help">書籍を追加するには：</p>
+          <ol class="empty-steps">
+            <li><a href="./?p=convert">アップロード</a>ページで書籍ファイルを変換し、Google Drive に保存する</li>
+            <li>または、Google Drive の「Yomii」フォルダに .yomii ファイルを直接配置する</li>
+          </ol>
+        `
       case "pcloud_share":
         return `
           <p class="empty-title">共有本棚に書籍がありません</p>
@@ -478,6 +513,95 @@ export class Main{
     const div = document.createElement("div")
     div.textContent = str
     return div.innerHTML
+  }
+
+  // ============================================================
+  // Google Drive ヘッダー管理
+  // ============================================================
+
+  /**
+   * Google Drive ヘッダー（容量表示・接続解除ボタン）を表示
+   */
+  show_google_drive_header(datas){
+    const header = document.querySelector(".google-drive-header")
+    if(!header) return
+
+    header.style.display = ""
+
+    // ファイル統計表示
+    const stats = aggregate_file_stats(datas || [])
+    const quota_el = header.querySelector(".google-drive-quota")
+    if(quota_el){
+      const size_str = format_storage_size(stats.total_size)
+      quota_el.textContent = `${stats.count} 冊 / ${size_str}`
+    }
+
+    // 接続解除ボタン
+    const disconnect_btn = header.querySelector(".btn-google-drive-disconnect")
+    if(disconnect_btn){
+      disconnect_btn.style.display = ""
+      disconnect_btn.onclick = () => this.on_google_drive_disconnect()
+    }
+
+    // ストレージ容量を非同期で取得
+    this.load_google_drive_quota()
+  }
+
+  /**
+   * Google Drive ストレージ容量を取得して表示
+   */
+  async load_google_drive_quota(){
+    const quota_el = document.querySelector(".google-drive-quota")
+    if(!quota_el) return
+
+    try{
+      const quota = await GoogleDrive.get_storage_quota()
+      const usage_str = format_storage_size(quota.usage)
+      const limit_str = format_storage_size(quota.limit)
+      const remaining_str = format_storage_size(quota.remaining)
+
+      let text = `使用: ${usage_str} / ${limit_str}（残り ${remaining_str}）`
+      if(check_low_storage(quota.remaining)){
+        text += " ⚠️ 容量が少なくなっています"
+      }
+      quota_el.textContent = text
+    }catch(e){
+      // 容量取得失敗時は非表示（書籍一覧に影響しない）
+      console.error("Google Drive quota error:", e)
+    }
+  }
+
+  /**
+   * Google Drive 接続解除
+   */
+  on_google_drive_disconnect(){
+    if(!confirm("Google Drive との接続を解除しますか？ローカルキャッシュは保持されます。")) return
+
+    try{
+      GoogleDrive.logout()
+      // ページリロードで未認証状態に
+      const params = new URLSearchParams(location.search)
+      params.set("source", "google_drive")
+      location.search = params.toString()
+    }catch(e){
+      alert(`接続解除に失敗しました: ${e.message}`)
+    }
+  }
+
+  /**
+   * Google Drive に接続（OAuth 認証フロー開始）
+   */
+  async on_google_drive_connect(){
+    try{
+      await GoogleDrive.start_auth()
+      // 認証成功 → ページリロード
+      const params = new URLSearchParams(location.search)
+      params.set("source", "google_drive")
+      location.search = params.toString()
+    }catch(e){
+      console.error("Google Drive auth error:", e)
+      alert(`Google Drive 認証に失敗しました: ${e.message}`)
+    }
   }
 }
 

@@ -39,6 +39,9 @@ export class View{
       if(data.fileid){
         li.setAttribute("data-fileid", data.fileid)
       }
+      if(data.file_id){
+        li.setAttribute("data-file_id", data.file_id)
+      }
       if(data.folderid){
         li.setAttribute("data-folderid", data.folderid)
       }

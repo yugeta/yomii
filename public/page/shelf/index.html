@@ -9,17 +9,24 @@
     <option value="cache">キャッシュ</option>
     <option value="local">ローカル</option>
     <option value="pcloud">pCloud</option>
+    <option value="google_drive">Google Drive</option>
     <option value="sample">サンプル</option>
   </select>
   <button class="shelf-tab active" data-source="cache">キャッシュ</button>
   <button class="shelf-tab" data-source="local">ローカル</button>
   <button class="shelf-tab" data-source="pcloud">pCloud</button>
+  <button class="shelf-tab" data-source="google_drive">Google Drive</button>
   <button class="shelf-tab" data-source="sample">サンプル</button>
   <button class="shelf-tab-add" aria-label="本棚を追加" title="本棚を追加">+</button>
   <div class="shelf-view-toggle">
     <button class="view-btn active" data-view="icon" title="アイコン表示">⊞</button>
     <button class="view-btn" data-view="list" title="リスト表示">☰</button>
   </div>
+</div>
+
+<div class="google-drive-header" style="display:none;">
+  <span class="google-drive-quota"></span>
+  <button class="btn-google-drive-disconnect" style="display:none;">接続を解除</button>
 </div>
 
 <div class='breadcrumps'></div>

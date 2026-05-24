@@ -1,8 +1,11 @@
 import { PCloud } from "../../storage/js/pcloud.js"
 import { PCloudShare } from "../../storage/js/pcloud_share.js"
+import { GoogleDrive } from "../../storage/js/google_drive.js"
+import { GoogleDriveShare } from "../../storage/js/google_drive_share.js"
 import { BookCache } from "../../storage/js/book_cache.js"
 import { Loading } from "../../../asset/js/loading/loading.js"
 import { SourceRegistry } from "./source_registry.js"
+import { filter_file_list, sort_file_list } from "../../storage/js/google_drive_utils.js"
 
 export class Load{
   constructor(options){
@@ -22,6 +25,12 @@ export class Load{
         break
       case "pcloud_share":
         this.load_pcloud_share()
+        break
+      case "google_drive":
+        this.load_google_drive()
+        break
+      case "google_drive_share":
+        this.load_google_drive_share()
         break
       case "cache":
         this.load_cache()
@@ -90,8 +99,26 @@ export class Load{
         }
       }
 
+      // サブフォルダナビゲーション: dir パラメータがあればサブフォルダに潜る
+      let target_handle = handle
+      const params = new URLSearchParams(location.search)
+      const dir = params.get("dir") || ""
+      if(dir){
+        const segments = dir.split("/").filter(s => s)
+        for(const segment of segments){
+          try{
+            target_handle = await target_handle.getDirectoryHandle(segment)
+          }catch(e){
+            this.datas = []
+            this.error_message = `フォルダ「${segment}」が見つかりません。`
+            this.finish()
+            return
+          }
+        }
+      }
+
       const files = []
-      for await(const entry of handle.values()){
+      for await(const entry of target_handle.values()){
         if(entry.kind === "file" && entry.name.endsWith(".yomii")){
           files.push({
             type : "file",
@@ -256,6 +283,103 @@ export class Load{
   }
 
   // ============================================================
+  // Google Drive
+  // ============================================================
+  async load_google_drive(){
+    if(!GoogleDrive.is_authenticated()){
+      this.datas = []
+      this.error_message = "Google Drive が連携されていません。「Google Drive に接続」ボタンから認証してください。"
+      this.finish()
+      return
+    }
+
+    try{
+      const params = new URLSearchParams(location.search)
+      const dir = params.get("dir") || ""
+
+      let files
+      if(dir){
+        files = await GoogleDrive.list_files_path(dir)
+      }else{
+        files = await GoogleDrive.list_files()
+      }
+
+      const filtered = filter_file_list(files)
+      const sorted = sort_file_list(filtered)
+
+      this.datas = sorted.map(file => ({
+        type     : file.is_folder ? "dir" : "file",
+        name     : file.name,
+        size     : file.size,
+        modified : file.modified,
+        file_id  : file.file_id,
+      }))
+      this.finish()
+    }catch(e){
+      console.error("Google Drive list error:", e)
+      this.datas = []
+      this.error_message = e.message
+      this.finish()
+    }
+  }
+
+  // ============================================================
+  // Google Drive 共有フォルダ（読み取り専用）
+  // ============================================================
+  async load_google_drive_share(){
+    const params = new URLSearchParams(location.search)
+    const folder_id = params.get("folder_id") || ""
+    const source_id = params.get("source_id") || ""
+
+    // 動的ソースの場合、SourceRegistry からフォルダIDを取得
+    let target_folder_id = folder_id
+    if(!target_folder_id && source_id){
+      const source = SourceRegistry.get(source_id)
+      if(source && source.folder_id){
+        target_folder_id = source.folder_id
+      }
+    }
+
+    if(!target_folder_id){
+      this.datas = []
+      this.error_message = "Google Drive フォルダIDが指定されていません。URLに folder_id パラメータを追加してください。"
+      this.finish()
+      return
+    }
+
+    try{
+      // サブフォルダナビゲーション: sub_folder_id が URL にあればそれを使う
+      const sub_folder_id = params.get("sub_folder_id") || ""
+      const query_folder = sub_folder_id || target_folder_id
+
+      const result = await GoogleDriveShare.list_files(query_folder)
+
+      this.datas = (result.files || [])
+        .filter(file => {
+          if(file.name.startsWith(".")) return false
+          if(file.is_folder) return true
+          return file.name.endsWith(".yomii")
+        })
+        .map(file => ({
+          type     : file.is_folder ? "dir" : "file",
+          name     : file.name,
+          size     : file.size,
+          modified : file.modified,
+          file_id  : file.file_id,
+          folderid : file.is_folder ? file.file_id : undefined,
+        }))
+
+      this.share_folder_id = target_folder_id
+      this.finish()
+    }catch(e){
+      console.error("Google Drive share list error:", e)
+      this.datas = []
+      this.error_message = e.message
+      this.finish()
+    }
+  }
+
+  // ============================================================
   // pCloud 公開リンク共有
   // ============================================================
   async load_pcloud_share(){
@@ -356,6 +480,9 @@ export class Load{
       case "pcloud_share":
         await this.load_dynamic_pcloud_share(source)
         break
+      case "google_drive_share":
+        await this.load_dynamic_google_drive_share(source)
+        break
       case "local_folder":
         await this.load_dynamic_local_folder(source)
         break
@@ -404,6 +531,51 @@ export class Load{
       this.finish()
     }catch(e){
       console.error("Dynamic pCloud share list error:", e)
+      this.datas = []
+      this.error_message = `接続に失敗しました: ${e.message}`
+      this.finish()
+    }
+  }
+
+  /**
+   * 動的 Google Drive 共有フォルダの読み込み
+   */
+  async load_dynamic_google_drive_share(source){
+    const folder_id = source.folder_id
+    if(!folder_id){
+      this.datas = []
+      this.error_message = "Google Drive フォルダIDが見つかりません。"
+      this.finish()
+      return
+    }
+
+    try{
+      // サブフォルダナビゲーション: sub_folder_id が URL にあればそれを使う
+      const params = new URLSearchParams(location.search)
+      const sub_folder_id = params.get("sub_folder_id") || ""
+      const query_folder = sub_folder_id || folder_id
+
+      const result = await GoogleDriveShare.list_files(query_folder)
+
+      this.datas = (result.files || [])
+        .filter(file => {
+          if(file.name.startsWith(".")) return false
+          if(file.is_folder) return true
+          return file.name.endsWith(".yomii")
+        })
+        .map(file => ({
+          type     : file.is_folder ? "dir" : "file",
+          name     : file.name,
+          size     : file.size,
+          modified : file.modified,
+          file_id  : file.file_id,
+          folderid : file.is_folder ? file.file_id : undefined,
+        }))
+
+      this.share_folder_id = folder_id
+      this.finish()
+    }catch(e){
+      console.error("Dynamic Google Drive share list error:", e)
       this.datas = []
       this.error_message = `接続に失敗しました: ${e.message}`
       this.finish()

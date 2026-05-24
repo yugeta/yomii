@@ -1,4 +1,5 @@
 import { Urlinfo } from "../../../asset/js/lib/urlinfo.js"
+import { generate_breadcrumbs } from "../../storage/js/google_drive_utils.js"
 
 export class Breadcrumps{
   constructor(){
@@ -7,6 +8,7 @@ export class Breadcrumps{
     if(!dir){return}
     this.clear()
     this.dir = dir
+    this.source = params.get("source") || "local"
     this.create_links()
     this.view()
   }
@@ -17,6 +19,15 @@ export class Breadcrumps{
   }
 
   create_links(){
+    // Google Drive の場合は generate_breadcrumbs ユーティリティを使用
+    if(this.source === "google_drive"){
+      const crumbs = generate_breadcrumbs(this.dir)
+      if(!crumbs) return
+      this.links = crumbs.slice(1).map(c => ({ dir: c.path, name: c.name }))
+      this.root_name = "Yomii"
+      return
+    }
+
     const dirs = this.dir.split('/')
     const links = []
     for(let i=0; i<dirs.length; i++){
@@ -26,7 +37,8 @@ export class Breadcrumps{
         name : decodeURIComponent(dirs[i].replace(/\+/g, ' ')),
       })
     }
-    this.links =  links
+    this.links = links
+    this.root_name = "Top"
     return links
   }
 
@@ -50,7 +62,7 @@ export class Breadcrumps{
 
     {
       const a = document.createElement('a')
-      a.textContent = 'Top'
+      a.textContent = this.root_name || 'Top'
       a.href = `${url}?${build_params("")}`
       this.elm.appendChild(a)
       this.elm.innerHTML += " / "

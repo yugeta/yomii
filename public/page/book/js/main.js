@@ -5,6 +5,7 @@ import { Urlinfo }   from "../../../asset/js/lib/urlinfo.js"
 import { BookCache } from "../../storage/js/book_cache.js"
 import { PCloud }    from "../../storage/js/pcloud.js"
 import { PCloudShare } from "../../storage/js/pcloud_share.js"
+import { GoogleDriveShare } from "../../storage/js/google_drive_share.js"
 
 export class Main{
   constructor(){
@@ -19,6 +20,10 @@ export class Main{
       this.load_from_pcloud(params)
     }else if(source === "pcloud_share"){
       this.load_from_pcloud_share(params)
+    }else if(source === "google_drive_share"){
+      this.load_from_google_drive_share(params)
+    }else if(source === "google_drive"){
+      this.load_from_google_drive(params)
     }else if(source === "cache"){
       this.load_from_cache(params)
     }else if(source === "local"){
@@ -83,6 +88,60 @@ export class Main{
       new Direction()
     }catch(e){
       console.error("pCloud share book load error:", e)
+      alert(`書籍の読み込みに失敗しました: ${e.message}`)
+    }
+  }
+
+  /**
+   * Google Drive 共有フォルダから書籍を読み込む（認証不要）
+   */
+  async load_from_google_drive_share(params){
+    const file_id = params.get("file_id")
+    const name    = params.get("book") || "book"
+
+    if(!file_id){
+      console.error("Google Drive share: file_id が指定されていません")
+      alert("ファイル情報が不足しています。")
+      return
+    }
+
+    try{
+      const source_path = `google_drive_share://${file_id}`
+      const blob = await BookCache.get_or_download(source_path, name, async () => {
+        return await GoogleDriveShare.download_file(file_id)
+      })
+      const file = new File([blob], name, { type: "application/zip" })
+      new Upload({ target: { files: [file] } })
+      new Direction()
+    }catch(e){
+      console.error("Google Drive share book load error:", e)
+      alert(`書籍の読み込みに失敗しました: ${e.message}`)
+    }
+  }
+
+  /**
+   * Google Drive（OAuth認証済み）から書籍を読み込む
+   */
+  async load_from_google_drive(params){
+    const file_id = params.get("file_id")
+    const name    = params.get("book") || "book"
+
+    if(!file_id){
+      console.error("Google Drive: file_id が指定されていません")
+      return
+    }
+
+    try{
+      const source_path = `google_drive://${file_id}`
+      const { GoogleDrive } = await import("../../storage/js/google_drive.js")
+      const blob = await BookCache.get_or_download(source_path, name, async () => {
+        return await GoogleDrive.download_file(file_id)
+      })
+      const file = new File([blob], name, { type: "application/zip" })
+      new Upload({ target: { files: [file] } })
+      new Direction()
+    }catch(e){
+      console.error("Google Drive book load error:", e)
       alert(`書籍の読み込みに失敗しました: ${e.message}`)
     }
   }
@@ -153,6 +212,7 @@ export class Main{
    */
   async load_from_local(params){
     const name = params.get("book") || ""
+    const dir = params.get("dir") || ""
     if(!name) return
 
     try{
@@ -163,7 +223,16 @@ export class Main{
         return
       }
 
-      const file_handle = await folder_handle.getFileHandle(name)
+      // サブフォルダに潜る
+      let target_handle = folder_handle
+      if(dir){
+        const segments = dir.split("/").filter(s => s)
+        for(const segment of segments){
+          target_handle = await target_handle.getDirectoryHandle(segment)
+        }
+      }
+
+      const file_handle = await target_handle.getFileHandle(name)
       const file = await file_handle.getFile()
 
       new Upload({ target: { files: [file] } })

@@ -1,6 +1,7 @@
 import { Main } from "./main.js"
 import { Urlinfo } from "../../../asset/js/lib/urlinfo.js"
 import { BookCache } from "../../storage/js/book_cache.js"
+import { GoogleDrive } from "../../storage/js/google_drive.js"
 import { PCloudShare } from "../../storage/js/pcloud_share.js"
 import { SourceRegistry } from "./source_registry.js"
 
@@ -151,6 +152,27 @@ export class Event{
         blob = await BookCache.get_or_download(source_path, name, async () => {
           const { PCloud } = await import("../../storage/js/pcloud.js")
           return await PCloud.download_file(pcloud_path)
+        })
+      }else if(source === "google_drive"){
+        const file_id = li.getAttribute("data-file_id") || li.getAttribute("data-fileid")
+        if(!file_id){
+          alert("ファイル情報が不足しています。")
+          return
+        }
+        source_path = `google_drive://${file_id}`
+        blob = await BookCache.get_or_download(source_path, name, async () => {
+          return await GoogleDrive.download_file(file_id)
+        })
+      }else if(source === "google_drive_share" || source.startsWith("dynamic_google_drive_share")){
+        const file_id = li.getAttribute("data-file_id") || li.getAttribute("data-fileid")
+        if(!file_id){
+          alert("ファイル情報が不足しています。")
+          return
+        }
+        source_path = `google_drive_share://${file_id}`
+        blob = await BookCache.get_or_download(source_path, name, async () => {
+          const { GoogleDriveShare } = await import("../../storage/js/google_drive_share.js")
+          return await GoogleDriveShare.download_file(file_id)
         })
       }else if(source === "pcloud_share" || source.startsWith("dynamic_pcloud_share")){
         const url_params = new URLSearchParams(location.search)
@@ -323,6 +345,9 @@ export class Event{
       case "pcloud_share":
         this.open_pcloud_share_book(li)
         break
+      case "google_drive":
+        this.open_google_drive_book(li)
+        break
       case "cache":
         this.open_cached_book(li)
         break
@@ -336,6 +361,8 @@ export class Event{
         // 動的ソース
         if(source.startsWith("dynamic_pcloud_share")){
           this.open_pcloud_share_book(li)
+        }else if(source.startsWith("dynamic_google_drive_share")){
+          this.open_google_drive_share_book(li)
         }else if(source.startsWith("dynamic_local_folder")){
           this.open_local_book(li)
         }else{
@@ -356,6 +383,171 @@ export class Event{
     params.set("path", pcloud_path)
     params.set("book", name)
     location.href = `book.html?${params.toString()}`
+  }
+
+  /**
+   * Google Drive の書籍を開く
+   * BookCache.get_or_download を使用
+   */
+  async open_google_drive_book(li){
+    const name = li.getAttribute("data-name")
+    const file_id = li.getAttribute("data-file_id") || li.getAttribute("data-fileid")
+    if(!file_id){
+      alert("ファイル情報が不足しています。")
+      return
+    }
+
+    const source_path = `google_drive://${file_id}`
+
+    try{
+      await BookCache.get_or_download(source_path, name, async () => {
+        return await GoogleDrive.download_file(file_id)
+      })
+
+      // キャッシュ済みマークを付ける
+      li.setAttribute("data-cached", "true")
+
+      const params = new URLSearchParams()
+      params.set("source", "google_drive")
+      params.set("file_id", file_id)
+      params.set("book", name)
+      location.href = `book.html?${params.toString()}`
+    }catch(e){
+      console.error("Google Drive book open error:", e)
+      alert(`書籍を開けませんでした: ${e.message}`)
+    }
+  }
+
+  /**
+   * Google Drive 共有フォルダの書籍を開く（読み取り専用、認証不要）
+   */
+  open_google_drive_share_book(li){
+    const name = li.getAttribute("data-name")
+    const file_id = li.getAttribute("data-file_id") || li.getAttribute("data-fileid")
+    if(!file_id){
+      alert("ファイル情報が不足しています。")
+      return
+    }
+
+    const url_params = new URLSearchParams(location.search)
+    const source_id = url_params.get("source_id") || ""
+
+    const params = new URLSearchParams()
+    params.set("source", "google_drive_share")
+    params.set("file_id", file_id)
+    params.set("book", name)
+    if(source_id){
+      params.set("source_id", source_id)
+    }
+    location.href = `book.html?${params.toString()}`
+  }
+
+  /**
+   * Google Drive の書籍を削除
+   */
+  async delete_google_drive_book(li){
+    const name = li.getAttribute("data-name")
+    const file_id = li.getAttribute("data-file_id") || li.getAttribute("data-fileid")
+    if(!file_id) return
+
+    if(!confirm(`「${name}」を Google Drive から削除しますか？`)) return
+
+    // 削除中は操作を無効化
+    li.setAttribute("data-deleting", "true")
+    li.style.opacity = "0.5"
+
+    try{
+      await GoogleDrive.delete_file(file_id)
+
+      // ローカルキャッシュも削除
+      const source_path = `google_drive://${file_id}`
+      const meta = await BookCache.get_meta(source_path)
+      if(meta){
+        await BookCache.remove(meta.id)
+      }
+
+      // 一覧から除去
+      li.remove()
+
+    }catch(e){
+      console.error("Google Drive delete error:", e)
+      alert(`削除に失敗しました: ${e.message}`)
+      li.removeAttribute("data-deleting")
+      li.style.opacity = ""
+    }
+  }
+
+  /**
+   * キャッシュの書籍を Google Drive にアップロード
+   */
+  async upload_to_google_drive(li){
+    const name = li.getAttribute("data-name")
+    const source_path = li.getAttribute("data-source-path") || ""
+    if(!name) return
+
+    // 認証チェック
+    if(!GoogleDrive.is_authenticated()){
+      try{
+        await GoogleDrive.start_auth()
+      }catch(e){
+        alert(`Google Drive 認証に失敗しました: ${e.message}`)
+        return
+      }
+    }
+
+    try{
+      // キャッシュから Blob を取得
+      const meta = await BookCache.get_meta(source_path)
+      if(!meta){
+        alert("キャッシュデータが見つかりません。")
+        return
+      }
+      const blob = await BookCache.get_data(meta.id)
+      if(!blob){
+        alert("キャッシュデータが見つかりません。")
+        return
+      }
+
+      // Yomii フォルダを確保
+      const folder_id = await GoogleDrive.ensure_folder()
+
+      // 同名ファイルチェック
+      const existing_id = await GoogleDrive.find_file_by_name(name, folder_id)
+      if(existing_id){
+        if(!confirm(`「${name}」は既に Google Drive に存在します。上書きしますか？`)){
+          return
+        }
+        // 既存ファイルを削除してからアップロード
+        await GoogleDrive.delete_file(existing_id)
+      }
+
+      // アップロード実行（リトライ付き）
+      let last_error = null
+      for(let attempt = 0; attempt < 3; attempt++){
+        try{
+          await GoogleDrive.upload_file(blob, name, (rate) => {
+            // プログレス表示（簡易）
+            li.style.background = `linear-gradient(to right, #e3f2fd ${rate}%, transparent ${rate}%)`
+          })
+          li.style.background = ""
+          alert(`「${name}」を Google Drive にアップロードしました。`)
+          return
+        }catch(e){
+          last_error = e
+          // 容量不足はリトライしない
+          if(e.message.includes("容量")){
+            throw e
+          }
+          await new Promise(r => setTimeout(r, 1000))
+        }
+      }
+      throw last_error
+
+    }catch(e){
+      console.error("Google Drive upload error:", e)
+      li.style.background = ""
+      alert(`アップロードに失敗しました: ${e.message}`)
+    }
   }
 
   /**
@@ -425,6 +617,11 @@ export class Event{
     const params = new URLSearchParams()
     params.set("source", "local")
     params.set("book", name)
+    // サブフォルダ内の場合は dir を引き継ぐ
+    const dir = new URLSearchParams(location.search).get("dir") || ""
+    if(dir){
+      params.set("dir", dir)
+    }
     location.href = `book.html?${params.toString()}`
   }
 
