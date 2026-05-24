@@ -6,6 +6,7 @@ import { BookCache } from "../../storage/js/book_cache.js"
 import { PCloud }    from "../../storage/js/pcloud.js"
 import { PCloudShare } from "../../storage/js/pcloud_share.js"
 import { GoogleDriveShare } from "../../storage/js/google_drive_share.js"
+import { ReadingHistory } from "../../storage/js/reading_history.js"
 
 export class Main{
   constructor(){
@@ -58,6 +59,7 @@ export class Main{
       const file = new File([blob], name, { type: "application/zip" })
       new Upload({ target: { files: [file] } })
       new Direction()
+      ReadingHistory.record({ name, source: "pcloud", source_path: path })
     }catch(e){
       console.error("pCloud book load error:", e)
       alert(`書籍の読み込みに失敗しました: ${e.message}`)
@@ -86,6 +88,7 @@ export class Main{
       const file = new File([blob], name, { type: "application/zip" })
       new Upload({ target: { files: [file] } })
       new Direction()
+      ReadingHistory.record({ name, source: "pcloud_share", source_path })
     }catch(e){
       console.error("pCloud share book load error:", e)
       alert(`書籍の読み込みに失敗しました: ${e.message}`)
@@ -113,6 +116,7 @@ export class Main{
       const file = new File([blob], name, { type: "application/zip" })
       new Upload({ target: { files: [file] } })
       new Direction()
+      ReadingHistory.record({ name, source: "google_drive_share", source_path })
     }catch(e){
       console.error("Google Drive share book load error:", e)
       alert(`書籍の読み込みに失敗しました: ${e.message}`)
@@ -140,6 +144,7 @@ export class Main{
       const file = new File([blob], name, { type: "application/zip" })
       new Upload({ target: { files: [file] } })
       new Direction()
+      ReadingHistory.record({ name, source: "google_drive", source_path })
     }catch(e){
       console.error("Google Drive book load error:", e)
       alert(`書籍の読み込みに失敗しました: ${e.message}`)
@@ -171,6 +176,7 @@ export class Main{
           const file = new File([legacy_blob], name, { type: "application/zip" })
           new Upload({ target: { files: [file] } })
           new Direction()
+          ReadingHistory.record({ name, source: "cache", source_path })
           return
         }
 
@@ -181,6 +187,7 @@ export class Main{
         const file = new File([blob], name, { type: "application/zip" })
         new Upload({ target: { files: [file] } })
         new Direction()
+        ReadingHistory.record({ name, source: "cache", source_path })
         return
       }
 
@@ -194,6 +201,7 @@ export class Main{
         const file = new File([new_blob], name, { type: "application/zip" })
         new Upload({ target: { files: [file] } })
         new Direction()
+        ReadingHistory.record({ name, source: "cache", source_path })
         return
       }
 
@@ -201,6 +209,7 @@ export class Main{
       const file = new File([blob], name, { type: "application/zip" })
       new Upload({ target: { files: [file] } })
       new Direction()
+      ReadingHistory.record({ name, source: "cache", source_path })
     }catch(e){
       console.error("Cache book load error:", e)
       alert(`書籍の読み込みに失敗しました: ${e.message}`)
@@ -237,6 +246,8 @@ export class Main{
 
       new Upload({ target: { files: [file] } })
       new Direction()
+      const source_path = dir ? `local://${dir}/${name}` : `local://${name}`
+      ReadingHistory.record({ name, source: "local", source_path })
     }catch(e){
       console.error("Local book load error:", e)
       alert(`書籍の読み込みに失敗しました: ${e.message}`)
@@ -263,6 +274,7 @@ export class Main{
 
       new Upload({ target: { files: [file] } })
       new Direction()
+      ReadingHistory.record({ name, source: "sample", source_path: path })
     }catch(e){
       console.error("Sample book load error:", e)
       alert(`サンプル書籍の読み込みに失敗しました: ${e.message}`)
